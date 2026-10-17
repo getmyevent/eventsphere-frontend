@@ -562,25 +562,27 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       api.sessions.getAll()
         .then((backendSessions) => {
           if (backendSessions && Array.isArray(backendSessions) && backendSessions.length > 0) {
-            setSessions(backendSessions.map((b: any) => ({
-              id: b.id,
-              title: b.title,
-              track: b.track,
-              day: b.day || 1,
-              timeRange: b.timeRange,
-              room: b.room,
-              speakerName: b.speakerName || '',
-              speakerDesignation: b.speakerDesignation || '',
-              speakerCompany: b.speakerCompany || '',
-              speakerId: b.speakerId || (b.speakerIds && b.speakerIds[0]) || '',
-              speakerIds: b.speakerIds || [],
-              description: b.description || '',
-              takeaways: b.takeaways || [],
-              status: b.status || 'upcoming',
-              attendanceCount: typeof b.attendanceCount === 'number' ? b.attendanceCount : 0,
-              isBookmarked: Boolean(b.isBookmarked),
-              questionsCount: typeof b.questionsCount === 'number' ? b.questionsCount : 0,
-            })));
+            setSessions((prev) => {
+              const bMap = new Map(backendSessions.map((b: any) => [b.id, b]));
+              const bTitleMap = new Map(
+                backendSessions.map((b: any) => [b.title?.toLowerCase().trim(), b])
+              );
+
+              return INITIAL_SESSIONS.map((init) => {
+                const b = bMap.get(init.id) || bTitleMap.get(init.title.toLowerCase().trim());
+                if (b) {
+                  return {
+                    ...init,
+                    panelists: (init.panelists && init.panelists.length > 0) ? init.panelists : (b.panelists || []),
+                    isBookmarked: typeof b.isBookmarked === 'boolean' ? b.isBookmarked : init.isBookmarked,
+                    attendanceCount: typeof b.attendanceCount === 'number' ? b.attendanceCount : init.attendanceCount,
+                    status: b.status || init.status,
+                    questionsCount: typeof b.questionsCount === 'number' ? b.questionsCount : init.questionsCount,
+                  };
+                }
+                return init;
+              });
+            });
           }
         })
         .catch((err) => {

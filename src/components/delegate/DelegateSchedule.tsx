@@ -16,8 +16,8 @@ import {
 } from 'lucide-react';
 
 import { useStore } from '../../lib/store';
-import { INITIAL_ATTENDEES } from '../../lib/mockData';
-import { Session, Person } from '../../types';
+import { INITIAL_ATTENDEES, INITIAL_SESSIONS } from '../../lib/mockData';
+import { Session, Person, SessionSpeakerInfo } from '../../types';
 
 const getSessionImage = (session: Session) => {
   const stageImages = [
@@ -109,6 +109,71 @@ export const DelegateSchedule: React.FC = () => {
     if (!session) return [];
 
     const speakerPool = [...attendees, ...INITIAL_ATTENDEES];
+    const initialSession =
+      INITIAL_SESSIONS.find((s: Session) => s.id === session.id) ||
+      INITIAL_SESSIONS.find((s: Session) => s.title.toLowerCase().trim() === session.title?.toLowerCase().trim());
+
+    // Priority 1: If session has explicit panelists array (or matched in INITIAL_SESSIONS), resolve each panelist
+    const panelistsList =
+      (session.panelists && session.panelists.length > 0)
+        ? session.panelists
+        : (initialSession?.panelists && initialSession.panelists.length > 0)
+        ? initialSession.panelists
+        : [];
+
+    if (panelistsList.length > 0) {
+      return panelistsList.map((p: SessionSpeakerInfo, idx: number) => {
+        // Find existing match in speaker pool by speakerId or name
+        const matched = p.speakerId
+          ? speakerPool.find((a) => a.id === p.speakerId)
+          : speakerPool.find(
+              (a) =>
+                a.name.toLowerCase() === p.name.toLowerCase() ||
+                a.name.toLowerCase().includes(p.name.toLowerCase()) ||
+                p.name.toLowerCase().includes(a.name.toLowerCase())
+            );
+
+        const roleText = p.role || (panelistsList.length > 1 ? 'Panelist' : 'Keynote Speaker');
+
+        if (matched) {
+          return {
+            ...matched,
+            designation: p.designation || matched.designation,
+            company: p.company || matched.company,
+            panelRole: roleText,
+            linkedin: p.linkedin || matched.linkedin,
+            avatar: p.avatar || matched.avatar,
+          };
+        }
+
+        const slug = p.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+        return {
+          id: p.speakerId || `spk-panel-${session.id}-${slug || idx}`,
+          name: p.name,
+          designation: p.designation || 'Participant',
+          company: p.company || 'MP Semiconductor Summit 2026',
+          role: 'speaker',
+          panelRole: roleText,
+          bio: `${roleText} · ${p.name} (${p.designation || 'Speaker'}, ${p.company || 'MPSS 2026'}) participating in "${session.title}" at the Madhya Pradesh Semiconductor Summit 2026.`,
+          interests: ['Semiconductors', 'Electronics Ecosystem'],
+          skills: [],
+          email: '',
+          mobile: '',
+          linkedin: p.linkedin || '',
+          avatar: p.avatar,
+          privacy: {
+            preset: 'Connections Only',
+            shareEmail: false,
+            sharePhone: false,
+            shareLinkedIn: Boolean(p.linkedin),
+            shareTwitter: false,
+          },
+          checkedIn: true,
+          ticketType: 'Speaker',
+          registrationId: `#SPK-${slug.slice(0, 4).toUpperCase() || 'PNL'}`,
+        } as Person;
+      });
+    }
 
     if (session.speakerIds && session.speakerIds.length > 0) {
       const matched = session.speakerIds
@@ -184,15 +249,58 @@ export const DelegateSchedule: React.FC = () => {
   };
 
   // If a session is selected, render Session Detail Screen (excluding breaks/informational slots)
-  const activeSession = sessions.find((s) => s.id === selectedSessionId && !isBreakSession(s));
+  const rawActiveSession = sessions.find((s: Session) => s.id === selectedSessionId && !isBreakSession(s));
+  const activeSessionInitial = rawActiveSession
+    ? INITIAL_SESSIONS.find((s: Session) => s.id === rawActiveSession.id) ||
+      INITIAL_SESSIONS.find((s: Session) => s.title.toLowerCase().trim() === rawActiveSession.title?.toLowerCase().trim())
+    : null;
+
+  const activeSession = rawActiveSession
+    ? {
+        ...rawActiveSession,
+        timeRange: activeSessionInitial?.timeRange || rawActiveSession.timeRange,
+        room: activeSessionInitial?.room || rawActiveSession.room,
+        track: activeSessionInitial?.track || rawActiveSession.track,
+        panelists:
+          (rawActiveSession.panelists && rawActiveSession.panelists.length > 0)
+            ? rawActiveSession.panelists
+            : (activeSessionInitial?.panelists || []),
+        speakerName: activeSessionInitial?.speakerName || rawActiveSession.speakerName,
+        takeaways:
+          (activeSessionInitial?.takeaways && activeSessionInitial.takeaways.length > 0)
+            ? activeSessionInitial.takeaways
+            : rawActiveSession.takeaways,
+        description: activeSessionInitial?.description || rawActiveSession.description,
+      }
+    : null;
+
+  // Enhanced session list mapped with official INITIAL_SESSIONS definitions
+  const enhancedSessions = sessions.map((s: Session) => {
+    const init =
+      INITIAL_SESSIONS.find((is: Session) => is.id === s.id) ||
+      INITIAL_SESSIONS.find((is: Session) => is.title.toLowerCase().trim() === s.title?.toLowerCase().trim());
+    if (init) {
+      return {
+        ...s,
+        timeRange: init.timeRange || s.timeRange,
+        room: init.room || s.room,
+        track: init.track || s.track,
+        speakerName: init.speakerName || s.speakerName,
+        panelists: (s.panelists && s.panelists.length > 0) ? s.panelists : init.panelists,
+        takeaways: (init.takeaways && init.takeaways.length > 0) ? init.takeaways : s.takeaways,
+        description: init.description || s.description,
+      };
+    }
+    return s;
+  });
 
   // Day filter counts
-  const daySessions = sessions.filter((s) => s.day === activeDay);
+  const daySessions = enhancedSessions.filter((s) => s.day === activeDay);
   const daySavedSessions = daySessions.filter((s) => s.isBookmarked);
-  const totalSavedSessions = sessions.filter((s) => s.isBookmarked);
+  const totalSavedSessions = enhancedSessions.filter((s) => s.isBookmarked);
 
   // Filter sessions by Day and Tab
-  const filteredSessions = sessions.filter((s) => {
+  const filteredSessions = enhancedSessions.filter((s) => {
     if (s.day !== activeDay) return false;
     if (activeTab === 'saved' && !s.isBookmarked) return false;
     return true;
@@ -321,7 +429,7 @@ export const DelegateSchedule: React.FC = () => {
                     Key Takeaways & Highlights
                   </h3>
                   <ul className="space-y-1.5 text-[#4B5563] text-[12px]">
-                    {activeSession.takeaways.map((item, idx) => (
+                    {activeSession.takeaways.map((item: string, idx: number) => (
                       <li key={idx} className="flex items-start gap-2">
                         <span className="w-1.5 h-1.5 rounded-full bg-[#DC2626] mt-1.5 flex-shrink-0" />
                         <span>{item}</span>
@@ -347,9 +455,6 @@ export const DelegateSchedule: React.FC = () => {
                     key={spk.id || idx}
                     onClick={() => {
                       if (spk.id) {
-                        if (!attendees.some((a) => a.id === spk.id)) {
-                          setAttendees((prev) => [...prev, spk]);
-                        }
                         setSelectedPersonId(spk.id);
                       } else if (spk.name) {
                         setSelectedPersonId(spk.name);
@@ -379,9 +484,26 @@ export const DelegateSchedule: React.FC = () => {
                           <h3 className="text-[13.5px] sm:text-[14px] font-bold text-[#111827] group-hover:text-[#DC2626] transition-colors truncate">
                             {spk.name}
                           </h3>
-                          <span className="inline-block text-[9.5px] font-semibold text-[#DC2626] bg-[#FEF2F2] border border-[#FEE2E2] px-1.5 py-0.5 rounded-md flex-shrink-0">
-                            {sessionSpeakers.length > 1 ? 'Panelist' : 'Keynote Speaker'}
-                          </span>
+                          {(() => {
+                            const roleText = spk.panelRole || (sessionSpeakers.length > 1 ? 'Panelist' : 'Keynote Speaker');
+                            const lower = roleText.toLowerCase();
+                            let badgeStyle = 'text-[#475569] bg-[#F1F5F9] border-[#E2E8F0]';
+                            if (lower.includes('moderator')) {
+                              badgeStyle = 'text-[#7C3AED] bg-[#F5F3FF] border-[#DDD6FE]';
+                            } else if (lower.includes('chair')) {
+                              badgeStyle = 'text-[#B45309] bg-[#FEF3C7] border-[#FDE68A]';
+                            } else if (lower.includes('keynote')) {
+                              badgeStyle = 'text-[#DC2626] bg-[#FEF2F2] border-[#FEE2E2]';
+                            } else if (lower.includes('guest') || lower.includes('dignitary')) {
+                              badgeStyle = 'text-[#047857] bg-[#ECFDF5] border-[#A7F3D0]';
+                            }
+
+                            return (
+                              <span className={`inline-block text-[9.5px] font-bold px-2 py-0.5 rounded-md border flex-shrink-0 ${badgeStyle}`}>
+                                {roleText}
+                              </span>
+                            );
+                          })()}
                         </div>
 
                         <p className="text-[11.5px] sm:text-[12px] text-[#4B5563] mt-0.5 truncate">
@@ -617,6 +739,13 @@ export const DelegateSchedule: React.FC = () => {
                         <h3 className="text-[13px] sm:text-[14px] font-bold text-[#0F172A] leading-snug group-hover:text-[#DC2626] transition-colors">
                           {session.title}
                         </h3>
+
+                        {/* Speaker / Panelist Summary */}
+                        {session.speakerName && (
+                          <p className="mt-1 text-[11px] text-[#475569] font-medium line-clamp-1">
+                            {session.speakerName}
+                          </p>
+                        )}
 
                         {/* Location / Room */}
                         {session.room && (

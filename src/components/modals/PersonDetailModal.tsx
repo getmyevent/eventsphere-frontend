@@ -2,9 +2,9 @@
 
 import React, { useEffect, useState } from 'react';
 import { useStore } from '../../lib/store';
-import { INITIAL_ATTENDEES } from '../../lib/mockData';
+import { INITIAL_ATTENDEES, INITIAL_SESSIONS } from '../../lib/mockData';
 import { Person } from '../../types';
-import { X, Check, UserPlus, Mail, Phone, Linkedin, Twitter, Star, Pencil, Save, RotateCcw } from 'lucide-react';
+import { X, Mail, Phone, Linkedin, Twitter, Star, Pencil, Save } from 'lucide-react';
 
 export const PersonDetailModal: React.FC = () => {
   const {
@@ -12,9 +12,6 @@ export const PersonDetailModal: React.FC = () => {
     setSelectedPersonId,
     attendees,
     sessions,
-    connections,
-    connectWith,
-    disconnectFrom,
     savedPeopleIds,
     toggleSavePerson,
     updateAttendee,
@@ -56,8 +53,49 @@ export const PersonDetailModal: React.FC = () => {
     attendees.find((a) => a.id.toLowerCase().includes(normalizedSearch)) ||
     INITIAL_ATTENDEES.find((a) => a.id.toLowerCase().includes(normalizedSearch)) ||
     (() => {
-      // Find matching session
-      for (const s of (sessions || [])) {
+      // 1. Find matching panelist across sessions
+      const allSessions = [...(sessions || []), ...INITIAL_SESSIONS];
+      for (const s of allSessions) {
+        if (s.panelists && s.panelists.length > 0) {
+          const p = s.panelists.find(
+            (item, idx) =>
+              (item.speakerId && item.speakerId === selectedPersonId) ||
+              `spk-panel-${s.id}-${item.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}` === selectedPersonId ||
+              `spk-panel-${s.id}-${idx}` === selectedPersonId ||
+              item.name.toLowerCase().trim() === normalizedSearch
+          );
+          if (p) {
+            return {
+              id: selectedPersonId,
+              name: p.name,
+              designation: p.designation || 'Panelist',
+              company: p.company || 'Madhya Pradesh Semiconductor Summit 2026',
+              role: 'speaker' as const,
+              panelRole: p.role || 'Panelist',
+              bio: `${p.role ? p.role + ' · ' : ''}${p.name} (${p.designation || 'Speaker'}, ${p.company || 'MPSS 2026'}) participating in "${s.title}" at the Madhya Pradesh Semiconductor Summit 2026.`,
+              interests: ['Semiconductors', 'Electronics Ecosystem'],
+              skills: [],
+              email: 'Not listed',
+              mobile: 'Not listed',
+              linkedin: p.linkedin || '',
+              privacy: {
+                preset: 'Connections Only' as const,
+                shareEmail: false,
+                sharePhone: false,
+                shareLinkedIn: Boolean(p.linkedin),
+                shareTwitter: false,
+              },
+              checkedIn: true,
+              ticketType: 'Speaker',
+              registrationId: `#SPK-${selectedPersonId.slice(-4).toUpperCase()}`,
+              relevanceScore: 95,
+            } as Person;
+          }
+        }
+      }
+
+      // 2. Find matching session speaker
+      for (const s of allSessions) {
         const matches =
           s.speakerId === selectedPersonId ||
           `spk-${s.id}` === selectedPersonId ||
@@ -97,8 +135,6 @@ export const PersonDetailModal: React.FC = () => {
 
   if (!person) return null;
 
-  const isConnected = connections.some((c) => c.personId === person.id && c.status === 'connected');
-  const isPending = connections.some((c) => c.personId === person.id && c.status === 'pending');
   const isSaved = savedPeopleIds.includes(person.id);
 
   const handleStartEdit = () => {
@@ -124,14 +160,6 @@ export const PersonDetailModal: React.FC = () => {
       // toast in store
     } finally {
       setIsSaving(false);
-    }
-  };
-
-  const handleConnect = () => {
-    if (isConnected || isPending) {
-      disconnectFrom(person.id);
-    } else {
-      connectWith(person.id, 'direct');
     }
   };
 
@@ -307,11 +335,6 @@ export const PersonDetailModal: React.FC = () => {
                       {person.relevanceScore}% Match
                     </span>
                   )}
-                  {person.checkedIn && (
-                    <span className="text-[11px] font-medium text-[#16A34A] bg-[#DCFCE7] px-2 py-0.5 rounded-md">
-                      Checked In ✓
-                    </span>
-                  )}
                 </div>
               </div>
             </div>
@@ -423,38 +446,10 @@ export const PersonDetailModal: React.FC = () => {
             </div>
 
             {/* Action buttons */}
-            <div className="pt-1 flex items-center gap-2">
-              <button
-                onClick={handleConnect}
-                className={`flex-1 py-2 px-3 rounded-xl font-medium text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-xs active:scale-98 ${
-                  isConnected
-                    ? 'bg-[#E5E7EB] text-[#181818] hover:bg-gray-300'
-                    : isPending
-                    ? 'bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A]'
-                    : 'bg-[#181818] text-white hover:bg-black'
-                }`}
-              >
-                {isConnected ? (
-                  <>
-                    <Check className="w-3.5 h-3.5" />
-                    Connected
-                  </>
-                ) : isPending ? (
-                  <>
-                    <Check className="w-3.5 h-3.5" />
-                    Request Sent
-                  </>
-                ) : (
-                  <>
-                    <UserPlus className="w-3.5 h-3.5" />
-                    Connect
-                  </>
-                )}
-              </button>
-
+            <div className="pt-1 flex items-center">
               <button
                 onClick={() => setSelectedPersonId(null)}
-                className="py-2 px-4 rounded-xl border border-[#DEDCD7] text-[#181818] font-medium text-xs hover:bg-[#F6F4F0] cursor-pointer"
+                className="w-full py-2.5 px-4 rounded-xl border border-[#DEDCD7] bg-[#F8F7F4] hover:bg-[#EFECE6] text-[#181818] font-semibold text-xs cursor-pointer text-center transition-colors"
               >
                 Close
               </button>

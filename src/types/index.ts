@@ -46,6 +46,7 @@ export interface Person {
   checkInTime?: string;
   registrationId: string;
   ticketType: string;
+  panelRole?: string;
 }
 
 export interface Connection {
@@ -147,6 +148,16 @@ export interface Poll {
   votedOptionId?: string | null;
 }
 
+export interface SessionSpeakerInfo {
+  name: string;
+  role?: string; // 'Moderator' | 'Chair' | 'Co-Chair' | 'Panelist' | 'Keynote Speaker' | string;
+  designation?: string;
+  company?: string;
+  speakerId?: string;
+  avatar?: string;
+  linkedin?: string;
+}
+
 export interface Session {
   id: string;
   title: string;
@@ -159,6 +170,7 @@ export interface Session {
   speakerCompany: string;
   speakerId: string;
   speakerIds?: string[];
+  panelists?: SessionSpeakerInfo[];
   description: string;
   takeaways: string[];
   status: 'live' | 'upcoming' | 'completed';

@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useStore } from '../../../../../lib/store';
+import { INITIAL_SESSIONS } from '../../../../../lib/mockData';
 import { DelegateSchedule } from '../../../../../components/delegate/DelegateSchedule';
 
 interface SessionPageProps {
@@ -15,7 +16,7 @@ export default function SessionDetailPage({ params }: SessionPageProps) {
   const router = useRouter();
 
   useEffect(() => {
-    const session = sessions.find((s) => s.id === sessionId);
+    const session = sessions.find((s) => s.id === sessionId) || INITIAL_SESSIONS.find((s) => s.id === sessionId);
     if (!session) {
       // Session not found — show not-found state via null selection
       setSelectedSessionId(null);
@@ -27,7 +28,7 @@ export default function SessionDetailPage({ params }: SessionPageProps) {
     setSelectedSessionId(sessionId);
   }, [sessionId, sessions, setSelectedSessionId, setScheduleSubTab, setSessionBackTab]);
 
-  const session = sessions.find((s) => s.id === sessionId);
+  const session = sessions.find((s) => s.id === sessionId) || INITIAL_SESSIONS.find((s) => s.id === sessionId);
 
   if (!session) {
     return (
