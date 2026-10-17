@@ -73,10 +73,10 @@ export const PersonDetailModal: React.FC = () => {
             company: s.speakerCompany || 'MP Semiconductor Summit',
             role: 'speaker' as const,
             bio: `${s.speakerName} is a distinguished keynote speaker at the Madhya Pradesh Semiconductor Summit 2026, presenting "${s.title}". Leading national semiconductor ecosystem, fab enablement, and industry initiatives.`,
-            interests: ['Semiconductors', 'Wafer Fabs', 'ATMP / OSAT', 'Chip Design', 'Ecosystem Strategy'],
-            skills: ['Semiconductor Engineering', 'Executive Leadership', 'Strategic Roadmap'],
-            email: 'Not publicly listed',
-            mobile: 'Not publicly listed',
+            interests: [],
+            skills: [],
+            email: 'Not listed',
+            mobile: 'Not listed',
             linkedin: 'https://linkedin.com',
             privacy: {
               preset: 'Open' as const,
@@ -323,12 +323,12 @@ export const PersonDetailModal: React.FC = () => {
               </div>
             )}
 
-            {/* Focus Areas & Skills */}
-            <div className="pt-1">
-              <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#6B6B6B] mb-1.5">
-                Focus Areas & Skills
-              </h3>
-              {allTags.length > 0 ? (
+            {/* Focus Areas & Skills (hidden for speakers and when empty) */}
+            {person.role !== 'speaker' && allTags.length > 0 && (
+              <div className="pt-1">
+                <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#6B6B6B] mb-1.5">
+                  Focus Areas & Skills
+                </h3>
                 <div className="flex flex-wrap gap-1.5">
                   {allTags.map((tag, idx) => (
                     <span key={idx} className="text-[11px] bg-[#F3F4F6] text-[#4B5563] px-2.5 py-1 rounded-md font-medium border border-[#E5E7EB]">
@@ -336,10 +336,8 @@ export const PersonDetailModal: React.FC = () => {
                     </span>
                   ))}
                 </div>
-              ) : (
-                <p className="text-[11.5px] text-[#9CA3AF] italic">General Semiconductor & Tech Ecosystem</p>
-              )}
-            </div>
+              </div>
+            )}
 
             {/* Contact details */}
             <div className="bg-[#FAFAFA] p-3 rounded-xl border border-[#E5E7EB] space-y-2.5 text-[12px]">
@@ -349,13 +347,13 @@ export const PersonDetailModal: React.FC = () => {
                   <Mail className="w-4 h-4 text-[#4B5563]" />
                   Email
                 </span>
-                <span className="text-[#181818] font-medium font-mono text-[11.5px] truncate max-w-[200px]">
-                  {person.email ? (
-                    <a href={`mailto:${person.email}`} className="hover:underline text-[#181818]">
+                <span className="text-[#181818] font-medium text-[11.5px] truncate max-w-[200px]">
+                  {person.role !== 'speaker' && person.email && person.email !== 'Not listed' && person.email !== 'Not publicly listed' ? (
+                    <a href={`mailto:${person.email}`} className="hover:underline text-[#181818] font-mono">
                       {person.email}
                     </a>
                   ) : (
-                    <span className="text-[#9CA3AF] italic font-normal">Not shared</span>
+                    <span className="text-[#9CA3AF] italic font-normal">Not listed</span>
                   )}
                 </span>
               </div>
@@ -366,13 +364,13 @@ export const PersonDetailModal: React.FC = () => {
                   <Phone className="w-4 h-4 text-[#4B5563]" />
                   Mobile
                 </span>
-                <span className="text-[#181818] font-medium font-mono text-[11.5px]">
-                  {person.mobile ? (
-                    <a href={`tel:${person.mobile}`} className="hover:underline text-[#181818]">
+                <span className="text-[#181818] font-medium text-[11.5px]">
+                  {person.role !== 'speaker' && person.mobile && person.mobile !== 'Not listed' && person.mobile !== 'Not publicly listed' ? (
+                    <a href={`tel:${person.mobile}`} className="hover:underline text-[#181818] font-mono">
                       {person.mobile}
                     </a>
                   ) : (
-                    <span className="text-[#9CA3AF] italic font-normal">Not shared</span>
+                    <span className="text-[#9CA3AF] italic font-normal">Not listed</span>
                   )}
                 </span>
               </div>
