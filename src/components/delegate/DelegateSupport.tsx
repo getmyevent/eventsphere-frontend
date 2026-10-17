@@ -18,7 +18,7 @@ export const DelegateSupport: React.FC = () => {
             <p className="text-[10.5px] uppercase tracking-[0.15em] text-[#6B6B6B] font-semibold mb-0.5">
               MPSS26 · SUPPORT
             </p>
-            <h1 className="text-[32px] font-serif font-medium text-[#181818] tracking-tight leading-none">
+            <h1 className="text-[32px] font-sans font-semibold text-[#181818] tracking-tight leading-none">
               Help & Support
             </h1>
           </div>

@@ -4,11 +4,11 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useStore } from '../../lib/store';
 import { calculateProfileCompletion } from '../../lib/mockData';
-import { ArrowLeft, Camera, RefreshCw, Save, Trash2 } from 'lucide-react';
+import { ArrowLeft, Camera, Lock, Save } from 'lucide-react';
 
 export const DelegateEditProfile: React.FC = () => {
   const router = useRouter();
-  const { currentUser, updateCurrentUser, setActiveDelegateTab, showToast } = useStore();
+  const { currentUser, updateCurrentUser, showToast } = useStore();
   
   const [formData, setFormData] = useState({
     name: currentUser.name || '',
@@ -45,36 +45,6 @@ export const DelegateEditProfile: React.FC = () => {
       };
       reader.readAsDataURL(file);
     }
-  };
-
-  const handleClearAll = () => {
-    setFormData({
-      name: '',
-      designation: '',
-      company: '',
-      bio: '',
-      linkedin: '',
-      twitter: '',
-      email: '',
-      mobile: '',
-      avatar: '',
-    });
-    showToast('All profile fields cleared', 'info');
-  };
-
-  const handleFillDemo = () => {
-    setFormData({
-      name: 'Hari Gupta',
-      designation: 'CEO',
-      company: 'EventSphere',
-      bio: 'Founder & CEO building next-gen event engagement platforms.',
-      linkedin: 'https://linkedin.com/in/harigupta',
-      twitter: 'https://x.com/harigupta',
-      email: 'hari@eventsphere.com',
-      mobile: '+91 98765 43210',
-      avatar: '/images/avatars/hari-gupta.png',
-    });
-    showToast('Demo profile loaded (100% complete)', 'success');
   };
 
   const [isSaving, setIsSaving] = useState(false);
@@ -258,14 +228,20 @@ export const DelegateEditProfile: React.FC = () => {
           </div>
 
           <div className="space-y-1">
-            <label className="text-[11.5px] font-semibold text-[#181818]">Mobile Number</label>
+            <div className="flex items-center justify-between">
+              <label className="text-[11.5px] font-semibold text-[#181818]">Mobile Number</label>
+              <span className="text-[10px] font-medium text-[#71717A] flex items-center gap-1 bg-[#F4F4F5] px-1.5 py-0.5 rounded border border-[#E4E4E7]">
+                <Lock className="w-2.5 h-2.5 text-[#71717A]" />
+                Registered
+              </span>
+            </div>
             <input
               type="tel"
               name="mobile"
-              placeholder="e.g. +91 97137 22841"
               value={formData.mobile}
-              onChange={handleChange}
-              className="w-full px-3 py-2 rounded-lg border border-[#DEDCD7] text-[12.5px] focus:outline-none focus:ring-1 focus:ring-[#181818]"
+              readOnly
+              disabled
+              className="w-full px-3 py-2 rounded-lg border border-[#E5E7EB] bg-[#F9FAFB] text-[12.5px] text-[#6B7280] font-medium cursor-not-allowed select-none"
             />
           </div>
 
@@ -280,39 +256,6 @@ export const DelegateEditProfile: React.FC = () => {
               className="w-full px-3 py-2 rounded-lg border border-[#DEDCD7] text-[12.5px] focus:outline-none focus:ring-1 focus:ring-[#181818]"
             />
           </div>
-
-          <div className="space-y-1">
-            <label className="text-[11.5px] font-semibold text-[#181818]">Twitter / X Handle</label>
-            <input
-              type="text"
-              name="twitter"
-              placeholder="https://x.com/DrVishvakarma?lang=en"
-              value={formData.twitter}
-              onChange={handleChange}
-              className="w-full px-3 py-2 rounded-lg border border-[#DEDCD7] text-[12.5px] focus:outline-none focus:ring-1 focus:ring-[#181818]"
-            />
-          </div>
-        </div>
-
-        {/* Quick Testing Tools: Clear All & Fill Demo */}
-        <div className="pt-1 flex items-center justify-between gap-2">
-          <button
-            type="button"
-            onClick={handleClearAll}
-            className="flex-1 py-2 px-3 rounded-xl border border-red-200 text-[#DC2626] hover:bg-red-50 text-[11px] font-semibold transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
-          >
-            <Trash2 className="w-3.5 h-3.5" />
-            <span>Clear All (0%)</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={handleFillDemo}
-            className="flex-1 py-2 px-3 rounded-xl border border-[#DEDCD7] text-[#181818] hover:bg-gray-100 text-[11px] font-semibold transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
-          >
-            <RefreshCw className="w-3.5 h-3.5" />
-            <span>Fill Demo (100%)</span>
-          </button>
         </div>
       </div>
     </div>

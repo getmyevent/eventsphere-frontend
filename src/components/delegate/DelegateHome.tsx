@@ -219,11 +219,11 @@ export const DelegateHome: React.FC = () => {
       {/* Top Greeting & Attendee Identity Header */}
       <div className="pt-2 pb-1">
         <div className="flex items-center justify-between">
-          <div className="min-w-0 pr-2">
-            <p className="text-[10.5px] uppercase tracking-[0.15em] text-[#6B6B6B] font-semibold mb-0.5">
+          <div className="pr-2">
+            <p className="text-[10.5px] uppercase tracking-[0.15em] text-[#6B6B6B] font-semibold mb-0.5 whitespace-nowrap">
               MPSS26 · DELEGATE
             </p>
-            <h1 className="text-[32px] font-serif font-medium text-[#181818] tracking-tight leading-none truncate">
+            <h1 className="text-[32px] font-sans font-semibold text-[#181818] tracking-tight leading-none whitespace-nowrap">
               {currentUser.name || 'Delegate'}
             </h1>
             <p className="text-[12px] text-[#6B6B6B] font-medium mt-1 truncate">
@@ -232,6 +232,10 @@ export const DelegateHome: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-2 flex-shrink-0 ml-2">
+            <div className="px-2 py-0.5 bg-[#FAF7F2] border border-[#EBE7DF] rounded-full text-[9.5px] font-semibold text-[#111827] shadow-2xs whitespace-nowrap select-none -translate-y-[26px]">
+              Powered by IET DAVV
+            </div>
+
             <button
               onClick={() => router.push('/delegate/profile')}
               className="relative group focus:outline-none flex-shrink-0"

@@ -307,7 +307,7 @@ export const INITIAL_ATTENDEES: Person[] = [
     registrationId: "#SPK-102",
     email: "Not listed",
     mobile: "Not listed",
-    linkedin: "",
+    linkedin: "https://www.linkedin.com/in/dr-mohan-yadav-6072192a7/",
     avatar: "/images/speakers/dr-mohan-yadav.png",
     bio: "Hon'ble Chief Minister at Madhya Pradesh. Featured expert speaker and thought leader at the Madhya Pradesh Semiconductor Summit 2026.",
     interests: [],
@@ -4383,7 +4383,7 @@ export const getProfileCompletionDetails = (user: Partial<Person> | null | undef
     { key: 'mobile', label: 'Mobile Number', completed: Boolean(user.mobile?.trim()) },
     { key: 'bio', label: 'Bio / Summary', completed: Boolean(user.bio?.trim()) },
     { key: 'avatar', label: 'Profile Photo', completed: Boolean(user.avatar?.trim()) },
-    { key: 'social', label: 'Social Profile (LinkedIn/Twitter)', completed: Boolean(user.linkedin?.trim() || user.twitter?.trim()) },
+    { key: 'social', label: 'Social Profile (LinkedIn)', completed: Boolean(user.linkedin?.trim() || user.twitter?.trim()) },
   ];
 
   const completedCount = checks.filter((c) => c.completed).length;

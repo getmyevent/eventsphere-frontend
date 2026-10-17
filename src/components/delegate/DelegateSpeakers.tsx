@@ -37,6 +37,15 @@ export const DelegateSpeakers: React.FC = () => {
     return attendees.filter((p) => p.role === 'speaker' && p.id !== currentUser.id);
   }, [attendees, currentUser.id]);
 
+  const cmSpeaker = useMemo(() => {
+    return speakers.find(
+      (s) =>
+        s.id === 'speaker-dr-mohan-yadav' ||
+        s.name.toLowerCase().includes('mohan yadav') ||
+        s.designation.toLowerCase().includes('chief minister')
+    );
+  }, [speakers]);
+
   const filteredSpeakers = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
     if (!q) return speakers;
@@ -47,6 +56,21 @@ export const DelegateSpeakers: React.FC = () => {
         speaker.designation.toLowerCase().includes(q)
     );
   }, [speakers, searchQuery]);
+
+  const isCmMatched = useMemo(() => {
+    if (!cmSpeaker) return false;
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.trim().toLowerCase();
+    return (
+      cmSpeaker.name.toLowerCase().includes(q) ||
+      cmSpeaker.company.toLowerCase().includes(q) ||
+      cmSpeaker.designation.toLowerCase().includes(q)
+    );
+  }, [cmSpeaker, searchQuery]);
+
+  const otherSpeakers = useMemo(() => {
+    return filteredSpeakers.filter((s) => s.id !== cmSpeaker?.id);
+  }, [filteredSpeakers, cmSpeaker]);
 
   return (
     <div className="flex-1 min-h-0 bg-[#F8F7F4] flex flex-col h-full overflow-hidden">
@@ -76,7 +100,7 @@ export const DelegateSpeakers: React.FC = () => {
       </div>
 
       {/* Grid of 2 Columns */}
-      <div className="flex-1 min-h-0 overflow-y-auto px-4 pb-4 no-scrollbar">
+      <div className="flex-1 min-h-0 overflow-y-auto px-4 pb-3 no-scrollbar">
         <div className="flex items-center justify-between mt-3 mb-2.5 px-0.5">
           <p className="text-[13.5px] font-bold text-[#1F2937]">
             {filteredSpeakers.length === speakers.length
@@ -88,8 +112,70 @@ export const DelegateSpeakers: React.FC = () => {
           </span>
         </div>
 
+        {/* Featured Chief Minister Card on First Line */}
+        {cmSpeaker && isCmMatched && (
+          <div
+            onClick={() => setSelectedPersonId(cmSpeaker.id)}
+            className="bg-white rounded-[16px] p-2.5 mb-3 border border-[#E5E7EB] hover:border-gray-400 transition-all shadow-xs cursor-pointer flex flex-col group select-none"
+          >
+            <div className="relative w-full h-[120px] rounded-[12px] overflow-hidden bg-slate-50 shrink-0 border border-slate-200/70 flex items-center justify-center">
+              {cmSpeaker.avatar ? (
+                <>
+                  <img
+                    src={cmSpeaker.avatar}
+                    alt={cmSpeaker.name}
+                    className="w-full h-full object-contain object-center transition-transform duration-300 group-hover:scale-105"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                      const fallback = e.currentTarget.parentElement?.querySelector('.avatar-fallback');
+                      if (fallback) (fallback as HTMLElement).style.display = 'flex';
+                    }}
+                  />
+                  <div className="avatar-fallback w-full h-full hidden items-center justify-center bg-gradient-to-br from-[#E2E8F0] to-[#CBD5E1] text-[#1E293B] font-bold text-2xl select-none">
+                    {getInitials(cmSpeaker.name)}
+                  </div>
+                </>
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#E2E8F0] to-[#CBD5E1] text-[#1E293B] font-bold text-2xl select-none">
+                  {getInitials(cmSpeaker.name)}
+                </div>
+              )}
+
+              {cmSpeaker.linkedin ? (
+                <a
+                  href={
+                    cmSpeaker.linkedin.startsWith('http')
+                      ? cmSpeaker.linkedin
+                      : `https://${cmSpeaker.linkedin}`
+                  }
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className="absolute top-2 right-2 w-[24px] h-[24px] rounded-[6px] bg-white shadow-xs border border-white/80 flex items-center justify-center transition-transform active:scale-90 hover:scale-105 z-10"
+                  title="View LinkedIn Profile"
+                >
+                  <div className="w-[15px] h-[15px] rounded-[2.5px] bg-[#0A66C2] flex items-center justify-center text-white text-[9.5px] font-bold leading-none font-sans">
+                    in
+                  </div>
+                </a>
+              ) : null}
+            </div>
+
+            {/* Speaker Info - Centered */}
+            <div className="mt-2 pb-0.5 text-center px-1">
+              <h3 className="text-[14px] font-bold text-[#111827] leading-tight tracking-tight">
+                {cmSpeaker.name}
+              </h3>
+              <p className="text-[11.5px] text-[#6B7280] leading-snug mt-0.5">
+                {cmSpeaker.designation} · {cmSpeaker.company}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Remaining Speakers in 2-Column Grid */}
         <div className="grid grid-cols-2 gap-3">
-          {filteredSpeakers.map((speaker) => {
+          {otherSpeakers.map((speaker) => {
             return (
               <div
                 key={speaker.id}
@@ -156,6 +242,13 @@ export const DelegateSpeakers: React.FC = () => {
             );
           })}
         </div>
+
+        {/* Empty State */}
+        {!isCmMatched && otherSpeakers.length === 0 && (
+          <div className="py-12 text-center text-[#6B7280] text-[13px]">
+            No speakers found matching &quot;{searchQuery}&quot;
+          </div>
+        )}
       </div>
     </div>
   );

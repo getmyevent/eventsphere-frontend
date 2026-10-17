@@ -2,7 +2,8 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { useStore } from '../../lib/store';
-import { api } from '../../lib/api';
+import { api, ApiUser } from '../../lib/api';
+import { CURRENT_USER } from '../../lib/mockData';
 import { ShieldCheck, CheckCircle2, AlertCircle, ArrowRight, Loader2, Lock } from 'lucide-react';
 
 interface AccessScreenProps {
@@ -53,8 +54,53 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
 
     setStatus('verifying');
 
+    // Extract digits and check for local test bypass number (00000000)
+    const cleanDigits = rawMobile.replace(/\D/g, '');
+    const isLocalBypass = rawMobile === '00000000' || cleanDigits === '00000000' || /^0{6,}$/.test(cleanDigits);
+
+    if (isLocalBypass) {
+      resetUserState();
+
+      const bypassUser: ApiUser = {
+        id: 'att-hari-gupta',
+        name: 'Hari Gupta',
+        mobile: '00000000',
+        email: 'hari@eventsphere.com',
+        role: 'ROLE_DELEGATE',
+        company: 'EventSphere',
+        designation: 'CEO',
+        avatar: '/images/avatars/hari-gupta.png',
+        ticketType: 'Delegate',
+        checkedIn: true,
+      };
+
+      api.setToken('bypass-local-dev-token-00000000');
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem('eventsphere_auth_user', JSON.stringify(bypassUser));
+        } catch {
+          // ignore
+        }
+      }
+
+      setRole('delegate');
+      setCurrentUser({
+        ...CURRENT_USER,
+        id: 'att-hari-gupta',
+        name: 'Hari Gupta',
+        mobile: '00000000',
+      });
+
+      setStatus('confirmed');
+      setTimeout(() => {
+        setHasAccessConfirmed(true);
+        onSuccess();
+      }, 350);
+      return;
+    }
+
     // Extract digits and normalize
-    let num = rawMobile.replace(/\D/g, '');
+    let num = cleanDigits;
     if (num.startsWith('91') && num.length > 10) num = num.slice(2);
     if (num.startsWith('0')) num = num.slice(1);
 
@@ -169,7 +215,17 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
       }
     } catch (err: any) {
       setStatus('error');
-      setErrorMessage(err.message || 'Login failed. Please verify your registered mobile number.');
+      const isConnectionOrServerError =
+        err.message?.includes('500') ||
+        err.message?.includes('Internal Server Error') ||
+        err.message?.includes('Failed to fetch') ||
+        err.message?.includes('NetworkError');
+
+      if (isConnectionOrServerError) {
+        setErrorMessage('Backend server offline. Enter 00000000 to log in on local server.');
+      } else {
+        setErrorMessage(err.message || 'Login failed. Please verify your registered mobile number.');
+      }
       return;
     }
   };
@@ -255,11 +311,21 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
                     setMobile(e.target.value);
                     if (status === 'error') setStatus('idle');
                   }}
-                  placeholder="e.g. 9876543210"
+                  placeholder="e.g. 9876543210 or 00000000"
                   disabled={status === 'verifying' || status === 'confirmed'}
                   className="w-full px-3 py-2 rounded-lg bg-white border border-[#DEDCD7] text-[13px] font-medium text-[#181818] focus:outline-none focus:ring-2 focus:ring-[#B51F32] focus:border-transparent transition-all shadow-sm"
                   autoComplete="tel"
                 />
+              </div>
+              <div className="flex items-center justify-between mt-1.5 px-0.5">
+                <span className="text-[11px] text-[#71717A]">Local dev test number:</span>
+                <button
+                  type="button"
+                  onClick={() => handleQuickSelect('00000000')}
+                  className="text-[11px] font-medium text-[#B51F32] bg-red-50 hover:bg-red-100 border border-red-200 px-2 py-0.5 rounded cursor-pointer transition-colors"
+                >
+                  Quick fill 00000000
+                </button>
               </div>
             </div>
 
