@@ -3,7 +3,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useStore } from '../../lib/store';
 import { api, ApiUser } from '../../lib/api';
-import { CURRENT_USER } from '../../lib/mockData';
 import { ShieldCheck, CheckCircle2, AlertCircle, ArrowRight, Loader2, Lock, ChevronDown } from 'lucide-react';
 
 const COUNTRY_CODES = [
@@ -72,50 +71,14 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
       return;
     }
 
-    setStatus('verifying');
-
-    // Extract digits and check for local test bypass number (00000000)
+    // Extract digits
     const cleanDigits = rawMobile.replace(/\D/g, '');
-    const isLocalBypass = rawMobile === '00000000' || cleanDigits === '00000000' || /^0{6,}$/.test(cleanDigits);
 
-    if (isLocalBypass) {
-      resetUserState();
-
-      const bypassUser: ApiUser = {
-        id: 'att-hari-gupta',
-        name: 'Hari Gupta',
-        mobile: '00000000',
-        email: 'hari@eventsphere.com',
-        role: 'ROLE_DELEGATE',
-        company: 'EventSphere',
-        designation: 'CEO',
-        avatar: '/images/avatars/hari-gupta.png',
-        ticketType: 'Delegate',
-        checkedIn: true,
-      };
-
-      api.setToken('bypass-local-dev-token-00000000');
-      if (typeof window !== 'undefined') {
-        try {
-          localStorage.setItem('eventsphere_auth_user', JSON.stringify(bypassUser));
-        } catch {
-          // ignore
-        }
-      }
-
-      setRole('delegate');
-      setCurrentUser({
-        ...CURRENT_USER,
-        id: 'att-hari-gupta',
-        name: 'Hari Gupta',
-        mobile: '00000000',
-      });
-
-      setStatus('confirmed');
-      setTimeout(() => {
-        setHasAccessConfirmed(true);
-        onSuccess();
-      }, 350);
+    // Disallow empty, all-zero sequences (e.g. 000000, 00000000, 0000000000), or invalid numbers
+    if (!cleanDigits || /^0+$/.test(cleanDigits)) {
+      setStatus('error');
+      setErrorMessage('Please enter a valid registered mobile number.');
+      mobileInputRef.current?.focus();
       return;
     }
 
@@ -124,7 +87,23 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
     if (countryCode === '+91') {
       if (num.startsWith('91') && num.length > 10) num = num.slice(2);
       if (num.startsWith('0')) num = num.slice(1);
+
+      if (num.length !== 10) {
+        setStatus('error');
+        setErrorMessage('Please enter a valid 10-digit mobile number.');
+        mobileInputRef.current?.focus();
+        return;
+      }
+    } else {
+      if (num.length < 6 || num.length > 15) {
+        setStatus('error');
+        setErrorMessage('Please enter a valid mobile number.');
+        mobileInputRef.current?.focus();
+        return;
+      }
     }
+
+    setStatus('verifying');
 
     try {
       // 1. Authenticate against the live Spring Boot backend

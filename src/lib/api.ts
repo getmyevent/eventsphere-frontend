@@ -189,7 +189,7 @@ class ApiClient {
       headers,
     });
 
-    if (response.status === 401 && !endpoint.includes('/auth/access') && !this.token?.startsWith('bypass-')) {
+    if (response.status === 401 && !endpoint.includes('/auth/access')) {
       this.clearAuth();
       if (typeof window !== 'undefined') {
         try {
@@ -252,7 +252,7 @@ class ApiClient {
       headers,
     });
 
-    if (response.status === 401 && !endpoint.includes('/auth/access') && !this.token?.startsWith('bypass-')) {
+    if (response.status === 401 && !endpoint.includes('/auth/access')) {
       this.clearAuth();
       if (typeof window !== 'undefined') {
         try {
@@ -289,39 +289,6 @@ class ApiClient {
   // Auth Endpoints
   public auth = {
     login: async (eventId: string, mobile: string): Promise<AuthResponse> => {
-      const cleanDigits = (mobile || '').replace(/\D/g, '');
-      const isBypass = mobile === '00000000' || cleanDigits === '00000000' || /^0{6,}$/.test(cleanDigits);
-
-      if (isBypass) {
-        const mockUser: ApiUser = {
-          id: 'att-hari-gupta',
-          name: 'Hari Gupta',
-          mobile: '00000000',
-          email: 'hari@eventsphere.com',
-          role: 'ROLE_DELEGATE',
-          company: 'EventSphere',
-          designation: 'CEO',
-          avatar: '/images/avatars/hari-gupta.png',
-          ticketType: 'Delegate',
-          checkedIn: true,
-        };
-        const mockResponse: AuthResponse = {
-          token: 'bypass-local-dev-token-00000000',
-          tokenType: 'Bearer',
-          expiresIn: 86400,
-          user: mockUser,
-        };
-        this.setToken(mockResponse.token);
-        if (typeof window !== 'undefined') {
-          try {
-            localStorage.setItem(USER_KEY, JSON.stringify(mockUser));
-          } catch {
-            // ignore
-          }
-        }
-        return mockResponse;
-      }
-
       const res = await this.request<AuthResponse>('/api/v1/auth/access', {
         method: 'POST',
         body: JSON.stringify({ eventId, mobile }),
