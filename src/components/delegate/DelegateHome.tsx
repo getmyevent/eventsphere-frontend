@@ -301,7 +301,7 @@ export const DelegateHome: React.FC = () => {
                 <strong className="text-white font-semibold">{event.totalRegistered || attendees.length}</strong> attendees
               </span>
               <span className="bg-[#1E293B]/70 border border-slate-700/60 text-slate-300 px-2 py-0.5 rounded-md shrink-0">
-                <strong className="text-white font-semibold">40+</strong> speakers
+                <strong className="text-white font-semibold">{event.totalSpeakers || 89}+</strong> speakers
               </span>
               <span className="bg-[#1E293B]/70 border border-slate-700/60 text-slate-300 px-2 py-0.5 rounded-md shrink-0">
                 <strong className="text-white font-semibold">50+</strong> exhibitors

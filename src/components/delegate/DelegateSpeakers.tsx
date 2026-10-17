@@ -1,22 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-  BarChart2,
-  Briefcase,
-  Building2,
-  Calendar,
-  Check,
   ChevronLeft,
-  Clock,
-  LineChart,
-  Linkedin,
-  Mic,
   Search,
-  User,
-  UserPlus,
-  Users,
   Star,
 } from 'lucide-react';
 
@@ -30,9 +18,7 @@ export const DelegateSpeakers: React.FC = () => {
     currentUser,
     connections,
     connectWith,
-    disconnectFrom,
     setSelectedPersonId,
-    setActiveDelegateTab,
     savedPeopleIds,
     toggleSavePerson,
   } = useStore();
@@ -42,57 +28,28 @@ export const DelegateSpeakers: React.FC = () => {
   const isConnected = (personId: string) => connections.some((c) => c.personId === personId && c.status === 'connected');
   const isPending = (personId: string) => connections.some((c) => c.personId === personId && c.status === 'pending');
 
-  const [serverSpeakers, setServerSpeakers] = useState<Person[] | null>(null);
-
-  React.useEffect(() => {
-    if (!searchQuery.trim()) {
-      setServerSpeakers(null);
-      return;
-    }
-    const timer = setTimeout(() => {
-      import('../../lib/api').then(({ api }) => {
-        api.attendees.getAll({ query: searchQuery.trim(), category: 'speaker' })
-          .then((res) => {
-            if (Array.isArray(res)) {
-              setServerSpeakers(res.map((a: any) => ({
-                id: a.id,
-                name: a.name,
-                designation: a.designation || '',
-                company: a.company || '',
-                role: 'speaker',
-                avatar: a.avatar || a.avatarUrl || '',
-                bio: a.bio || '',
-                email: a.email || 'Not publicly listed',
-                mobile: a.mobile || '',
-                linkedin: a.linkedin || '',
-                interests: a.interests || [],
-                skills: a.skills || [],
-                privacy: a.privacy || { preset: 'Open', shareEmail: false, sharePhone: false, shareLinkedIn: true, shareTwitter: true },
-                checkedIn: Boolean(a.checkedIn),
-                registrationId: a.registrationId || `#${a.id.slice(-4)}`,
-                ticketType: a.ticketType || 'Speaker Pass',
-              })));
-            }
-          })
-          .catch(() => setServerSpeakers(null));
-      });
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [searchQuery]);
-
-  const speakers = attendees.filter(p => p.role === 'speaker' && p.id !== currentUser.id);
-  
-  const filteredSpeakers = serverSpeakers || speakers.filter(speaker => 
-    searchQuery === '' || 
-    speaker.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    speaker.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    speaker.designation.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const handleConnect = (personId: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    connectWith(personId, 'direct');
+  const getInitials = (name: string) => {
+    const clean = name.replace(/^(dr\.|prof\.|maj\.\s*gen\.?|mr\.|mrs\.|ms\.)\s+/i, '').trim();
+    const parts = clean.split(/\s+/).filter(Boolean);
+    if (parts.length === 0) return name.slice(0, 2).toUpperCase();
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
   };
+
+  const speakers = useMemo(() => {
+    return attendees.filter((p) => p.role === 'speaker' && p.id !== currentUser.id);
+  }, [attendees, currentUser.id]);
+
+  const filteredSpeakers = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return speakers;
+    return speakers.filter(
+      (speaker) =>
+        speaker.name.toLowerCase().includes(q) ||
+        speaker.company.toLowerCase().includes(q) ||
+        speaker.designation.toLowerCase().includes(q)
+    );
+  }, [speakers, searchQuery]);
 
   return (
     <div className="flex-1 min-h-0 bg-[#F8F7F4] flex flex-col h-full overflow-hidden">
@@ -136,9 +93,6 @@ export const DelegateSpeakers: React.FC = () => {
 
         <div className="grid grid-cols-2 gap-3">
           {filteredSpeakers.map((speaker) => {
-            const connected = isConnected(speaker.id);
-            const pending = isPending(speaker.id);
-
             return (
               <div
                 key={speaker.id}
@@ -149,14 +103,24 @@ export const DelegateSpeakers: React.FC = () => {
                   {/* Photo with LinkedIn Badge */}
                   <div className="relative w-full h-[126px] rounded-[12px] overflow-hidden bg-slate-100 shrink-0 border border-slate-200/70">
                     {speaker.avatar ? (
-                      <img
-                        src={speaker.avatar}
-                        alt={speaker.name}
-                        className="w-full h-full object-cover object-top transition-transform duration-300 group-hover:scale-105"
-                      />
+                      <>
+                        <img
+                          src={speaker.avatar}
+                          alt={speaker.name}
+                          className="w-full h-full object-cover object-top transition-transform duration-300 group-hover:scale-105"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                            const fallback = e.currentTarget.parentElement?.querySelector('.avatar-fallback');
+                            if (fallback) (fallback as HTMLElement).style.display = 'flex';
+                          }}
+                        />
+                        <div className="avatar-fallback w-full h-full hidden items-center justify-center bg-gradient-to-br from-[#E2E8F0] to-[#CBD5E1] text-[#1E293B] font-bold text-lg select-none">
+                          {getInitials(speaker.name)}
+                        </div>
+                      </>
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#E2E8F0] to-[#CBD5E1] text-[#1E293B] font-bold text-xl">
-                        {speaker.name.split(' ').map((n) => n[0]).join('')}
+                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#E2E8F0] to-[#CBD5E1] text-[#1E293B] font-bold text-lg select-none">
+                        {getInitials(speaker.name)}
                       </div>
                     )}
 
@@ -178,25 +142,25 @@ export const DelegateSpeakers: React.FC = () => {
                       />
                     </button>
 
-                    {/* LinkedIn Badge at Top Right */}
-                    <a
-                      href={
-                        speaker.linkedin
-                          ? speaker.linkedin.startsWith('http')
+                    {/* LinkedIn Badge at Top Right (if linkedin profile exists) */}
+                    {speaker.linkedin ? (
+                      <a
+                        href={
+                          speaker.linkedin.startsWith('http')
                             ? speaker.linkedin
                             : `https://${speaker.linkedin}`
-                          : `https://www.linkedin.com/search/results/all/?keywords=${encodeURIComponent(speaker.name)}`
-                      }
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={(e) => e.stopPropagation()}
-                      className="absolute top-2 right-2 w-[24px] h-[24px] rounded-[6px] bg-white shadow-xs border border-white/80 flex items-center justify-center transition-transform active:scale-90 hover:scale-105 z-10"
-                      title="View LinkedIn Profile"
-                    >
-                      <div className="w-[15px] h-[15px] rounded-[2.5px] bg-[#0A66C2] flex items-center justify-center text-white text-[9.5px] font-bold leading-none font-sans">
-                        in
-                      </div>
-                    </a>
+                        }
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="absolute top-2 right-2 w-[24px] h-[24px] rounded-[6px] bg-white shadow-xs border border-white/80 flex items-center justify-center transition-transform active:scale-90 hover:scale-105 z-10"
+                        title="View LinkedIn Profile"
+                      >
+                        <div className="w-[15px] h-[15px] rounded-[2.5px] bg-[#0A66C2] flex items-center justify-center text-white text-[9.5px] font-bold leading-none font-sans">
+                          in
+                        </div>
+                      </a>
+                    ) : null}
                   </div>
 
                   {/* Speaker Info */}
