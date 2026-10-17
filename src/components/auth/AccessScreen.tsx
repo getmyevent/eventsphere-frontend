@@ -4,7 +4,25 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useStore } from '../../lib/store';
 import { api, ApiUser } from '../../lib/api';
 import { CURRENT_USER } from '../../lib/mockData';
-import { ShieldCheck, CheckCircle2, AlertCircle, ArrowRight, Loader2, Lock } from 'lucide-react';
+import { ShieldCheck, CheckCircle2, AlertCircle, ArrowRight, Loader2, Lock, ChevronDown } from 'lucide-react';
+
+const COUNTRY_CODES = [
+  { code: '+91' },
+  { code: '+1' },
+  { code: '+44' },
+  { code: '+971' },
+  { code: '+65' },
+  { code: '+886' },
+  { code: '+81' },
+  { code: '+82' },
+  { code: '+49' },
+  { code: '+33' },
+  { code: '+31' },
+  { code: '+61' },
+  { code: '+966' },
+  { code: '+972' },
+  { code: '+86' },
+];
 
 interface AccessScreenProps {
   onSuccess: () => void;
@@ -14,6 +32,7 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
   const { setRole, setHasAccessConfirmed, setCurrentUser, resetUserState } = useStore();
   
   const [eventId, setEventId] = useState('MPSS26');
+  const [countryCode, setCountryCode] = useState('+91');
   const [mobile, setMobile] = useState('');
   const [status, setStatus] = useState<'idle' | 'verifying' | 'confirmed' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
@@ -27,6 +46,7 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
   }, [mobile]);
 
   const handleQuickSelect = (num: string) => {
+    setCountryCode('+91');
     setMobile(num);
     setErrorMessage('');
     if (status === 'error') setStatus('idle');
@@ -101,8 +121,10 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
 
     // Extract digits and normalize
     let num = cleanDigits;
-    if (num.startsWith('91') && num.length > 10) num = num.slice(2);
-    if (num.startsWith('0')) num = num.slice(1);
+    if (countryCode === '+91') {
+      if (num.startsWith('91') && num.length > 10) num = num.slice(2);
+      if (num.startsWith('0')) num = num.slice(1);
+    }
 
     try {
       // 1. Authenticate against the live Spring Boot backend
@@ -222,7 +244,7 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
         err.message?.includes('NetworkError');
 
       if (isConnectionOrServerError) {
-        setErrorMessage('Backend server offline. Enter 00000000 to log in on local server.');
+        setErrorMessage('Unable to connect to server. Please try again later.');
       } else {
         setErrorMessage(err.message || 'Login failed. Please verify your registered mobile number.');
       }
@@ -302,7 +324,32 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
               <label className="block text-[11.5px] font-semibold text-[#181818] mb-1">
                 Registered Mobile Number
               </label>
-              <div className="relative">
+              <div className="flex rounded-lg bg-white border border-[#DEDCD7] focus-within:ring-2 focus-within:ring-[#B51F32] focus-within:border-transparent transition-all shadow-sm overflow-hidden">
+                {/* Country Code Section */}
+                <div className="relative flex items-center bg-[#F9F9F8] border-r border-[#DEDCD7] px-2.5 shrink-0 hover:bg-[#F3F2EE] transition-colors cursor-pointer">
+                  {/* Visible Code and Arrow with tight spacing */}
+                  <div className="flex items-center gap-1 text-[13px] font-semibold text-[#181818] tracking-tight pointer-events-none select-none">
+                    <span>{countryCode}</span>
+                    <ChevronDown className="w-3 h-3 text-[#6B6B6B]" />
+                  </div>
+
+                  {/* Native Select Overlay */}
+                  <select
+                    value={countryCode}
+                    onChange={(e) => setCountryCode(e.target.value)}
+                    disabled={status === 'verifying' || status === 'confirmed'}
+                    aria-label="Country Code"
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  >
+                    {COUNTRY_CODES.map((c) => (
+                      <option key={c.code} value={c.code}>
+                        {c.code}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Mobile Input */}
                 <input
                   ref={mobileInputRef}
                   type="tel"
@@ -311,21 +358,11 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
                     setMobile(e.target.value);
                     if (status === 'error') setStatus('idle');
                   }}
-                  placeholder="e.g. 9876543210 or 00000000"
+                  placeholder="e.g. 9876543210"
                   disabled={status === 'verifying' || status === 'confirmed'}
-                  className="w-full px-3 py-2 rounded-lg bg-white border border-[#DEDCD7] text-[13px] font-medium text-[#181818] focus:outline-none focus:ring-2 focus:ring-[#B51F32] focus:border-transparent transition-all shadow-sm"
+                  className="flex-1 min-w-0 px-3 py-2 text-[13px] font-medium text-[#181818] bg-transparent focus:outline-none placeholder-[#9CA3AF]"
                   autoComplete="tel"
                 />
-              </div>
-              <div className="flex items-center justify-between mt-1.5 px-0.5">
-                <span className="text-[11px] text-[#71717A]">Local dev test number:</span>
-                <button
-                  type="button"
-                  onClick={() => handleQuickSelect('00000000')}
-                  className="text-[11px] font-medium text-[#B51F32] bg-red-50 hover:bg-red-100 border border-red-200 px-2 py-0.5 rounded cursor-pointer transition-colors"
-                >
-                  Quick fill 00000000
-                </button>
               </div>
             </div>
 
