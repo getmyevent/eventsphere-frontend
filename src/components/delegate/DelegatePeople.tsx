@@ -37,6 +37,7 @@ export const DelegatePeople: React.FC = () => {
     ).filter(Boolean) as Person[];
   }, [attendees, viewSavedPeopleOnly, savedPeopleIds]);
 
+  
   const [serverResults, setServerResults] = useState<Person[] | null>(null);
 
   React.useEffect(() => {
