@@ -43,6 +43,7 @@ export const DelegatePeople: React.FC = () => {
     if (!searchQuery.trim() || viewSavedPeopleOnly) {
       setServerResults(null);
       return;
+      
     }
     const timer = setTimeout(() => {
       import('../../lib/api').then(({ api }) => {
