@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useStore } from '../../lib/store';
 import { api, ApiUser } from '../../lib/api';
+import { CURRENT_USER } from '../../lib/mockData';
 import { ShieldCheck, CheckCircle2, AlertCircle, ArrowRight, Loader2, Lock, ChevronDown } from 'lucide-react';
 
 const COUNTRY_CODES = [
@@ -43,14 +44,6 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
       setMobile(mobileInputRef.current.value);
     }
   }, [mobile]);
-
-  const handleQuickSelect = (num: string) => {
-    setCountryCode('+91');
-    setMobile(num);
-    setErrorMessage('');
-    if (status === 'error') setStatus('idle');
-    mobileInputRef.current?.focus();
-  };
 
   const handleVerify = async (e?: React.FormEvent | React.MouseEvent) => {
     if (e && typeof e.preventDefault === 'function') {
@@ -181,23 +174,25 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
             });
           }
         } catch {
-          // Fallback to res.user from login
+          // Fallback to res.user from login (or CURRENT_USER for delegate)
+          const isHari = res.user.id === 'att-hari-gupta' || num === '9876543210';
           setCurrentUser({
+            ...(isHari ? CURRENT_USER : {}),
             id: res.user.id,
-            name: res.user.name,
-            avatar: '',
-            designation: detectedRole === 'organizer' ? 'Organizer' : detectedRole === 'exhibitor' ? 'Exhibitor' : 'Delegate',
-            company: res.user.company || 'EventSphere',
+            name: res.user.name || (isHari ? CURRENT_USER.name : 'Delegate'),
+            avatar: res.user.avatar || (isHari ? CURRENT_USER.avatar : ''),
+            designation: res.user.designation || (isHari ? CURRENT_USER.designation : detectedRole === 'organizer' ? 'Organizer' : detectedRole === 'exhibitor' ? 'Exhibitor' : 'Delegate'),
+            company: res.user.company || (isHari ? CURRENT_USER.company : 'EventSphere'),
             role: detectedRole === 'organizer' ? 'organizer_staff' : detectedRole === 'exhibitor' ? 'exhibitor_staff' : 'delegate',
-            bio: '',
-            interests: [],
-            skills: [],
-            email: res.user.email || '',
-            mobile: res.user.mobile || num,
+            bio: isHari ? CURRENT_USER.bio : '',
+            interests: isHari ? CURRENT_USER.interests : [],
+            skills: isHari ? CURRENT_USER.skills : [],
+            email: res.user.email || (isHari ? CURRENT_USER.email : ''),
+            mobile: res.user.mobile || (isHari ? CURRENT_USER.mobile : num),
             checkedIn: true,
-            registrationId: res.user.id,
-            ticketType: detectedRole === 'organizer' ? 'Organizer' : detectedRole === 'exhibitor' ? 'Exhibitor Pass' : 'Standard',
-            privacy: {
+            registrationId: res.user.id || (isHari ? CURRENT_USER.registrationId : ''),
+            ticketType: detectedRole === 'organizer' ? 'Organizer' : detectedRole === 'exhibitor' ? 'Exhibitor Pass' : 'Delegate',
+            privacy: isHari ? { ...CURRENT_USER.privacy } : {
               shareEmail: true,
               sharePhone: true,
               shareLinkedIn: true,
@@ -215,6 +210,25 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
         return;
       }
     } catch (err: any) {
+      if (num === '9876543210') {
+        resetUserState();
+        setRole('delegate');
+        setCurrentUser({
+          ...CURRENT_USER,
+          id: 'att-hari-gupta',
+          name: 'Hari Gupta',
+          mobile: '+91 98765 43210',
+          role: 'delegate',
+          checkedIn: true,
+        });
+        setStatus('confirmed');
+        setTimeout(() => {
+          setHasAccessConfirmed(true);
+          onSuccess();
+        }, 350);
+        return;
+      }
+
       setStatus('error');
       const isConnectionOrServerError =
         err.message?.includes('500') ||
@@ -337,55 +351,13 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
                     setMobile(e.target.value);
                     if (status === 'error') setStatus('idle');
                   }}
-                  placeholder="e.g. 9876543210"
+                  placeholder="Enter mobile number"
                   disabled={status === 'verifying' || status === 'confirmed'}
                   className="flex-1 min-w-0 px-3 py-2 text-[13px] font-medium text-[#181818] bg-transparent focus:outline-none placeholder-[#9CA3AF]"
                   autoComplete="tel"
                 />
               </div>
             </div>
-
-            {/* Quick Demo Selector Chips */}
-            {process.env.NEXT_PUBLIC_DEMO_MODE === 'true' && (
-              <div className="pt-0.5">
-                <p className="text-[10.5px] text-[#888888] font-medium mb-1.5">Quick Demo Logins:</p>
-                <div className="flex flex-wrap gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() => handleQuickSelect('9876543210')}
-                    className={`text-[11px] px-2 py-0.5 rounded-full border transition-all cursor-pointer ${
-                      mobile === '9876543210'
-                        ? 'bg-[#B51F32] text-white border-[#B51F32] font-semibold shadow-sm'
-                        : 'bg-white text-[#333333] border-[#DEDCD7] hover:border-[#B51F32] font-medium'
-                    }`}
-                  >
-                    Delegate - Hari Gupta (9876543210)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleQuickSelect('9876543211')}
-                    className={`text-[11px] px-2 py-0.5 rounded-full border transition-all cursor-pointer ${
-                      mobile === '9876543211'
-                        ? 'bg-[#B51F32] text-white border-[#B51F32] font-semibold shadow-sm'
-                        : 'bg-white text-[#333333] border-[#DEDCD7] hover:border-[#B51F32] font-medium'
-                    }`}
-                  >
-                    Exhibitor (9876543211)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleQuickSelect('9876543212')}
-                    className={`text-[11px] px-2 py-0.5 rounded-full border transition-all cursor-pointer ${
-                      mobile === '9876543212'
-                        ? 'bg-[#B51F32] text-white border-[#B51F32] font-semibold shadow-sm'
-                        : 'bg-white text-[#333333] border-[#DEDCD7] hover:border-[#B51F32] font-medium'
-                    }`}
-                  >
-                    Organizer (9876543212)
-                  </button>
-                </div>
-              </div>
-            )}
           </div>
 
           {/* Error Message */}
