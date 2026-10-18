@@ -36,7 +36,7 @@ interface PollItem {
 }
 
 export const OrganizerPolls: React.FC = () => {
-  const { sessions, poll, showToast, togglePollStatus, resetPollVote } = useStore();
+  const { sessions, poll, setPoll, showToast, togglePollStatus, resetPollVote } = useStore();
 
   const [pollsList, setPollsList] = useState<PollItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -125,6 +125,22 @@ export const OrganizerPolls: React.FC = () => {
         question: cleanQuestion,
         options: cleanOptions,
       });
+
+      if (newPoll && newPoll.id) {
+        setPoll({
+          id: newPoll.id,
+          sessionId: newPoll.sessionId || formSessionId,
+          question: newPoll.question || cleanQuestion,
+          status: (newPoll.status as any) || 'open',
+          totalVotes: newPoll.totalVotes || 0,
+          voterIds: [],
+          options: (newPoll.options || []).map((opt: any) => ({
+            id: opt.id,
+            text: opt.text,
+            votes: opt.votes || 0,
+          })),
+        });
+      }
 
       showToast('Live poll published successfully! Attendees can now vote in real-time.', 'success');
       setIsModalOpen(false);
@@ -341,6 +357,29 @@ export const OrganizerPolls: React.FC = () => {
                 </div>
 
                 <div className="flex items-center gap-2 shrink-0">
+                  {poll.id !== p.id && (
+                    <button
+                      onClick={() => {
+                        setPoll({
+                          id: p.id,
+                          sessionId: p.sessionId,
+                          question: p.question,
+                          status: p.status,
+                          totalVotes: p.totalVotes,
+                          voterIds: [],
+                          options: p.options.map((opt) => ({
+                            id: opt.id,
+                            text: opt.text,
+                            votes: opt.voteCount ?? 0,
+                          })),
+                        });
+                        showToast(`Activated poll "${p.question.substring(0, 30)}..."`, 'info');
+                      }}
+                      className="px-2.5 py-1 text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 font-medium rounded transition-colors cursor-pointer"
+                    >
+                      Make Active
+                    </button>
+                  )}
                   <button
                     onClick={() => handleToggleStatus(p.id, p.status)}
                     className="px-2.5 py-1 text-xs border border-gray-200 rounded hover:bg-gray-50 text-gray-700 transition-colors cursor-pointer"

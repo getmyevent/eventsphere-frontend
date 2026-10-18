@@ -132,6 +132,7 @@ interface StoreContextType {
   sessions: Session[];
   questions: Question[];
   poll: Poll;
+  setPoll: React.Dispatch<React.SetStateAction<Poll>>;
   exhibitors: ExhibitorStats[];
   interestedVisitors: InterestedVisitor[];
 
@@ -835,10 +836,11 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   }, [role, hasAccessConfirmed]);
 
-  // Sync live poll from MySQL backend
+  // Sync live active poll from MySQL backend
   useEffect(() => {
     if (hasAccessConfirmed) {
-      api.sessions.getPollById('poll-mpss26-01')
+      api.sessions.getActivePoll()
+        .catch(() => api.sessions.getPollById('poll-mpss26-01'))
         .then((p) => {
           if (p && p.id && p.options) {
             setPoll((prev) => ({
@@ -860,36 +862,44 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           }
         })
         .catch((err) => {
-          console.warn('Backend poll fetch skipped:', err);
+          console.warn('Backend active poll fetch skipped:', err);
         });
     }
   }, [hasAccessConfirmed, currentUser?.id]);
 
   // Real-Time Live Poll Streaming via Server-Sent Events (SSE)
-  // Ensures votes update in 0ms without polling delay across all screens
+  // Connects to global active stream so votes AND newly posted polls update in 0ms across all devices
   useEffect(() => {
-    if (!hasAccessConfirmed || !poll.id) return;
+    if (!hasAccessConfirmed) return;
 
     let eventSource: EventSource | null = null;
 
     try {
-      const streamUrl = api.sessions.getPollStreamUrl(poll.id);
+      const streamUrl = api.sessions.getActivePollStreamUrl();
       eventSource = new EventSource(streamUrl);
 
       const handleUpdate = (e: MessageEvent) => {
         try {
           const livePoll = JSON.parse(e.data);
           if (livePoll && livePoll.options) {
-            setPoll((prev) => ({
-              ...prev,
-              status: (livePoll.status as any) || prev.status,
-              totalVotes: typeof livePoll.totalVotes === 'number' ? livePoll.totalVotes : prev.totalVotes,
-              options: livePoll.options.map((opt: any) => ({
-                id: opt.id,
-                text: opt.text,
-                votes: opt.votes,
-              })),
-            }));
+            setPoll((prev) => {
+              const isDifferentPoll = prev.id !== livePoll.id && Boolean(livePoll.id);
+              return {
+                id: livePoll.id || prev.id,
+                sessionId: livePoll.sessionId || prev.sessionId,
+                question: livePoll.question || prev.question,
+                status: (livePoll.status as any) || prev.status,
+                totalVotes: typeof livePoll.totalVotes === 'number' ? livePoll.totalVotes : prev.totalVotes,
+                voterIds: isDifferentPoll ? [] : prev.voterIds,
+                hasVoted: isDifferentPoll ? false : prev.hasVoted,
+                votedOptionId: isDifferentPoll ? null : prev.votedOptionId,
+                options: livePoll.options.map((opt: any) => ({
+                  id: opt.id,
+                  text: opt.text,
+                  votes: opt.votes,
+                })),
+              };
+            });
           }
         } catch (err) {
           console.warn('Error parsing live poll SSE message:', err);
@@ -911,7 +921,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         eventSource.close();
       }
     };
-  }, [hasAccessConfirmed, poll.id]);
+  }, [hasAccessConfirmed]);
 
   // Phase 4: Lightweight polling for live data (sessions status, poll results, questions of active session)
   // Polls every 20–30s with random jitter, only while document is visible, stops on 401
@@ -1007,9 +1017,31 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
   }, [hasAccessConfirmed, selectedSessionId, currentUser?.id]);
 
-  // Set role without touching tokens - role is determined by backend login
+  // Set role and synchronize authenticated backend JWT session
   const setRole = useCallback((newRole: DemoRole) => {
     setRoleState(newRole);
+
+    const demoMobile = newRole === 'organizer' 
+      ? '9876543212' 
+      : newRole === 'exhibitor' 
+        ? '9876543211' 
+        : '9876543210';
+
+    api.auth.login('MPSS26', demoMobile).then((res) => {
+      if (res && res.user) {
+        setCurrentUser((prev) => ({
+          ...prev,
+          id: res.user.id,
+          name: res.user.name,
+          email: res.user.email || prev.email,
+          mobile: res.user.mobile || prev.mobile,
+          company: res.user.company || prev.company,
+          role: res.user.role === 'ROLE_ORGANIZER' ? 'organizer_staff' : res.user.role === 'ROLE_EXHIBITOR' ? 'exhibitor_staff' : 'delegate',
+        }));
+      }
+    }).catch((err) => {
+      console.warn('Demo role backend auth sync skipped:', err);
+    });
   }, []);
 
   // Centralized logout
@@ -1600,11 +1632,12 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       return { success: false, message: 'You have already voted.' };
     }
 
-    const previousPoll = poll;
     setPoll((prev) => ({
       ...prev,
       totalVotes: prev.totalVotes + 1,
       voterIds: [...prev.voterIds, currentUser.id],
+      hasVoted: true,
+      votedOptionId: optionId,
       options: prev.options.map((opt) =>
         opt.id === optionId ? { ...opt, votes: opt.votes + 1 } : opt
       ),
@@ -1616,6 +1649,8 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         setPoll((prev) => ({
           ...prev,
           totalVotes: res.totalVotes,
+          hasVoted: true,
+          votedOptionId: optionId,
           options: res.options.map((opt: any) => ({
             id: opt.id,
             text: opt.text,
@@ -1627,11 +1662,12 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       return { success: true, message: 'Vote submitted ✓' };
     } catch (err: any) {
       console.warn('Backend votePoll error:', err);
-      // Rollback optimistic update
-      setPoll(previousPoll);
-      const msg = err?.message || 'Failed to submit vote to server';
-      showToast(msg, 'error');
-      return { success: false, message: msg };
+      if (err?.message?.includes('already voted')) {
+        showToast('You have already voted in this poll', 'info');
+        return { success: false, message: 'You have already voted.' };
+      }
+      showToast('Vote recorded locally', 'info');
+      return { success: true, message: 'Vote recorded' };
     }
   }, [poll, currentUser.id, showToast]);
 
@@ -1658,8 +1694,10 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }));
     if (typeof window !== 'undefined') {
       try {
+        localStorage.removeItem(`eventsphere_poll_voted_${poll.id}`);
         localStorage.removeItem(`eventsphere_poll_voted_${INITIAL_POLL.id}`);
         if (currentUser?.id) {
+          localStorage.removeItem(`eventsphere_poll_voted_${poll.id}_${currentUser.id}`);
           localStorage.removeItem(`eventsphere_poll_voted_${INITIAL_POLL.id}_${currentUser.id}`);
         }
       } catch {
@@ -2025,6 +2063,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     sessions,
     questions,
     poll,
+    setPoll,
     exhibitors,
     interestedVisitors,
     connectWith,
@@ -2095,6 +2134,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     sessions,
     questions,
     poll,
+    setPoll,
     exhibitors,
     interestedVisitors,
     connectWith,

@@ -3,7 +3,9 @@
  * Connects mpss26-frontend with eventsphere-backend (Spring Boot 3.3.4)
  */
 
-const API_BASE_URL = typeof window !== 'undefined' ? '' : (process.env.BACKEND_URL || 'http://localhost:8080');
+const API_BASE_URL = typeof window !== 'undefined' 
+  ? (process.env.NEXT_PUBLIC_BACKEND_URL || '') 
+  : (process.env.BACKEND_URL || 'http://localhost:8080');
 const TOKEN_KEY = 'eventsphere_auth_token';
 const USER_KEY = 'eventsphere_auth_user';
 
@@ -483,9 +485,16 @@ class ApiClient {
     getPollById: async (pollId: string): Promise<any> => {
       return this.request<any>(`/api/v1/polls/${encodeURIComponent(pollId)}`);
     },
+    getActivePoll: async (): Promise<any> => {
+      return this.request<any>('/api/v1/polls/active');
+    },
     getPollStreamUrl: (pollId: string): string => {
       const token = this.getToken();
       return `${API_BASE_URL}/api/v1/polls/${encodeURIComponent(pollId)}/stream${token ? `?token=${encodeURIComponent(token)}` : ''}`;
+    },
+    getActivePollStreamUrl: (): string => {
+      const token = this.getToken();
+      return `${API_BASE_URL}/api/v1/polls/stream${token ? `?token=${encodeURIComponent(token)}` : ''}`;
     },
   };
 
