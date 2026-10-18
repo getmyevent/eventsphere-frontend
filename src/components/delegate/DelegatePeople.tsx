@@ -40,6 +40,7 @@ export const DelegatePeople: React.FC = () => {
   
   const [serverResults, setServerResults] = useState<Person[] | null>(null);
 
+  
   React.useEffect(() => {
     if (!searchQuery.trim() || viewSavedPeopleOnly) {
       setServerResults(null);
