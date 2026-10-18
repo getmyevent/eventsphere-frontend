@@ -7,6 +7,7 @@ import {
   Users,
   Building2,
   Calendar,
+  BarChart3,
   FileText,
   Settings,
   LogOut,
@@ -17,6 +18,7 @@ import { OrganizerOverview } from './OrganizerOverview';
 import { OrganizerAttendees } from './OrganizerAttendees';
 import { OrganizerExhibitors } from './OrganizerExhibitors';
 import { OrganizerSessions } from './OrganizerSessions';
+import { OrganizerPolls } from './OrganizerPolls';
 import { OrganizerReports } from './OrganizerReports';
 import { OrganizerSettings } from './OrganizerSettings';
 
@@ -35,6 +37,7 @@ export const OrganizerConsole: React.FC = () => {
     { id: 'attendees' as const, label: 'Attendees', icon: Users, badge: event.totalRegistered.toLocaleString() },
     { id: 'exhibitors' as const, label: 'Exhibitors', icon: Building2, badge: event.totalExhibitors.toString() },
     { id: 'sessions' as const, label: 'Sessions', icon: Calendar },
+    { id: 'polls' as const, label: 'Live Polls', icon: BarChart3 },
     { id: 'reports' as const, label: 'Reports', icon: FileText },
     { id: 'settings' as const, label: 'Settings', icon: Settings },
   ];
@@ -155,6 +158,7 @@ export const OrganizerConsole: React.FC = () => {
         {activeOrganizerTab === 'attendees' && <OrganizerAttendees />}
         {activeOrganizerTab === 'exhibitors' && <OrganizerExhibitors />}
         {activeOrganizerTab === 'sessions' && <OrganizerSessions />}
+        {activeOrganizerTab === 'polls' && <OrganizerPolls />}
         {activeOrganizerTab === 'reports' && <OrganizerReports />}
         {activeOrganizerTab === 'settings' && <OrganizerSettings />}
       </main>

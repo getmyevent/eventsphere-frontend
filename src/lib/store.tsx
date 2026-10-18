@@ -83,8 +83,8 @@ interface StoreContextType {
   toggleSaveCompany: (id: string) => void;
   activeExhibitorTab: 'home' | 'leads' | 'scan' | 'products' | 'more';
   setActiveExhibitorTab: (tab: 'home' | 'leads' | 'scan' | 'products' | 'more') => void;
-  activeOrganizerTab: 'overview' | 'attendees' | 'exhibitors' | 'sessions' | 'reports' | 'settings';
-  setActiveOrganizerTab: (tab: 'overview' | 'attendees' | 'exhibitors' | 'sessions' | 'reports' | 'settings') => void;
+  activeOrganizerTab: 'overview' | 'attendees' | 'exhibitors' | 'sessions' | 'polls' | 'reports' | 'settings';
+  setActiveOrganizerTab: (tab: 'overview' | 'attendees' | 'exhibitors' | 'sessions' | 'polls' | 'reports' | 'settings') => void;
 
   // View frame mode for Delegate/Exhibitor (centered 430px frame vs full)
   viewMode: 'frame' | 'responsive';
@@ -180,7 +180,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [viewSavedCompaniesOnly, setViewSavedCompaniesOnly] = useState<boolean>(false);
   const [scheduleSubTab, setScheduleSubTab] = useState<'all' | 'saved'>('all');
   const [activeExhibitorTab, setActiveExhibitorTab] = useState<'home' | 'leads' | 'scan' | 'products' | 'more'>('home');
-  const [activeOrganizerTab, setActiveOrganizerTab] = useState<'overview' | 'attendees' | 'exhibitors' | 'sessions' | 'reports' | 'settings'>('overview');
+  const [activeOrganizerTab, setActiveOrganizerTab] = useState<'overview' | 'attendees' | 'exhibitors' | 'sessions' | 'polls' | 'reports' | 'settings'>('overview');
   const [viewMode, setViewMode] = useState<'frame' | 'responsive'>('frame');
 
   // Connectivity
