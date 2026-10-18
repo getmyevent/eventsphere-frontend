@@ -865,6 +865,54 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   }, [hasAccessConfirmed, currentUser?.id]);
 
+  // Real-Time Live Poll Streaming via Server-Sent Events (SSE)
+  // Ensures votes update in 0ms without polling delay across all screens
+  useEffect(() => {
+    if (!hasAccessConfirmed || !poll.id) return;
+
+    let eventSource: EventSource | null = null;
+
+    try {
+      const streamUrl = api.sessions.getPollStreamUrl(poll.id);
+      eventSource = new EventSource(streamUrl);
+
+      const handleUpdate = (e: MessageEvent) => {
+        try {
+          const livePoll = JSON.parse(e.data);
+          if (livePoll && livePoll.options) {
+            setPoll((prev) => ({
+              ...prev,
+              status: (livePoll.status as any) || prev.status,
+              totalVotes: typeof livePoll.totalVotes === 'number' ? livePoll.totalVotes : prev.totalVotes,
+              options: livePoll.options.map((opt: any) => ({
+                id: opt.id,
+                text: opt.text,
+                votes: opt.votes,
+              })),
+            }));
+          }
+        } catch (err) {
+          console.warn('Error parsing live poll SSE message:', err);
+        }
+      };
+
+      eventSource.addEventListener('poll-init', handleUpdate);
+      eventSource.addEventListener('poll-update', handleUpdate);
+
+      eventSource.onerror = () => {
+        // EventSource will automatically retry in background
+      };
+    } catch (err) {
+      console.warn('EventSource initialization failed:', err);
+    }
+
+    return () => {
+      if (eventSource) {
+        eventSource.close();
+      }
+    };
+  }, [hasAccessConfirmed, poll.id]);
+
   // Phase 4: Lightweight polling for live data (sessions status, poll results, questions of active session)
   // Polls every 20–30s with random jitter, only while document is visible, stops on 401
   useEffect(() => {
@@ -1588,13 +1636,17 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }, [poll, currentUser.id, showToast]);
 
   // Toggle Poll Status (Open / Closed)
-  const togglePollStatus = useCallback(() => {
-    setPoll((prev) => {
-      const nextStatus = prev.status === 'open' ? 'closed' : 'open';
-      showToast(`Poll is now ${nextStatus.toUpperCase()}`, 'info');
-      return { ...prev, status: nextStatus };
-    });
-  }, [showToast]);
+  const togglePollStatus = useCallback(async () => {
+    const nextStatus = poll.status === 'open' ? 'closed' : 'open';
+    setPoll((prev) => ({ ...prev, status: nextStatus }));
+    showToast(`Poll is now ${nextStatus.toUpperCase()}`, 'info');
+
+    try {
+      await api.organizer.updatePollStatus(poll.id, nextStatus);
+    } catch (err) {
+      console.warn('Backend updatePollStatus error:', err);
+    }
+  }, [poll.id, poll.status, showToast]);
 
   // Reset Poll to Initial State (for delegates / testing)
   const resetPollVote = useCallback(async () => {

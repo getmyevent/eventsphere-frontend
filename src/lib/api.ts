@@ -413,6 +413,21 @@ class ApiClient {
     getExhibitors: async (): Promise<OrganizerExhibitor[]> => {
       return this.request<OrganizerExhibitor[]>('/api/v1/organizer/exhibitors');
     },
+    getPolls: async (): Promise<any[]> => {
+      return this.request<any[]>('/api/v1/organizer/polls');
+    },
+    createPoll: async (data: { sessionId: string; question: string; options: string[] }): Promise<any> => {
+      return this.request<any>('/api/v1/organizer/polls', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+    },
+    updatePollStatus: async (pollId: string, status: 'open' | 'closed'): Promise<any> => {
+      return this.request<any>(`/api/v1/organizer/polls/${encodeURIComponent(pollId)}/status`, {
+        method: 'PATCH',
+        body: JSON.stringify({ status }),
+      });
+    },
   };
 
   // Phase 7: Sessions, Q&A & Live Polls
@@ -467,6 +482,10 @@ class ApiClient {
     },
     getPollById: async (pollId: string): Promise<any> => {
       return this.request<any>(`/api/v1/polls/${encodeURIComponent(pollId)}`);
+    },
+    getPollStreamUrl: (pollId: string): string => {
+      const token = this.getToken();
+      return `${API_BASE_URL}/api/v1/polls/${encodeURIComponent(pollId)}/stream${token ? `?token=${encodeURIComponent(token)}` : ''}`;
     },
   };
 
