@@ -358,6 +358,48 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
                 />
               </div>
             </div>
+
+            {/* Quick Demo Access Pills */}
+            <div className="pt-1">
+              <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-wider mb-1.5">
+                Quick Demo Access
+              </p>
+              <div className="flex flex-wrap gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCountryCode('+91');
+                    setMobile('9876543210');
+                    if (status === 'error') setStatus('idle');
+                  }}
+                  className="px-2 py-1 bg-white hover:bg-[#EFECE6] border border-[#DEDCD7] rounded text-[11px] font-medium text-[#444] transition-colors cursor-pointer"
+                >
+                  <span className="font-semibold text-[#181818]">Delegate:</span> 9876543210
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCountryCode('+91');
+                    setMobile('9876543211');
+                    if (status === 'error') setStatus('idle');
+                  }}
+                  className="px-2 py-1 bg-white hover:bg-[#EFECE6] border border-[#DEDCD7] rounded text-[11px] font-medium text-[#444] transition-colors cursor-pointer"
+                >
+                  <span className="font-semibold text-[#181818]">Exhibitor:</span> 9876543211
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCountryCode('+91');
+                    setMobile('9876543212');
+                    if (status === 'error') setStatus('idle');
+                  }}
+                  className="px-2 py-1 bg-white hover:bg-[#FBEAEA] border border-[#B51F32]/40 text-[#B51F32] rounded text-[11px] font-medium transition-colors cursor-pointer"
+                >
+                  <span className="font-bold">Organizer:</span> 9876543212
+                </button>
+              </div>
+            </div>
           </div>
 
           {/* Error Message */}
