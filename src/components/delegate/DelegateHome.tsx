@@ -215,15 +215,29 @@ export const DelegateHome: React.FC = () => {
   };
 
   return (
-    <div className="flex-1 min-h-0 h-full px-3 pt-2 pb-3 space-y-3 bg-[#F8F7F4] overflow-y-auto select-none">
+    <div className="flex-1 min-h-0 h-full px-3 pt-2 pb-3 space-y-3 bg-[#F8F7F4] overflow-y-auto overflow-x-hidden select-none">
       {/* Top Greeting & Attendee Identity Header */}
       <div className="pt-2 pb-1">
-        <div className="flex items-center justify-between">
-          <div className="pr-2">
-            <p className="text-[10.5px] uppercase tracking-[0.15em] text-[#6B6B6B] font-semibold mb-0.5 whitespace-nowrap">
-              MPSS26 · DELEGATE
-            </p>
-            <h1 className="text-[32px] font-sans font-semibold text-[#181818] tracking-tight leading-none whitespace-nowrap">
+        {/* Top Tag Row: Category pill & Powered by badge in same line */}
+        <div className="flex items-center justify-between gap-2 mb-1">
+          <p className="text-[10.5px] uppercase tracking-[0.15em] text-[#6B6B6B] font-semibold whitespace-nowrap">
+            MPSS26 · DELEGATE
+          </p>
+          <div className="px-2 py-0.5 bg-[#FAF7F2] border border-[#EBE7DF] rounded-full text-[9.5px] font-semibold text-[#111827] shadow-2xs whitespace-nowrap select-none">
+            Powered by IET DAVV
+          </div>
+        </div>
+
+        {/* Main Row: Attendee Name + Subtitle on left, Avatar on right */}
+        <div className="flex items-center justify-between gap-3">
+          <div className="min-w-0 flex-1">
+            <h1 className={`font-sans font-semibold text-[#181818] tracking-tight leading-tight break-words ${
+              (currentUser.name || '').length > 16
+                ? 'text-[22px] sm:text-[26px]'
+                : (currentUser.name || '').length > 12
+                ? 'text-[25px] sm:text-[28px]'
+                : 'text-[30px] sm:text-[32px]'
+            }`}>
               {currentUser.name || 'Delegate'}
             </h1>
             <p className="text-[12px] text-[#6B6B6B] font-medium mt-1 truncate">
@@ -231,30 +245,24 @@ export const DelegateHome: React.FC = () => {
             </p>
           </div>
 
-          <div className="flex items-center gap-2 flex-shrink-0 ml-2">
-            <div className="px-2 py-0.5 bg-[#FAF7F2] border border-[#EBE7DF] rounded-full text-[9.5px] font-semibold text-[#111827] shadow-2xs whitespace-nowrap select-none -translate-y-[26px]">
-              Powered by IET DAVV
-            </div>
-
-            <button
-              onClick={() => router.push('/delegate/profile')}
-              className="relative group focus:outline-none flex-shrink-0"
-              aria-label="View Profile"
-            >
-              {currentUser.avatar ? (
-                <img
-                  src={currentUser.avatar}
-                  alt={currentUser.name || 'Delegate'}
-                  className="w-12 h-12 rounded-full border-2 border-white object-cover shadow-sm"
-                />
-              ) : (
-                <div className="w-12 h-12 rounded-full bg-[#181818] text-white flex items-center justify-center font-bold text-base border-2 border-white shadow-sm">
-                  {currentUser.name ? currentUser.name.split(' ').filter(Boolean).map((n) => n[0]).join('').slice(0, 2) : '?'}
-                </div>
-              )}
-              <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-[#22C55E] border-2 border-white rounded-full shadow-xs" />
-            </button>
-          </div>
+          <button
+            onClick={() => router.push('/delegate/profile')}
+            className="relative group focus:outline-none flex-shrink-0"
+            aria-label="View Profile"
+          >
+            {currentUser.avatar ? (
+              <img
+                src={currentUser.avatar}
+                alt={currentUser.name || 'Delegate'}
+                className="w-12 h-12 rounded-full border-2 border-white object-cover shadow-sm"
+              />
+            ) : (
+              <div className="w-12 h-12 rounded-full bg-[#181818] text-white flex items-center justify-center font-bold text-base border-2 border-white shadow-sm">
+                {currentUser.name ? currentUser.name.split(' ').filter(Boolean).map((n) => n[0]).join('').slice(0, 2) : '?'}
+              </div>
+            )}
+            <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-[#22C55E] border-2 border-white rounded-full shadow-xs" />
+          </button>
         </div>
       </div>
 
