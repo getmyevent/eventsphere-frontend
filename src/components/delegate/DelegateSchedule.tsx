@@ -512,22 +512,8 @@ export const DelegateSchedule: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* Right side: LinkedIn shortcut & Arrow to open profile */}
-                    <div className="flex items-center gap-2 flex-shrink-0">
-                      {spk.linkedin && (
-                        <a
-                          href={spk.linkedin.startsWith('http') ? spk.linkedin : `https://${spk.linkedin}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center text-[10.5px] font-bold text-[#0A66C2] bg-[#E8F3FF] hover:bg-[#D0E8FF] px-2.5 py-1 rounded-full transition-colors"
-                          title={`View ${spk.name} on LinkedIn`}
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <span>LinkedIn</span>
-                        </a>
-                      )}
-                      <ChevronRight className="w-4 h-4 text-[#9CA3AF] group-hover:text-[#DC2626] group-hover:translate-x-0.5 transition-all" />
-                    </div>
+                    {/* Right side: Arrow to open profile */}
+                    <ChevronRight className="w-4 h-4 text-[#9CA3AF] group-hover:text-[#DC2626] group-hover:translate-x-0.5 transition-all flex-shrink-0" />
                   </div>
                 ))
               )}
