@@ -48,11 +48,11 @@ export const OrganizerConsole: React.FC = () => {
       <div className="md:hidden no-print bg-[#14233B] text-white px-4 py-3 border-b border-[#1E293B] flex items-center justify-between shrink-0 z-30">
         <div className="flex items-center gap-2.5 min-w-0">
           <div className="w-7 h-7 rounded-lg bg-[#3563F6] text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
-            E
+            G
           </div>
           <div className="min-w-0">
             <span className="text-[14px] font-semibold text-white truncate block leading-tight">
-              EventSphere
+              GetMyEvent
             </span>
             <span className="text-[11px] text-[#94A3B8] truncate block">
               {event.name}
@@ -78,11 +78,11 @@ export const OrganizerConsole: React.FC = () => {
           {/* Brand & Console Identity */}
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-[#3563F6] text-white flex items-center justify-center font-bold text-sm shadow-xs shrink-0">
-              E
+              G
             </div>
             <div className="min-w-0">
               <h2 className="text-[15px] font-semibold text-white tracking-tight leading-tight">
-                EventSphere
+                GetMyEvent
               </h2>
               <p className="text-[11px] text-[#94A3B8] font-normal mt-0.5">
                 Organizer Console

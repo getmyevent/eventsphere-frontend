@@ -145,7 +145,7 @@ export const ContactPrivacyModal: React.FC<ContactPrivacyModalProps> = ({ isOpen
         </div>
 
         <p className="text-[10px] text-[#6B6B6B] leading-tight">
-          Protected by India DPDP Act compliance. Unshared fields will display as "Not shared" across EventSphere.
+          Protected by India DPDP Act compliance. Unshared fields will display as "Not shared" across GetMyEvent.
         </p>
 
         {/* Save button */}

@@ -25,7 +25,7 @@ export const DemoBar: React.FC = () => {
         <div className="flex items-center gap-2.5">
           <div className="flex items-center gap-1.5 font-bold tracking-tight text-white text-[13px]">
             <span className="w-2.5 h-2.5 rounded-full bg-[#B51F32] inline-block animate-pulse" />
-            <span>EventSphere</span>
+            <span>GetMyEvent</span>
           </div>
           <span className="text-[#888888] hidden sm:inline">|</span>
           <div className="hidden sm:flex items-center gap-1.5 text-xs text-[#CCCCCC] bg-[#282828] px-2 py-0.5 rounded border border-[#3A3A3A]">

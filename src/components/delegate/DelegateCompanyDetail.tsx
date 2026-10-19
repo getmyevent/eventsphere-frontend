@@ -76,7 +76,7 @@ ${companyProducts.length > 0
   : 'Detailed catalog available at the booth.'}
 
 ------------------------------------------------
-Generated via EventSphere Official App (MPSS26)
+Generated via GetMyEvent Official App (MPSS26)
 `;
 
     const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });

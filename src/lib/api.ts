@@ -309,21 +309,50 @@ class ApiClient {
         }
         return res;
       } catch (err) {
-        if (cleanDigits === '9876543210' || mobile === '9876543210') {
+        if (cleanDigits === '7089157046' || mobile === '7089157046' || cleanDigits === '9876543210' || mobile === '9876543210') {
           const delegateUser: ApiUser = {
             id: 'att-hari-gupta',
             name: 'Hari Gupta',
-            mobile: '+91 98765 43210',
-            email: 'hari@eventsphere.com',
+            mobile: '+91 7089157046',
+            email: 'harigupta@getmyevent.in',
             role: 'ROLE_DELEGATE',
-            company: 'EventSphere',
-            designation: 'CEO',
-            avatar: '/images/avatars/hari-gupta.png',
-            ticketType: 'Delegate',
+            company: 'GetMyEvent',
+            designation: 'Co-Founder',
+            avatar: '/images/founders/hari-gupta.jpg?v=4',
+            ticketType: '',
             checkedIn: true,
           };
           const fallbackRes: AuthResponse = {
-            token: 'mpss26-delegate-token-9876543210',
+            token: 'mpss26-delegate-token-harigupta',
+            tokenType: 'Bearer',
+            expiresIn: 86400,
+            user: delegateUser,
+          };
+          this.setToken(fallbackRes.token);
+          if (typeof window !== 'undefined') {
+            try {
+              localStorage.setItem(USER_KEY, JSON.stringify(delegateUser));
+            } catch {
+              // ignore
+            }
+          }
+          return fallbackRes;
+        }
+        if (cleanDigits === '8463865310' || mobile === '8463865310') {
+          const delegateUser: ApiUser = {
+            id: 'att-pushpit-upadhyay',
+            name: 'Pushpit Upadhyay',
+            mobile: '+91 8463865310',
+            email: 'pushpitupadhya@getmyevent.in',
+            role: 'ROLE_DELEGATE',
+            company: 'GetMyEvent',
+            designation: 'Co-Founder',
+            avatar: '/images/founders/pushpit-upadhyay.jpg',
+            ticketType: '',
+            checkedIn: true,
+          };
+          const fallbackRes: AuthResponse = {
+            token: 'mpss26-delegate-token-pushpit',
             tokenType: 'Bearer',
             expiresIn: 86400,
             user: delegateUser,

@@ -3,7 +3,7 @@ import './globals.css';
 import { StoreProvider } from '../lib/store';
 
 export const metadata: Metadata = {
-  title: 'EventSphere — Digital Experience Layer | MP Semiconductor Summit 2026 (MPSS26)',
+  title: 'GetMyEvent — Digital Experience Layer | MP Semiconductor Summit 2026 (MPSS26)',
   description: 'The digital networking & engagement layer for professional events. Experience MP Semiconductor Summit 2026.',
   manifest: '/manifest.json',
   icons: {
