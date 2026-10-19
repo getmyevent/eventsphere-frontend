@@ -78,6 +78,7 @@ export const DelegatePeople: React.FC = () => {
     }, 300);
     return () => clearTimeout(timer);
   }, [searchQuery, viewSavedPeopleOnly]);
+
   
 
   const displayedList = useMemo(() => {
@@ -95,6 +96,7 @@ export const DelegatePeople: React.FC = () => {
       );
     });
   }, [baseList, searchQuery, serverResults]);
+
 
   return (
     <div className="flex-1 min-h-0 h-full bg-[#F8F7F4] select-none flex flex-col overflow-hidden">
