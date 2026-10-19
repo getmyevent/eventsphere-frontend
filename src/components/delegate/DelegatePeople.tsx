@@ -78,6 +78,7 @@ export const DelegatePeople: React.FC = () => {
     }, 300);
     return () => clearTimeout(timer);
   }, [searchQuery, viewSavedPeopleOnly]);
+  
 
   const displayedList = useMemo(() => {
     if (serverResults) return serverResults;
