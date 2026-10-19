@@ -228,7 +228,7 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
           email: 'harigupta@getmyevent.in',
           mobile: '+91 7089157046',
           linkedin: 'https://www.linkedin.com/in/hari-gupta-159948330',
-          avatar: 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792442670/hari_gupta.png',
+          avatar: 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792450462/hari.png',
           role: 'delegate',
           ticketType: '',
           checkedIn: true,
