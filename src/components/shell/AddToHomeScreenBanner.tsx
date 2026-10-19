@@ -36,7 +36,7 @@ export const AddToHomeScreenBanner: React.FC = () => {
 
     const handleAppInstalled = () => {
       setInstalled(true);
-      showToast('EventSphere PWA installed successfully ✓', 'success');
+      showToast('GetMyEvent PWA installed successfully ✓', 'success');
       setTimeout(() => {
         setDismissed(true);
         sessionStorage.setItem('pwa_banner_dismissed', 'true');
@@ -60,7 +60,7 @@ export const AddToHomeScreenBanner: React.FC = () => {
         const choice = await deferredPrompt.userChoice;
         if (choice.outcome === 'accepted') {
           setInstalled(true);
-          showToast('Installing EventSphere to Home Screen...', 'success');
+          showToast('Installing GetMyEvent to Home Screen...', 'success');
         }
         setDeferredPrompt(null);
       } catch (err) {
@@ -87,10 +87,10 @@ export const AddToHomeScreenBanner: React.FC = () => {
       <div className="max-w-md mx-auto flex items-center justify-between gap-2">
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-lg bg-[#B51F32] flex items-center justify-center text-white font-bold text-xs shadow-sm flex-shrink-0">
-            ES
+            GME
           </div>
           <div>
-            <p className="text-xs font-semibold leading-tight text-[#181818]">Install EventSphere PWA</p>
+            <p className="text-xs font-semibold leading-tight text-[#181818]">Install GetMyEvent PWA</p>
             <p className="text-[11px] text-[#6B6B6B] leading-tight mt-0.5">
               Add to Home Screen for fast, 1-tap offline access
             </p>

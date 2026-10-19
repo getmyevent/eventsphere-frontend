@@ -301,7 +301,7 @@ export const ExhibitorProducts: React.FC = React.memo(() => {
               ${productsHtml}
             </div>
             <div class="footer">
-              <div>EventSphere Digital Experience Layer · MP Semiconductor Summit 2026 (MPSS26)</div>
+              <div>GetMyEvent Digital Experience Layer · MP Semiconductor Summit 2026 (MPSS26)</div>
               <div>Truechip Solutions · Booth Hall 1 · A-02 · sales@truechip.net · https://www.truechip.net</div>
             </div>
           </body>

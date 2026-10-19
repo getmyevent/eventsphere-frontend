@@ -186,7 +186,7 @@ export const DelegateEditProfile: React.FC = () => {
             <input
               type="text"
               name="company"
-              placeholder="e.g. EventSphere"
+              placeholder="e.g. GetMyEvent"
               value={formData.company}
               onChange={handleChange}
               className="w-full px-3 py-2 rounded-lg border border-[#DEDCD7] text-[12.5px] focus:outline-none focus:ring-1 focus:ring-[#181818]"

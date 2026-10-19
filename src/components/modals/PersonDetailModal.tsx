@@ -326,16 +326,38 @@ export const PersonDetailModal: React.FC = () => {
                 <p className="text-[13.5px] text-[#4B5563] mt-0.5 leading-snug">
                   {[person.designation, person.company].filter(Boolean).join(' · ') || 'Attendee'}
                 </p>
-                <div className="flex flex-wrap items-center gap-1.5 mt-2">
-                  <span className="text-[11px] font-medium text-[#4B5563] bg-[#F3F4F6] px-2 py-0.5 rounded-md">
-                    {person.ticketType || (person.role === 'speaker' ? 'Speaker' : 'Delegate')}
-                  </span>
-                  {person.relevanceScore !== undefined && person.relevanceScore > 0 && (
-                    <span className="text-[11px] font-medium text-[#0D9488] bg-[#F0FDFA] border border-[#CCFBF1] px-2 py-0.5 rounded-md">
-                      {person.relevanceScore}% Match
-                    </span>
-                  )}
-                </div>
+                {(() => {
+                  const rawTag = person.ticketType !== undefined ? person.ticketType : (person.role === 'speaker' ? 'Speaker' : 'Delegate');
+                  const tag = (rawTag || '').trim();
+                  
+                  // Never show Team tag on any profile, and suppress tags for founders and guidance team
+                  if (
+                    !tag ||
+                    tag.toLowerCase() === 'team' ||
+                    person.id === 'att-hari-gupta' ||
+                    person.id === 'att-pushpit-upadhyay' ||
+                    person.id.startsWith('att-akarshan') ||
+                    person.id.startsWith('att-rochak') ||
+                    person.id.startsWith('att-sarthak') ||
+                    person.id.startsWith('att-sagar') ||
+                    person.id.startsWith('att-vipul')
+                  ) {
+                    return null;
+                  }
+
+                  return (
+                    <div className="flex flex-wrap items-center gap-1.5 mt-2">
+                      <span className="text-[11px] font-medium text-[#4B5563] bg-[#F3F4F6] px-2 py-0.5 rounded-md">
+                        {tag}
+                      </span>
+                      {person.relevanceScore !== undefined && person.relevanceScore > 0 && (
+                        <span className="text-[11px] font-medium text-[#0D9488] bg-[#F0FDFA] border border-[#CCFBF1] px-2 py-0.5 rounded-md">
+                          {person.relevanceScore}% Match
+                        </span>
+                      )}
+                    </div>
+                  );
+                })()}
               </div>
             </div>
 
@@ -346,8 +368,11 @@ export const PersonDetailModal: React.FC = () => {
               </div>
             )}
 
-            {/* Focus Areas & Skills (hidden for speakers and when empty) */}
-            {person.role !== 'speaker' && allTags.length > 0 && (
+            {/* Focus Areas & Skills (hidden for speakers, founders, and when empty) */}
+            {person.role !== 'speaker' &&
+              allTags.length > 0 &&
+              person.id !== 'att-hari-gupta' &&
+              person.id !== 'att-pushpit-upadhyay' && (
               <div className="pt-1">
                 <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#6B6B6B] mb-1.5">
                   Focus Areas & Skills
@@ -370,13 +395,13 @@ export const PersonDetailModal: React.FC = () => {
                   <Mail className="w-4 h-4 text-[#4B5563]" />
                   Email
                 </span>
-                <span className="text-[#181818] font-medium text-[11.5px] truncate max-w-[200px]">
-                  {person.role !== 'speaker' && person.email && person.email !== 'Not listed' && person.email !== 'Not publicly listed' ? (
-                    <a href={`mailto:${person.email}`} className="hover:underline text-[#181818] font-mono">
+                <span className="text-[#181818] font-medium text-[11.5px] flex items-center justify-end">
+                  {person.email && person.email !== 'Not listed' && person.email !== 'Not publicly listed' ? (
+                    <a href={`mailto:${person.email}`} className="hover:underline text-[#181818] font-mono truncate max-w-[210px] block">
                       {person.email}
                     </a>
                   ) : (
-                    <span className="text-[#9CA3AF] italic font-normal">Not listed</span>
+                    <span className="text-[#9CA3AF] italic font-normal pr-1.5 inline-block">Not listed</span>
                   )}
                 </span>
               </div>
@@ -387,13 +412,13 @@ export const PersonDetailModal: React.FC = () => {
                   <Phone className="w-4 h-4 text-[#4B5563]" />
                   Mobile
                 </span>
-                <span className="text-[#181818] font-medium text-[11.5px]">
-                  {person.role !== 'speaker' && person.mobile && person.mobile !== 'Not listed' && person.mobile !== 'Not publicly listed' ? (
+                <span className="text-[#181818] font-medium text-[11.5px] flex items-center justify-end">
+                  {person.mobile && person.mobile !== 'Not listed' && person.mobile !== 'Not publicly listed' ? (
                     <a href={`tel:${person.mobile}`} className="hover:underline text-[#181818] font-mono">
                       {person.mobile}
                     </a>
                   ) : (
-                    <span className="text-[#9CA3AF] italic font-normal">Not listed</span>
+                    <span className="text-[#9CA3AF] italic font-normal pr-1.5 inline-block">Not listed</span>
                   )}
                 </span>
               </div>
@@ -401,10 +426,12 @@ export const PersonDetailModal: React.FC = () => {
               {/* LinkedIn */}
               <div className="flex items-center justify-between">
                 <span className="flex items-center gap-2 text-[#6B6B6B]">
-                  <Linkedin className="w-4 h-4 text-[#0A66C2]" />
+                  <div className="w-[17px] h-[17px] rounded-[3.5px] bg-[#0A66C2] flex items-center justify-center text-white text-[10px] font-bold leading-none font-sans shrink-0 shadow-2xs">
+                    in
+                  </div>
                   LinkedIn
                 </span>
-                <span>
+                <span className="flex items-center justify-end">
                   {person.linkedin ? (
                     <a
                       href={person.linkedin.startsWith('http') ? person.linkedin : `https://${person.linkedin}`}
@@ -415,13 +442,15 @@ export const PersonDetailModal: React.FC = () => {
                       View LinkedIn Profile →
                     </a>
                   ) : (
-                    <span className="text-[#9CA3AF] italic font-normal">Not shared</span>
+                    <span className="text-[#9CA3AF] italic font-normal pr-1.5 inline-block">Not shared</span>
                   )}
                 </span>
               </div>
 
               {/* Twitter / X */}
-              {person.twitter && (
+              {person.twitter &&
+                person.id !== 'att-hari-gupta' &&
+                person.id !== 'att-pushpit-upadhyay' && (
                 <div className="flex items-center justify-between">
                   <span className="flex items-center gap-2 text-[#6B6B6B]">
                     <Twitter className="w-4 h-4 text-[#1DA1F2]" />

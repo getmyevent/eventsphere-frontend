@@ -131,7 +131,7 @@ export const OrganizerReports: React.FC = () => {
             <div className="flex items-center gap-2 mb-2">
               <span className="w-3.5 h-3.5 rounded-sm bg-[#3563F6]" />
               <span className="text-xs font-semibold tracking-tight text-[#172033]">
-                EventSphere
+                GetMyEvent
               </span>
             </div>
             <h2 className="text-2xl sm:text-3xl font-semibold text-[#172033] tracking-tight">
@@ -232,9 +232,9 @@ export const OrganizerReports: React.FC = () => {
         <div className="pt-4 border-t border-[#E2E8F0] flex flex-wrap items-center justify-between gap-2 text-xs text-[#64748B]">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-[#16A34A]" />
-            <span>Generated dynamically by EventSphere Digital Experience Engine</span>
+            <span>Generated dynamically by GetMyEvent Digital Experience Engine</span>
           </div>
-          <span className="font-mono">Document ID: ES-MPSS26-AUDIT-{Date.now().toString().slice(-6)}</span>
+          <span className="font-mono">Document ID: GME-MPSS26-AUDIT-{Date.now().toString().slice(-6)}</span>
         </div>
       </div>
     </div>

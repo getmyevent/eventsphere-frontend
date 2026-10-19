@@ -1168,7 +1168,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       showToast('Switched to Offline Mode · Sync pending for new actions', 'info');
     } else {
       setIsSyncing(true);
-      showToast('Syncing offline data with EventSphere server...', 'info');
+      showToast('Syncing offline data with GetMyEvent server...', 'info');
       setTimeout(() => {
         setIsSyncing(false);
         setIsOnline(true);

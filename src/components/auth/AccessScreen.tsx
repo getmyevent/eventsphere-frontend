@@ -154,7 +154,7 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
               name: res.user.name,
               avatar: '',
               designation: detectedRole === 'organizer' ? 'Organizer' : detectedRole === 'exhibitor' ? 'Exhibitor' : 'Delegate',
-              company: res.user.company || 'EventSphere',
+              company: res.user.company || 'GetMyEvent',
               role: detectedRole === 'organizer' ? 'organizer_staff' : detectedRole === 'exhibitor' ? 'exhibitor_staff' : 'delegate',
               bio: '',
               interests: [],
@@ -174,25 +174,29 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
             });
           }
         } catch {
-          // Fallback to res.user from login (or CURRENT_USER for delegate)
-          const isHari = res.user.id === 'att-hari-gupta' || num === '9876543210';
+          // Fallback to res.user from login (or CURRENT_USER / founder attendee for delegate)
+          const isHari = res.user.id === 'att-hari-gupta' || num === '7089157046' || num === '9876543210';
+          const isPushpit = res.user.id === 'att-pushpit-upadhyay' || num === '8463865310';
+          const pushpitAttendee = INITIAL_ATTENDEES.find((a) => a.id === 'att-pushpit-upadhyay');
+          const founderTemplate = isHari ? CURRENT_USER : isPushpit ? (pushpitAttendee || CURRENT_USER) : null;
+
           setCurrentUser({
-            ...(isHari ? CURRENT_USER : {}),
+            ...(founderTemplate ? founderTemplate : {}),
             id: res.user.id,
-            name: res.user.name || (isHari ? CURRENT_USER.name : 'Delegate'),
-            avatar: res.user.avatar || (isHari ? CURRENT_USER.avatar : ''),
-            designation: res.user.designation || (isHari ? CURRENT_USER.designation : detectedRole === 'organizer' ? 'Organizer' : detectedRole === 'exhibitor' ? 'Exhibitor' : 'Delegate'),
-            company: res.user.company || (isHari ? CURRENT_USER.company : 'EventSphere'),
+            name: res.user.name || (founderTemplate ? founderTemplate.name : 'Delegate'),
+            avatar: res.user.avatar || (founderTemplate ? founderTemplate.avatar : ''),
+            designation: res.user.designation || (founderTemplate ? founderTemplate.designation : detectedRole === 'organizer' ? 'Organizer' : detectedRole === 'exhibitor' ? 'Exhibitor' : 'Delegate'),
+            company: res.user.company || (founderTemplate ? founderTemplate.company : 'GetMyEvent'),
             role: detectedRole === 'organizer' ? 'organizer_staff' : detectedRole === 'exhibitor' ? 'exhibitor_staff' : 'delegate',
-            bio: isHari ? CURRENT_USER.bio : '',
-            interests: isHari ? CURRENT_USER.interests : [],
-            skills: isHari ? CURRENT_USER.skills : [],
-            email: res.user.email || (isHari ? CURRENT_USER.email : ''),
-            mobile: res.user.mobile || (isHari ? CURRENT_USER.mobile : num),
+            bio: founderTemplate ? founderTemplate.bio : '',
+            interests: founderTemplate ? (founderTemplate.interests || []) : [],
+            skills: founderTemplate ? (founderTemplate.skills || []) : [],
+            email: res.user.email || (founderTemplate ? founderTemplate.email : ''),
+            mobile: res.user.mobile || (founderTemplate ? founderTemplate.mobile : num),
             checkedIn: true,
-            registrationId: res.user.id || (isHari ? CURRENT_USER.registrationId : ''),
-            ticketType: detectedRole === 'organizer' ? 'Organizer' : detectedRole === 'exhibitor' ? 'Exhibitor Pass' : 'Delegate',
-            privacy: isHari ? { ...CURRENT_USER.privacy } : {
+            registrationId: res.user.id || (founderTemplate ? founderTemplate.registrationId : ''),
+            ticketType: founderTemplate ? '' : (detectedRole === 'organizer' ? 'Organizer' : detectedRole === 'exhibitor' ? 'Exhibitor Pass' : 'Delegate'),
+            privacy: founderTemplate ? { ...founderTemplate.privacy } : {
               shareEmail: true,
               sharePhone: true,
               shareLinkedIn: true,
@@ -210,6 +214,7 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
         return;
       }
     } catch (err: any) {
+<<<<<<< Updated upstream
       // Offline fallback: Check INITIAL_ATTENDEES for matching registered mobile
       const matchedAttendee = INITIAL_ATTENDEES.find((a) => {
         const aDigits = (a.mobile || '').replace(/\D/g, '');
@@ -217,6 +222,9 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
       });
 
       if (matchedAttendee) {
+=======
+      if (num === '7089157046' || num === '9876543210') {
+>>>>>>> Stashed changes
         resetUserState();
         const fallbackRole = (matchedAttendee.role as any) === 'organizer_staff'
           ? 'organizer'
@@ -225,7 +233,42 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
             : 'delegate';
         setRole(fallbackRole);
         setCurrentUser({
+<<<<<<< Updated upstream
           ...matchedAttendee,
+=======
+          ...CURRENT_USER,
+          id: 'att-hari-gupta',
+          name: 'Hari Gupta',
+          mobile: '+91 7089157046',
+          role: 'delegate',
+          ticketType: '',
+          checkedIn: true,
+        });
+        setStatus('confirmed');
+        setTimeout(() => {
+          setHasAccessConfirmed(true);
+          onSuccess();
+        }, 350);
+        return;
+      }
+
+      if (num === '8463865310') {
+        resetUserState();
+        setRole('delegate');
+        const pushpitAttendee = INITIAL_ATTENDEES.find((a) => a.id === 'att-pushpit-upadhyay');
+        setCurrentUser({
+          ...(pushpitAttendee || CURRENT_USER),
+          id: 'att-pushpit-upadhyay',
+          name: 'Pushpit Upadhyay',
+          company: 'GetMyEvent',
+          designation: 'Co-Founder',
+          email: 'pushpitupadhya@getmyevent.in',
+          mobile: '+91 8463865310',
+          linkedin: 'https://www.linkedin.com/in/pushpit-upadhyay/',
+          avatar: '/images/founders/pushpit-upadhyay.jpg',
+          role: 'delegate',
+          ticketType: '',
+>>>>>>> Stashed changes
           checkedIn: true,
         });
         setStatus('confirmed');
@@ -267,9 +310,9 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
         <div className="absolute top-0 left-0 w-full p-3 flex items-center justify-between z-10">
           <div className="flex items-center gap-2.5">
             <div className="w-6 h-6 bg-white flex items-center justify-center font-extrabold text-[#181818] text-[12px] rounded-sm">
-              E
+              G
             </div>
-            <span className="font-bold text-[12px] tracking-[0.15em] text-white">EVENTSPHERE</span>
+            <span className="font-bold text-[12px] tracking-[0.15em] text-white">GETMYEVENT</span>
           </div>
           <span className="text-[11px] font-medium tracking-widest text-white border border-white/40 px-2 py-0.5 rounded backdrop-blur-sm bg-black/20">
             MPSS26

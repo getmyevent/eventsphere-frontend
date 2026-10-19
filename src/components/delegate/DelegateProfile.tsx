@@ -77,9 +77,11 @@ export const DelegateProfile: React.FC<DelegateProfileProps> = () => {
             <p className="text-[12px] text-[#6B6B6B] leading-tight truncate">
               {[currentUser.designation, currentUser.company].filter(Boolean).join(' · ') || 'No title or company added'}
             </p>
-            <p className="text-[11.5px] text-[#8BA5CD] font-medium leading-tight">
-              {currentUser.ticketType || 'Delegate'} · 2-day
-            </p>
+            {currentUser.id !== 'att-hari-gupta' && currentUser.id !== 'att-pushpit-upadhyay' && (
+              <p className="text-[11.5px] text-[#8BA5CD] font-medium leading-tight">
+                {currentUser.ticketType || 'Delegate'} · 2-day
+              </p>
+            )}
           </div>
         </div>
         

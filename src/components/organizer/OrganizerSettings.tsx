@@ -69,14 +69,14 @@ export const OrganizerSettings: React.FC = () => {
         <div>
           <h2 className="text-sm font-semibold text-[#172033]">External Registration Bridge</h2>
           <p className="text-xs text-[#64748B] mt-0.5 leading-relaxed">
-            EventSphere receives verified attendees via webhook from your primary ticketing portal. Attendee records are encrypted and synced in real time.
+            GetMyEvent receives verified attendees via webhook from your primary ticketing portal. Attendee records are encrypted and synced in real time.
           </p>
         </div>
 
         <div className="p-3 bg-[#F8FAFC] rounded-lg border border-[#E2E8F0] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
           <div className="flex items-center gap-2 min-w-0">
             <span className="w-2 h-2 rounded-full bg-[#16A34A] flex-shrink-0" />
-            <span className="font-mono text-[#172033] truncate">https://api.eventsphere.io/v2/webhook/MPSS26</span>
+            <span className="font-mono text-[#172033] truncate">https://api.getmyevent.in/v2/webhook/MPSS26</span>
           </div>
           <span className="text-[11px] text-[#16A34A] font-medium bg-[#DCFCE7] px-2.5 py-1 rounded-md">
             Active · Ready
