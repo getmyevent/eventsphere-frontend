@@ -214,7 +214,6 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
         return;
       }
     } catch (err: any) {
-<<<<<<< Updated upstream
       // Offline fallback: Check INITIAL_ATTENDEES for matching registered mobile
       const matchedAttendee = INITIAL_ATTENDEES.find((a) => {
         const aDigits = (a.mobile || '').replace(/\D/g, '');
@@ -222,9 +221,6 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
       });
 
       if (matchedAttendee) {
-=======
-      if (num === '7089157046' || num === '9876543210') {
->>>>>>> Stashed changes
         resetUserState();
         const fallbackRole = (matchedAttendee.role as any) === 'organizer_staff'
           ? 'organizer'
@@ -233,10 +229,23 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
             : 'delegate';
         setRole(fallbackRole);
         setCurrentUser({
-<<<<<<< Updated upstream
           ...matchedAttendee,
-=======
-          ...CURRENT_USER,
+          checkedIn: true,
+        });
+        setStatus('confirmed');
+        setTimeout(() => {
+          setHasAccessConfirmed(true);
+          onSuccess();
+        }, 350);
+        return;
+      }
+
+      if (num === '7089157046' || num === '9876543210') {
+        resetUserState();
+        setRole('delegate');
+        const hariAttendee = INITIAL_ATTENDEES.find((a) => a.id === 'att-hari-gupta');
+        setCurrentUser({
+          ...(hariAttendee || CURRENT_USER),
           id: 'att-hari-gupta',
           name: 'Hari Gupta',
           mobile: '+91 7089157046',
@@ -268,7 +277,6 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
           avatar: '/images/founders/pushpit-upadhyay.jpg',
           role: 'delegate',
           ticketType: '',
->>>>>>> Stashed changes
           checkedIn: true,
         });
         setStatus('confirmed');
