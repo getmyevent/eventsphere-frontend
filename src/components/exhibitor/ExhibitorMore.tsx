@@ -42,7 +42,7 @@ export const ExhibitorMore: React.FC = React.memo(() => {
   };
 
   const companyName = currentUser?.company || 'Truechip Solutions';
-  const boothInfo = currentUser?.boothNumber || 'Hall 1 · Booth A-02';
+  const boothInfo = currentUser?.boothNumber || 'Booth 49';
   const avatarUrl = currentUser?.avatar || '/images/exhibitors/truechip.png';
 
   return (
@@ -151,7 +151,7 @@ export const ExhibitorMore: React.FC = React.memo(() => {
                   {modalTab === 'event' ? 'Event & Venue Guide' : 'Company Profile'}
                 </h3>
                 <p className="text-[12px] text-[#6B6B6B] mt-0.5">
-                  MPSS26 · Hall 1 · Booth A-02
+                  MPSS26 · Booth 49
                 </p>
               </div>
               <button
@@ -260,7 +260,7 @@ export const ExhibitorMore: React.FC = React.memo(() => {
                           Hall B · Semiconductor Ecosystem Pavilion
                         </p>
                         <p className="text-[12px] text-[#6B6B6B] mt-0.5">
-                          Hall 1 · Booth A-02 (Prominent semiconductor verification pavilion position)
+                          Booth 49 (Prominent semiconductor verification pavilion position)
                         </p>
                       </div>
                     </div>
@@ -291,7 +291,7 @@ export const ExhibitorMore: React.FC = React.memo(() => {
                   {/* Official Contact & Web Card */}
                   <div className="bg-white p-4 rounded-2xl border border-[#DEDCD7] shadow-sm space-y-2.5">
                     <span className="text-[11px] font-bold uppercase tracking-wider text-[#737373] block">
-                      Official Contacts
+                       Official Contacts
                     </span>
                     <div className="space-y-2 text-[12.5px]">
                       <div className="flex items-center gap-2.5 text-[#181818]">
@@ -304,7 +304,7 @@ export const ExhibitorMore: React.FC = React.memo(() => {
                       </div>
                       <div className="flex items-center gap-2.5 text-[#181818]">
                         <MapPin className="w-4 h-4 text-[#737373] shrink-0" />
-                        <span className="font-medium">Hall 1 · Booth A-02, Brilliant Convention Centre, Indore</span>
+                        <span className="font-medium">Booth 49, Brilliant Convention Centre, Indore</span>
                       </div>
                     </div>
                   </div>

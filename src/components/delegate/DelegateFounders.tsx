@@ -14,7 +14,7 @@ export const DelegateFounders: React.FC = () => {
       id: 'att-hari-gupta',
       name: 'Hari Gupta',
       role: 'Co-Founder',
-      avatar: '/images/founders/hari-gupta.jpg?v=4',
+      avatar: 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792442670/hari_gupta.png',
       linkedin: 'https://www.linkedin.com/in/hari-gupta-159948330',
     },
     {
@@ -32,7 +32,7 @@ export const DelegateFounders: React.FC = () => {
       name: 'Dr. Pratosh Bansal',
       role: 'Director',
       institution: 'IET DAVV',
-      avatar: '/images/mentors/pratosh-bansal.jpg',
+      avatar: 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792442670/pratosh_bansal.png',
       linkedin: 'https://www.linkedin.com/in/pratosh-bansal/',
     },
     {
@@ -40,7 +40,7 @@ export const DelegateFounders: React.FC = () => {
       name: 'Prof. Vaibhav Neema',
       role: 'Professor',
       institution: 'IET DAVV',
-      avatar: '/images/mentors/vaibhav-neema.jpg?v=2',
+      avatar: 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792442671/vaibhav_neema.png',
       linkedin: 'https://www.linkedin.com/in/dr-vaibhav-neema-5981677a/',
     },
     {
@@ -59,35 +59,40 @@ export const DelegateFounders: React.FC = () => {
       name: 'Akarshan Tyagi',
       role: 'AI Engineer',
       company: 'PhysicsWallah',
-      avatar: '/images/team/akarshan-tyagi.jpg?v=2',
+      avatar: 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792442853/akarshan_tyagi.png',
+      linkedin: 'https://www.linkedin.com/in/akarshantyagi/',
     },
     {
-      id: 'att-rochak-gunawadiya',
-      name: 'Rochak Gunawadiya',
+      id: 'att-rochak-gunavdiya',
+      name: 'Rochak Gunavdiya',
       role: 'Founder',
       company: 'Lettswap',
-      avatar: '/images/team/rochak-gunawadiya.jpg?v=2',
+      avatar: 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792442670/rochak_gunavdiya.png',
+      linkedin: 'https://www.linkedin.com/in/rochak-gunavdiya-28461a331/',
     },
     {
       id: 'att-vipul-jaiswal',
       name: 'Vipul Jaiswal',
       role: 'SDE',
       company: 'Mastercard',
-      avatar: '/images/team/vipul-jaiswal.jpg?v=2',
+      avatar: 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792442671/vipul_jaiswal.png',
+      linkedin: 'https://www.linkedin.com/in/vipul-jaiswal-08636628b/',
     },
     {
       id: 'att-sarthak-bouddh',
       name: 'Sarthak Bouddh',
       role: 'Backend Engineer',
       company: 'Dice',
-      avatar: '/images/team/sarthak-bouddh.jpg?v=2',
+      avatar: 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792442671/sarthak_bouddh.png',
+      linkedin: 'https://www.linkedin.com/in/sarthak-bouddh-7805771a1/',
     },
     {
       id: 'att-sagar-kature',
       name: 'Sagar Kature',
       role: 'Software Developer',
       company: 'Zaggle',
-      avatar: '/images/team/sagar-kature.jpg?v=2',
+      avatar: 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792442670/sagar_kature.png',
+      linkedin: 'https://www.linkedin.com/in/sagar-kature-b25110291/',
     },
   ];
 
@@ -309,6 +314,22 @@ export const DelegateFounders: React.FC = () => {
                         e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(member.name)}&background=181818&color=ffffff&bold=true`;
                       }}
                     />
+
+                    {/* LinkedIn Badge if available */}
+                    {member.linkedin && (
+                      <a
+                        href={member.linkedin.startsWith('http') ? member.linkedin : `https://${member.linkedin}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="absolute top-1.5 right-1.5 w-[22px] h-[22px] rounded-[5px] bg-white shadow-xs border border-white/80 flex items-center justify-center transition-transform active:scale-90 hover:scale-105 z-10"
+                        title={`View ${member.name} on LinkedIn`}
+                      >
+                        <div className="w-[14px] h-[14px] rounded-[2.5px] bg-[#0A66C2] flex items-center justify-center text-white text-[9px] font-bold leading-none font-sans">
+                          in
+                        </div>
+                      </a>
+                    )}
                   </div>
 
                   {/* Member Info - center aligned like cofounders */}

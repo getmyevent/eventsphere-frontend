@@ -214,32 +214,20 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
         return;
       }
     } catch (err: any) {
-<<<<<<< Updated upstream
-      // Offline fallback: Check INITIAL_ATTENDEES for matching registered mobile
-      const matchedAttendee = INITIAL_ATTENDEES.find((a) => {
-        const aDigits = (a.mobile || '').replace(/\D/g, '');
-        return aDigits === num || (aDigits.length >= 10 && num.length >= 10 && (aDigits.endsWith(num) || num.endsWith(aDigits)));
-      });
-
-      if (matchedAttendee) {
-=======
+      // 1. Specific Founder / Co-Founder offline fallbacks
       if (num === '7089157046' || num === '9876543210') {
->>>>>>> Stashed changes
         resetUserState();
-        const fallbackRole = (matchedAttendee.role as any) === 'organizer_staff'
-          ? 'organizer'
-          : (matchedAttendee.role as any) === 'exhibitor_staff'
-            ? 'exhibitor'
-            : 'delegate';
-        setRole(fallbackRole);
+        setRole('delegate');
         setCurrentUser({
-<<<<<<< Updated upstream
-          ...matchedAttendee,
-=======
           ...CURRENT_USER,
           id: 'att-hari-gupta',
           name: 'Hari Gupta',
+          company: 'GetMyEvent',
+          designation: 'Co-Founder',
+          email: 'harigupta@getmyevent.in',
           mobile: '+91 7089157046',
+          linkedin: 'https://www.linkedin.com/in/hari-gupta-159948330',
+          avatar: 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792442670/hari_gupta.png',
           role: 'delegate',
           ticketType: '',
           checkedIn: true,
@@ -268,7 +256,32 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
           avatar: '/images/founders/pushpit-upadhyay.jpg',
           role: 'delegate',
           ticketType: '',
->>>>>>> Stashed changes
+          checkedIn: true,
+        });
+        setStatus('confirmed');
+        setTimeout(() => {
+          setHasAccessConfirmed(true);
+          onSuccess();
+        }, 350);
+        return;
+      }
+
+      // 2. Dynamic Offline fallback: Check INITIAL_ATTENDEES for matching registered mobile
+      const matchedAttendee = INITIAL_ATTENDEES.find((a) => {
+        const aDigits = (a.mobile || '').replace(/\D/g, '');
+        return aDigits === num || (aDigits.length >= 10 && num.length >= 10 && (aDigits.endsWith(num) || num.endsWith(aDigits)));
+      });
+
+      if (matchedAttendee) {
+        resetUserState();
+        const fallbackRole = (matchedAttendee.role as any) === 'organizer_staff'
+          ? 'organizer'
+          : (matchedAttendee.role as any) === 'exhibitor_staff'
+            ? 'exhibitor'
+            : 'delegate';
+        setRole(fallbackRole);
+        setCurrentUser({
+          ...matchedAttendee,
           checkedIn: true,
         });
         setStatus('confirmed');

@@ -138,7 +138,7 @@ export const ExhibitorScan: React.FC = React.memo(() => {
     const linkedinToUse = selectedPerson.privacy?.shareLinkedIn !== false ? (selectedPerson.linkedin || '') : '';
 
     const existingLead = leadMap.get(selectedPerson.id);
-    const boothLabel = currentUser?.boothNumber || 'Hall 1 · Booth A-02';
+    const boothLabel = currentUser?.boothNumber || 'Booth 49';
     const companyLabel = currentUser?.company || 'Exhibitor Booth';
 
     saveLead({
@@ -176,7 +176,7 @@ export const ExhibitorScan: React.FC = React.memo(() => {
               {selectedPerson ? 'Save Lead' : 'Select Attendee'}
             </h1>
             <p className="text-xs text-gray-400">
-              {selectedPerson ? (currentUser?.boothNumber || 'Hall 1 · Booth A-02') : `Choose an attendee to add to ${currentUser?.company || 'exhibitor'} leads`}
+              {selectedPerson ? (currentUser?.boothNumber || 'Booth 49') : `Choose an attendee to add to ${currentUser?.company || 'exhibitor'} leads`}
             </p>
           </div>
 

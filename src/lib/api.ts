@@ -318,7 +318,7 @@ class ApiClient {
             role: 'ROLE_DELEGATE',
             company: 'GetMyEvent',
             designation: 'Co-Founder',
-            avatar: '/images/founders/hari-gupta.jpg?v=4',
+            avatar: 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792442670/hari_gupta.png',
             ticketType: '',
             checkedIn: true,
           };

@@ -5,6 +5,7 @@ import { useStore } from '../../lib/store';
 import { INITIAL_ATTENDEES, INITIAL_SESSIONS } from '../../lib/mockData';
 import { Person } from '../../types';
 import { X, Mail, Phone, Linkedin, Twitter, Star, Pencil, Save } from 'lucide-react';
+import { getProfileAvatar, getCloudinaryProfileUrl } from '../../lib/profileImages';
 
 export const PersonDetailModal: React.FC = () => {
   const {
@@ -68,6 +69,7 @@ export const PersonDetailModal: React.FC = () => {
             return {
               id: selectedPersonId,
               name: p.name,
+              avatar: (p as any).avatar || getCloudinaryProfileUrl(p.name) || getCloudinaryProfileUrl(selectedPersonId),
               designation: p.designation || 'Panelist',
               company: p.company || 'Madhya Pradesh Semiconductor Summit 2026',
               role: 'speaker' as const,
@@ -107,6 +109,7 @@ export const PersonDetailModal: React.FC = () => {
           return {
             id: selectedPersonId,
             name: s.speakerName,
+            avatar: (s as any).avatar || (s as any).speakerAvatar || getCloudinaryProfileUrl(s.speakerName) || getCloudinaryProfileUrl(selectedPersonId),
             designation: s.speakerDesignation || 'Keynote Speaker',
             company: s.speakerCompany || 'MP Semiconductor Summit',
             role: 'speaker' as const,
@@ -314,7 +317,7 @@ export const PersonDetailModal: React.FC = () => {
               </button>
 
               <img
-                src={person.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(person.name)}&background=181818&color=ffffff&bold=true`}
+                src={getProfileAvatar(person)}
                 alt={person.name}
                 className="w-14 h-14 rounded-full object-cover shadow-sm border border-[#E5E7EB] flex-shrink-0"
                 onError={(e) => {

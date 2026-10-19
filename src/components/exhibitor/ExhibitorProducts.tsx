@@ -142,12 +142,12 @@ export const ExhibitorProducts: React.FC = React.memo(() => {
       tagline: formTagline.trim() || 'Verification Solution by Truechip',
       category: formCategory.trim() || 'Verification IP & EDA',
       company: 'Truechip Solutions',
-      booth: 'Hall 1 · A-02',
+      booth: '49',
       image: '/images/exhibitors/truechip.png',
       views: 0,
       enquiries: 0,
       interestedVisitorsCount: 0,
-      overview: formOverview.trim() || 'Official featured solution showcased at Truechip Booth A-02.',
+      overview: formOverview.trim() || 'Official featured solution showcased at Truechip Booth 49.',
       features: ['Silicon Proven', 'SystemVerilog / UVM Native', 'Comprehensive Test Suites'],
       benefits: ['Drastically cuts verification cycle', 'First-pass silicon success', 'Multi-simulator support'],
       useCases: ['ASIC & SoC Verification', 'Chiplet Integration', 'Semiconductor Emulation'],
@@ -302,7 +302,7 @@ export const ExhibitorProducts: React.FC = React.memo(() => {
             </div>
             <div class="footer">
               <div>GetMyEvent Digital Experience Layer · MP Semiconductor Summit 2026 (MPSS26)</div>
-              <div>Truechip Solutions · Booth Hall 1 · A-02 · sales@truechip.net · https://www.truechip.net</div>
+              <div>Truechip Solutions · Booth 49 · sales@truechip.net · https://www.truechip.net</div>
             </div>
           </body>
         </html>
@@ -453,7 +453,7 @@ export const ExhibitorProducts: React.FC = React.memo(() => {
                 </div>
                 <div>
                   <h3 className="text-[15px] font-bold text-[#181818] leading-tight">Company Brochure</h3>
-                  <p className="text-[11px] text-[#6B6B6B]">Truechip Solutions · Booth Hall 1 · A-02</p>
+                  <p className="text-[11px] text-[#6B6B6B]">Truechip Solutions · Booth 49</p>
                 </div>
               </div>
               <button

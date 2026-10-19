@@ -142,7 +142,7 @@ Generated via GetMyEvent Official App (MPSS26)
               </div>
             )}
             <div className="bg-[#181818] text-white text-[11px] font-bold px-2.5 py-1 rounded-md">
-              Booth {company.booth || 'TBA'}
+              {company.booth ? (company.booth.toLowerCase().includes('pavilion') || company.booth.toLowerCase().includes('booth') ? company.booth : `Booth ${company.booth}`) : 'Booth TBA'}
             </div>
           </div>
           
@@ -153,7 +153,7 @@ Generated via GetMyEvent Official App (MPSS26)
           </div>
 
           <p className="text-[12px] text-[#181818] leading-relaxed mb-2">
-            {company.company} is showcasing their latest innovations in the {company.category} space. Visit Booth {company.booth} at MPSS26 to explore their products and engage with their experts.
+            {company.company} is showcasing their latest innovations in the {company.category} space. Visit {company.booth ? (company.booth.toLowerCase().includes('pavilion') || company.booth.toLowerCase().includes('booth') ? company.booth : `Booth ${company.booth}`) : 'their booth'} at MPSS26 to explore their products and engage with their experts.
           </p>
 
           <button 

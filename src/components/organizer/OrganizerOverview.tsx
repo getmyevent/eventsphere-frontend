@@ -54,7 +54,7 @@ export const OrganizerOverview: React.FC = () => {
 
   // Top exhibitors data matching specification or live metrics
   const defaultExhibitors = [
-    { name: 'Truechip Solutions', booth: 'Hall 1 · A-02', leads: 248 },
+    { name: 'Truechip Solutions', booth: 'Booth 49', leads: 248 },
     { name: 'Google Cloud', booth: 'Booth B-02', leads: 186 },
     { name: 'AWS', booth: 'Booth B-09', leads: 164 },
     { name: 'TCS', booth: 'Booth B-21', leads: 142 },

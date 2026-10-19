@@ -146,7 +146,7 @@ export const DelegateCompanies: React.FC = () => {
                   {company.booth && (
                     <span className="text-[8.5px] font-semibold bg-[#F0FDF4] border border-[#BBF7D0] px-1.5 py-0.5 rounded-md text-[#166534] flex items-center gap-0.5 tracking-tight whitespace-nowrap">
                       <MapPin className="w-2.5 h-2.5 flex-shrink-0" />
-                      Booth {company.booth}
+                      {company.booth.toLowerCase().includes('pavilion') || company.booth.toLowerCase().includes('booth') ? company.booth : `Booth ${company.booth}`}
                     </span>
                   )}
                   <span className="text-[10px] font-semibold text-[#B51F32] flex items-center gap-0.5">

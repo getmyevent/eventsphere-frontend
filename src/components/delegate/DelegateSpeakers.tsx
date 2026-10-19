@@ -9,6 +9,7 @@ import {
 
 import { useStore } from '../../lib/store';
 import { Person } from '../../types';
+import { getCloudinaryProfileUrl } from '../../lib/profileImages';
 
 export const DelegateSpeakers: React.FC = () => {
   const router = useRouter();
@@ -33,8 +34,19 @@ export const DelegateSpeakers: React.FC = () => {
     return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
   };
 
+  const getSpeakerRoleBadge = (speaker: Person) => {
+    if (speaker.panelRole) return speaker.panelRole;
+    if (speaker.id === 'speaker-dr-mohan-yadav') return 'Chief Guest';
+    if (speaker.id === 'speaker-ashok-barnwal' || speaker.id === 'speaker-prof-rajeev-dixit') return 'Dignitary';
+    if (speaker.priority && speaker.priority >= 4 && speaker.priority <= 7) return 'Keynote Speaker';
+    if (speaker.id === 'speaker-anand-kumar-panel') return 'Round Table Panelist';
+    return 'Panelist';
+  };
+
   const speakers = useMemo(() => {
-    return attendees.filter((p) => p.role === 'speaker' && p.id !== currentUser.id);
+    return attendees
+      .filter((p) => p.role === 'speaker' && p.id !== currentUser.id)
+      .sort((a, b) => (a.priority ?? 999) - (b.priority ?? 999));
   }, [attendees, currentUser.id]);
 
   const cmSpeaker = useMemo(() => {
@@ -119,10 +131,10 @@ export const DelegateSpeakers: React.FC = () => {
             className="bg-white rounded-[16px] p-2.5 mb-3 border border-[#E5E7EB] hover:border-gray-400 transition-all shadow-xs cursor-pointer flex flex-col group select-none"
           >
             <div className="relative w-full h-[120px] rounded-[12px] overflow-hidden bg-slate-50 shrink-0 border border-slate-200/70 flex items-center justify-center">
-              {cmSpeaker.avatar ? (
+              {cmSpeaker.avatar || getCloudinaryProfileUrl(cmSpeaker.name) ? (
                 <>
                   <img
-                    src={cmSpeaker.avatar}
+                    src={cmSpeaker.avatar || getCloudinaryProfileUrl(cmSpeaker.name)}
                     alt={cmSpeaker.name}
                     className="w-full h-full object-contain object-center transition-transform duration-300 group-hover:scale-105"
                     onError={(e) => {
@@ -163,9 +175,14 @@ export const DelegateSpeakers: React.FC = () => {
 
             {/* Speaker Info - Centered */}
             <div className="mt-2 pb-0.5 text-center px-1">
-              <h3 className="text-[14px] font-bold text-[#111827] leading-tight tracking-tight">
-                {cmSpeaker.name}
-              </h3>
+              <div className="flex items-center justify-center gap-1.5">
+                <h3 className="text-[14px] font-bold text-[#111827] leading-tight tracking-tight">
+                  {cmSpeaker.name}
+                </h3>
+                <span className="text-[9.5px] font-bold text-[#B51F32] bg-[#FDF2F2] border border-[#FCA5A5]/40 px-2 py-0.5 rounded-full shrink-0">
+                  Chief Guest
+                </span>
+              </div>
               <p className="text-[11.5px] text-[#6B7280] leading-snug mt-0.5">
                 {cmSpeaker.designation} · {cmSpeaker.company}
               </p>
@@ -185,10 +202,10 @@ export const DelegateSpeakers: React.FC = () => {
                 <div>
                   {/* Photo with LinkedIn Badge */}
                   <div className="relative w-full h-[126px] rounded-[12px] overflow-hidden bg-slate-100 shrink-0 border border-slate-200/70">
-                    {speaker.avatar ? (
+                    {speaker.avatar || getCloudinaryProfileUrl(speaker.name) ? (
                       <>
                         <img
-                          src={speaker.avatar}
+                          src={speaker.avatar || getCloudinaryProfileUrl(speaker.name)}
                           alt={speaker.name}
                           className="w-full h-full object-cover object-top transition-transform duration-300 group-hover:scale-105"
                           onError={(e) => {
@@ -236,6 +253,11 @@ export const DelegateSpeakers: React.FC = () => {
                     <p className="text-[11px] text-[#6B7280] leading-snug truncate mt-0.5">
                       {speaker.designation} · {speaker.company}
                     </p>
+                    <div className="mt-1.5 flex items-center">
+                      <span className="text-[9px] font-semibold px-2 py-0.5 rounded-md bg-[#F1F5F9] text-[#475569] border border-[#E2E8F0] truncate max-w-full">
+                        {getSpeakerRoleBadge(speaker)}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>

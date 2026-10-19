@@ -70,7 +70,7 @@ const FOUNDERS = [
     id: 'att-hari-gupta',
     name: 'Hari Gupta',
     role: 'Co-Founder',
-    avatar: '/images/founders/hari-gupta.jpg?v=4',
+    avatar: 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792442670/hari_gupta.png',
     linkedin: 'https://www.linkedin.com/in/hari-gupta-159948330',
   },
   {
@@ -189,9 +189,9 @@ export const DelegateHome: React.FC = () => {
 
   // Up next overlapping avatars
   const upNextAvatars = [
-    '/images/speakers/manish-hooda.png',
-    '/images/speakers/jaswinder-ahuja.png',
-    '/images/speakers/satya-gupta.png',
+    'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792441691/manish-hooda.png',
+    'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792441688/jaswinder-ahuja.jpg',
+    'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792441695/satya-gupta.png',
   ];
 
   // Auto-scroll for Event Partners Section (seamless infinite circular loop, scrolls one by one)
@@ -331,7 +331,7 @@ export const DelegateHome: React.FC = () => {
                 <strong className="text-white font-semibold">{event.totalRegistered || attendees.length}</strong> attendees
               </span>
               <span className="bg-[#1E293B]/70 border border-slate-700/60 text-slate-300 px-2 py-0.5 rounded-md shrink-0">
-                <strong className="text-white font-semibold">{event.totalSpeakers || 89}+</strong> speakers
+                <strong className="text-white font-semibold">{event.totalSpeakers || 46}</strong> speakers
               </span>
               <span className="bg-[#1E293B]/70 border border-slate-700/60 text-slate-300 px-2 py-0.5 rounded-md shrink-0">
                 <strong className="text-white font-semibold">50+</strong> exhibitors
@@ -642,21 +642,21 @@ export const DelegateHome: React.FC = () => {
         </div>
       </div>
 
-      {/* My AI Recommendations (People Profiles) - Matching reference design */}
+      {/* Speakers Section on Home Page */}
       {recommendedPeople.length > 0 && (
         <div className="space-y-2 pt-1">
           <div className="flex items-center justify-between px-0.5">
             <h3
-              onClick={() => router.push('/delegate/people')}
+              onClick={() => router.push('/delegate/speakers')}
               className="text-[17px] font-bold text-[#111827] tracking-tight cursor-pointer hover:text-[#B51F32] transition-colors"
             >
-              People You Should Meet
+              Speakers
             </h3>
             <button
-              onClick={() => router.push('/delegate/people')}
+              onClick={() => router.push('/delegate/speakers')}
               className="text-[13px] font-semibold text-[#111827] flex items-center gap-0.5 hover:underline"
             >
-              <span>View all</span>
+              <span>View all ({recommendedPeople.length})</span>
               <ChevronRight className="w-4 h-4 stroke-[2]" />
             </button>
           </div>
@@ -765,7 +765,7 @@ export const DelegateHome: React.FC = () => {
                     </div>
                     {company.booth && (
                       <span className="text-[8.5px] font-semibold text-[#166534] bg-[#F0FDF4] border border-[#BBF7D0] px-1.5 py-0.5 rounded-md flex-shrink-0 whitespace-nowrap tracking-tight">
-                        Booth {company.booth}
+                        {company.booth.toLowerCase().includes('pavilion') || company.booth.toLowerCase().includes('booth') ? company.booth : `Booth ${company.booth}`}
                       </span>
                     )}
                   </div>

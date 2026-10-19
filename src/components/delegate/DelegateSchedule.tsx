@@ -18,6 +18,7 @@ import {
 import { useStore } from '../../lib/store';
 import { INITIAL_ATTENDEES, INITIAL_SESSIONS } from '../../lib/mockData';
 import { Session, Person, SessionSpeakerInfo } from '../../types';
+import { getCloudinaryProfileUrl } from '../../lib/profileImages';
 
 const getSessionImage = (session: Session) => {
   const stageImages = [
@@ -142,7 +143,7 @@ export const DelegateSchedule: React.FC = () => {
             company: p.company || matched.company,
             panelRole: roleText,
             linkedin: p.linkedin || matched.linkedin,
-            avatar: p.avatar || matched.avatar,
+            avatar: p.avatar || matched.avatar || getCloudinaryProfileUrl(p.name) || getCloudinaryProfileUrl(p.speakerId),
           };
         }
 
@@ -160,7 +161,7 @@ export const DelegateSchedule: React.FC = () => {
           email: '',
           mobile: '',
           linkedin: p.linkedin || '',
-          avatar: p.avatar,
+          avatar: p.avatar || getCloudinaryProfileUrl(p.name) || getCloudinaryProfileUrl(p.speakerId),
           privacy: {
             preset: 'Connections Only',
             shareEmail: false,

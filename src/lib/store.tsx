@@ -852,7 +852,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                   tagline: b.tagline,
                   company: b.company || 'Truechip Solutions',
                   category: b.category,
-                  booth: b.booth || 'Hall 1 · A-02',
+                  booth: b.booth || '49',
                   image: b.image || '/images/products/pcie.png',
                   views: b.views || 0,
                   enquiries: b.enquiries || 0,

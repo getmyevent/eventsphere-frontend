@@ -47,6 +47,7 @@ export interface Person {
   registrationId: string;
   ticketType: string;
   panelRole?: string;
+  priority?: number;
 }
 
 export interface Connection {

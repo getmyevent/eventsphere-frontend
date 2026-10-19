@@ -14,7 +14,7 @@ export const ExhibitorHome: React.FC = React.memo(() => {
   } = useStore();
 
   const exhibitorCompany = currentUser?.company || 'Truechip Solutions';
-  const exhibitorBooth = currentUser?.boothNumber || 'Hall 1 · Booth A-02';
+  const exhibitorBooth = currentUser?.boothNumber || 'Booth 49';
   const exhibitorLogo = currentUser?.avatar || '/images/exhibitors/truechip.png';
 
   const companyProducts = useMemo(
