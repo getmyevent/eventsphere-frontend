@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useStore } from '../../lib/store';
 import { api, ApiUser } from '../../lib/api';
-import { CURRENT_USER } from '../../lib/mockData';
+import { CURRENT_USER, INITIAL_ATTENDEES } from '../../lib/mockData';
 import { ShieldCheck, CheckCircle2, AlertCircle, ArrowRight, Loader2, Lock, ChevronDown } from 'lucide-react';
 
 const COUNTRY_CODES = [
@@ -210,15 +210,22 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
         return;
       }
     } catch (err: any) {
-      if (num === '9876543210') {
+      // Offline fallback: Check INITIAL_ATTENDEES for matching registered mobile
+      const matchedAttendee = INITIAL_ATTENDEES.find((a) => {
+        const aDigits = (a.mobile || '').replace(/\D/g, '');
+        return aDigits === num || (aDigits.length >= 10 && num.length >= 10 && (aDigits.endsWith(num) || num.endsWith(aDigits)));
+      });
+
+      if (matchedAttendee) {
         resetUserState();
-        setRole('delegate');
+        const fallbackRole = (matchedAttendee.role as any) === 'organizer_staff'
+          ? 'organizer'
+          : (matchedAttendee.role as any) === 'exhibitor_staff'
+            ? 'exhibitor'
+            : 'delegate';
+        setRole(fallbackRole);
         setCurrentUser({
-          ...CURRENT_USER,
-          id: 'att-hari-gupta',
-          name: 'Hari Gupta',
-          mobile: '+91 98765 43210',
-          role: 'delegate',
+          ...matchedAttendee,
           checkedIn: true,
         });
         setStatus('confirmed');
@@ -356,48 +363,6 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
                   className="flex-1 min-w-0 px-3 py-2 text-[13px] font-medium text-[#181818] bg-transparent focus:outline-none placeholder-[#9CA3AF]"
                   autoComplete="tel"
                 />
-              </div>
-            </div>
-
-            {/* Quick Demo Access Pills */}
-            <div className="pt-1">
-              <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-wider mb-1.5">
-                Quick Demo Access
-              </p>
-              <div className="flex flex-wrap gap-1.5">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setCountryCode('+91');
-                    setMobile('9876543210');
-                    if (status === 'error') setStatus('idle');
-                  }}
-                  className="px-2 py-1 bg-white hover:bg-[#EFECE6] border border-[#DEDCD7] rounded text-[11px] font-medium text-[#444] transition-colors cursor-pointer"
-                >
-                  <span className="font-semibold text-[#181818]">Delegate:</span> 9876543210
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setCountryCode('+91');
-                    setMobile('9876543211');
-                    if (status === 'error') setStatus('idle');
-                  }}
-                  className="px-2 py-1 bg-white hover:bg-[#EFECE6] border border-[#DEDCD7] rounded text-[11px] font-medium text-[#444] transition-colors cursor-pointer"
-                >
-                  <span className="font-semibold text-[#181818]">Exhibitor:</span> 9876543211
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setCountryCode('+91');
-                    setMobile('9876543212');
-                    if (status === 'error') setStatus('idle');
-                  }}
-                  className="px-2 py-1 bg-white hover:bg-[#FBEAEA] border border-[#B51F32]/40 text-[#B51F32] rounded text-[11px] font-medium transition-colors cursor-pointer"
-                >
-                  <span className="font-bold">Organizer:</span> 9876543212
-                </button>
               </div>
             </div>
           </div>

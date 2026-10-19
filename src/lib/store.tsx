@@ -1124,31 +1124,9 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
   }, [hasAccessConfirmed, selectedSessionId, currentUser?.id]);
 
-  // Set role and synchronize authenticated backend JWT session
+  // Set role without touching tokens - role is determined by backend login
   const setRole = useCallback((newRole: DemoRole) => {
     setRoleState(newRole);
-
-    const demoMobile = newRole === 'organizer' 
-      ? '9876543212' 
-      : newRole === 'exhibitor' 
-        ? '9876543211' 
-        : '9876543210';
-
-    api.auth.login('MPSS26', demoMobile).then((res) => {
-      if (res && res.user) {
-        setCurrentUser((prev) => ({
-          ...prev,
-          id: res.user.id,
-          name: res.user.name,
-          email: res.user.email || prev.email,
-          mobile: res.user.mobile || prev.mobile,
-          company: res.user.company || prev.company,
-          role: res.user.role === 'ROLE_ORGANIZER' ? 'organizer_staff' : res.user.role === 'ROLE_EXHIBITOR' ? 'exhibitor_staff' : 'delegate',
-        }));
-      }
-    }).catch((err) => {
-      console.warn('Demo role backend auth sync skipped:', err);
-    });
   }, []);
 
   // Centralized logout
