@@ -214,12 +214,42 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
         return;
       }
     } catch (err: any) {
+<<<<<<< HEAD
       // 1. Specific Founder / Co-Founder offline fallbacks
       if (num === '7089157046' || num === '9876543210') {
+=======
+      // Offline fallback: Check INITIAL_ATTENDEES for matching registered mobile
+      const matchedAttendee = INITIAL_ATTENDEES.find((a) => {
+        const aDigits = (a.mobile || '').replace(/\D/g, '');
+        return aDigits === num || (aDigits.length >= 10 && num.length >= 10 && (aDigits.endsWith(num) || num.endsWith(aDigits)));
+      });
+
+      if (matchedAttendee) {
+>>>>>>> 7d538931d87f135f28003b5b6cfb47ff19ab1480
         resetUserState();
         setRole('delegate');
         setCurrentUser({
+<<<<<<< HEAD
           ...CURRENT_USER,
+=======
+          ...matchedAttendee,
+          checkedIn: true,
+        });
+        setStatus('confirmed');
+        setTimeout(() => {
+          setHasAccessConfirmed(true);
+          onSuccess();
+        }, 350);
+        return;
+      }
+
+      if (num === '7089157046' || num === '9876543210') {
+        resetUserState();
+        setRole('delegate');
+        const hariAttendee = INITIAL_ATTENDEES.find((a) => a.id === 'att-hari-gupta');
+        setCurrentUser({
+          ...(hariAttendee || CURRENT_USER),
+>>>>>>> 7d538931d87f135f28003b5b6cfb47ff19ab1480
           id: 'att-hari-gupta',
           name: 'Hari Gupta',
           company: 'GetMyEvent',
@@ -256,6 +286,7 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
           avatar: '/images/founders/pushpit-upadhyay.jpg',
           role: 'delegate',
           ticketType: '',
+<<<<<<< HEAD
           checkedIn: true,
         });
         setStatus('confirmed');
@@ -282,6 +313,8 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
         setRole(fallbackRole);
         setCurrentUser({
           ...matchedAttendee,
+=======
+>>>>>>> 7d538931d87f135f28003b5b6cfb47ff19ab1480
           checkedIn: true,
         });
         setStatus('confirmed');
