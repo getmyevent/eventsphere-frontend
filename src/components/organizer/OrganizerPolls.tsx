@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useStore } from '../../lib/store';
 import { api } from '../../lib/api';
+import { INITIAL_POLL } from '../../lib/mockData';
 import {
   BarChart3,
   Plus,
@@ -36,7 +37,7 @@ interface PollItem {
 }
 
 export const OrganizerPolls: React.FC = () => {
-  const { sessions, poll, setPoll, showToast, togglePollStatus, resetPollVote } = useStore();
+  const { sessions, poll, setPoll, customPolls, createPoll, activatePoll, showToast, togglePollStatus, resetPollVote } = useStore();
 
   const [pollsList, setPollsList] = useState<PollItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -49,16 +50,98 @@ export const OrganizerPolls: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState('');
 
-  // Fetch all polls on mount
+  // Fetch all polls on mount & merge with persistent customPolls and initial poll
   const fetchPolls = async () => {
     setIsLoading(true);
     try {
       const data = await api.organizer.getPolls();
-      if (Array.isArray(data)) {
-        setPollsList(data);
+      const map = new Map<string, PollItem>();
+
+      // 1. Seed with INITIAL_POLL
+      map.set(INITIAL_POLL.id, {
+        id: INITIAL_POLL.id,
+        sessionId: INITIAL_POLL.sessionId,
+        question: INITIAL_POLL.question,
+        status: INITIAL_POLL.status,
+        totalVotes: INITIAL_POLL.totalVotes,
+        options: INITIAL_POLL.options.map((o) => ({ id: o.id, text: o.text, voteCount: o.votes })),
+      });
+
+      // 2. Add customPolls from persistent store
+      customPolls.forEach((cp) => {
+        map.set(cp.id, {
+          id: cp.id,
+          sessionId: cp.sessionId,
+          question: cp.question,
+          status: cp.status,
+          totalVotes: cp.totalVotes,
+          options: cp.options.map((o) => ({ id: o.id, text: o.text, voteCount: o.votes })),
+        });
+      });
+
+      // 3. Add active poll if present
+      if (poll && poll.id) {
+        map.set(poll.id, {
+          id: poll.id,
+          sessionId: poll.sessionId,
+          question: poll.question,
+          status: poll.status,
+          totalVotes: poll.totalVotes,
+          options: poll.options.map((o) => ({ id: o.id, text: o.text, voteCount: o.votes })),
+        });
       }
+
+      // 4. Merge data from backend
+      if (Array.isArray(data)) {
+        data.forEach((bp: any) => {
+          map.set(bp.id, {
+            id: bp.id,
+            sessionId: bp.sessionId,
+            question: bp.question,
+            status: bp.status,
+            totalVotes: bp.totalVotes,
+            options: (bp.options || []).map((o: any) => ({
+              id: o.id,
+              text: o.text,
+              voteCount: o.votes ?? o.voteCount ?? 0,
+            })),
+          });
+        });
+      }
+
+      setPollsList(Array.from(map.values()));
     } catch (err) {
-      console.warn('Failed to load organizer polls:', err);
+      console.warn('Failed to load organizer polls from backend, using persistent store:', err);
+      const map = new Map<string, PollItem>();
+      map.set(INITIAL_POLL.id, {
+        id: INITIAL_POLL.id,
+        sessionId: INITIAL_POLL.sessionId,
+        question: INITIAL_POLL.question,
+        status: INITIAL_POLL.status,
+        totalVotes: INITIAL_POLL.totalVotes,
+        options: INITIAL_POLL.options.map((o) => ({ id: o.id, text: o.text, voteCount: o.votes })),
+      });
+      if (poll && poll.id) {
+        map.set(poll.id, {
+          id: poll.id,
+          sessionId: poll.sessionId,
+          question: poll.question,
+          status: poll.status,
+          totalVotes: poll.totalVotes,
+          options: poll.options.map((o) => ({ id: o.id, text: o.text, voteCount: o.votes })),
+        });
+      }
+      customPolls.forEach((cp) => {
+        map.set(cp.id, {
+          id: cp.id,
+          sessionId: cp.sessionId,
+          question: cp.question,
+          status: cp.status,
+          totalVotes: cp.totalVotes,
+          options: cp.options.map((o) => ({ id: o.id, text: o.text, voteCount: o.votes })),
+        });
+      });
+      setPollsList(Array.from(map.values()));
     } finally {
       setIsLoading(false);
     }
@@ -66,7 +149,7 @@ export const OrganizerPolls: React.FC = () => {
 
   useEffect(() => {
     fetchPolls();
-  }, [poll.id, poll.totalVotes]);
+  }, [poll.id, poll.totalVotes, customPolls.length]);
 
   // Set default session when sessions load
   useEffect(() => {
@@ -120,27 +203,11 @@ export const OrganizerPolls: React.FC = () => {
 
     setIsSubmitting(true);
     try {
-      const newPoll = await api.organizer.createPoll({
+      await createPoll({
         sessionId: formSessionId,
         question: cleanQuestion,
         options: cleanOptions,
       });
-
-      if (newPoll && newPoll.id) {
-        setPoll({
-          id: newPoll.id,
-          sessionId: newPoll.sessionId || formSessionId,
-          question: newPoll.question || cleanQuestion,
-          status: (newPoll.status as any) || 'open',
-          totalVotes: newPoll.totalVotes || 0,
-          voterIds: [],
-          options: (newPoll.options || []).map((opt: any) => ({
-            id: opt.id,
-            text: opt.text,
-            votes: opt.votes || 0,
-          })),
-        });
-      }
 
       showToast('Live poll published successfully! Attendees can now vote in real-time.', 'success');
       setIsModalOpen(false);
@@ -359,21 +426,10 @@ export const OrganizerPolls: React.FC = () => {
                 <div className="flex items-center gap-2 shrink-0">
                   {poll.id !== p.id && (
                     <button
-                      onClick={() => {
-                        setPoll({
-                          id: p.id,
-                          sessionId: p.sessionId,
-                          question: p.question,
-                          status: p.status,
-                          totalVotes: p.totalVotes,
-                          voterIds: [],
-                          options: p.options.map((opt) => ({
-                            id: opt.id,
-                            text: opt.text,
-                            votes: opt.voteCount ?? 0,
-                          })),
-                        });
+                      onClick={async () => {
+                        await activatePoll(p.id);
                         showToast(`Activated poll "${p.question.substring(0, 30)}..."`, 'info');
+                        fetchPolls();
                       }}
                       className="px-2.5 py-1 text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 font-medium rounded transition-colors cursor-pointer"
                     >

@@ -430,6 +430,11 @@ class ApiClient {
         body: JSON.stringify({ status }),
       });
     },
+    activatePoll: async (pollId: string): Promise<any> => {
+      return this.request<any>(`/api/v1/organizer/polls/${encodeURIComponent(pollId)}/activate`, {
+        method: 'POST',
+      });
+    },
   };
 
   // Phase 7: Sessions, Q&A & Live Polls
@@ -487,6 +492,11 @@ class ApiClient {
     },
     getActivePoll: async (): Promise<any> => {
       return this.request<any>('/api/v1/polls/active');
+    },
+    activatePoll: async (pollId: string): Promise<any> => {
+      return this.request<any>(`/api/v1/polls/${encodeURIComponent(pollId)}/activate`, {
+        method: 'POST',
+      });
     },
     getPollStreamUrl: (pollId: string): string => {
       const token = this.getToken();

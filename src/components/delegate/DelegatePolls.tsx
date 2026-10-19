@@ -11,8 +11,8 @@ export const DelegatePolls: React.FC = () => {
   const router = useRouter();
   const { setActiveDelegateTab, poll, votePoll, resetPollVote, currentUser } = useStore();
   
-  // Ensure we use the official summit poll data
-  const activePoll = poll && poll.id === INITIAL_POLL.id ? poll : (poll || INITIAL_POLL);
+  // Current live summit poll
+  const activePoll = poll || INITIAL_POLL;
   const storageKey = currentUser?.id
     ? `eventsphere_poll_voted_${activePoll.id}_${currentUser.id}`
     : `eventsphere_poll_voted_${activePoll.id}`;

@@ -133,6 +133,10 @@ interface StoreContextType {
   questions: Question[];
   poll: Poll;
   setPoll: React.Dispatch<React.SetStateAction<Poll>>;
+  customPolls: Poll[];
+  setCustomPolls: React.Dispatch<React.SetStateAction<Poll[]>>;
+  createPoll: (data: { sessionId: string; question: string; options: string[] }) => Promise<Poll>;
+  activatePoll: (pollId: string) => Promise<void>;
   exhibitors: ExhibitorStats[];
   interestedVisitors: InterestedVisitor[];
 
@@ -172,6 +176,42 @@ interface StoreContextType {
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
 const STORAGE_KEY = 'eventsphere_mpss26_store_v13';
+const STORAGE_ACTIVE_POLL_KEY = 'eventsphere_active_poll_v2';
+const STORAGE_CUSTOM_POLLS_KEY = 'eventsphere_custom_polls_v2';
+
+const getStoredActivePoll = (): Poll => {
+  if (typeof window !== 'undefined') {
+    try {
+      const saved = localStorage.getItem(STORAGE_ACTIVE_POLL_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed && parsed.id && Array.isArray(parsed.options) && parsed.options.length > 0) {
+          return parsed;
+        }
+      }
+    } catch {
+      // ignore
+    }
+  }
+  return INITIAL_POLL;
+};
+
+const getStoredCustomPolls = (): Poll[] => {
+  if (typeof window !== 'undefined') {
+    try {
+      const saved = localStorage.getItem(STORAGE_CUSTOM_POLLS_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          return parsed;
+        }
+      }
+    } catch {
+      // ignore
+    }
+  }
+  return [];
+};
 
 export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Navigation & Role
@@ -265,7 +305,8 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
   const [sessions, setSessions] = useState<Session[]>(INITIAL_SESSIONS);
   const [questions, setQuestions] = useState<Question[]>(INITIAL_QUESTIONS);
-  const [poll, setPoll] = useState<Poll>(INITIAL_POLL);
+  const [poll, setPoll] = useState<Poll>(getStoredActivePoll);
+  const [customPolls, setCustomPolls] = useState<Poll[]>(getStoredCustomPolls);
   const [exhibitors, setExhibitors] = useState<ExhibitorStats[]>(INITIAL_EXHIBITORS);
   const [interestedVisitors, setInterestedVisitors] = useState<InterestedVisitor[]>(INITIAL_INTERESTED_VISITORS);
 
@@ -836,33 +877,59 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   }, [role, hasAccessConfirmed]);
 
+  // Persist poll and customPolls changes to localStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined' && poll && poll.id) {
+      try {
+        localStorage.setItem(STORAGE_ACTIVE_POLL_KEY, JSON.stringify(poll));
+      } catch {
+        // ignore
+      }
+    }
+  }, [poll]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && customPolls) {
+      try {
+        localStorage.setItem(STORAGE_CUSTOM_POLLS_KEY, JSON.stringify(customPolls));
+      } catch {
+        // ignore
+      }
+    }
+  }, [customPolls]);
+
   // Sync live active poll from MySQL backend
   useEffect(() => {
     if (hasAccessConfirmed) {
       api.sessions.getActivePoll()
-        .catch(() => api.sessions.getPollById('poll-mpss26-01'))
         .then((p) => {
           if (p && p.id && p.options) {
-            setPoll((prev) => ({
-              ...prev,
-              id: p.id,
-              sessionId: p.sessionId || prev.sessionId,
-              question: p.question || prev.question,
-              status: (p.status as any) || prev.status,
-              totalVotes: typeof p.totalVotes === 'number' ? p.totalVotes : prev.totalVotes,
-              voterIds: p.hasVoted && currentUser?.id ? [currentUser.id] : [],
-              hasVoted: Boolean(p.hasVoted),
-              votedOptionId: p.votedOptionId || null,
-              options: p.options.map((opt: any) => ({
-                id: opt.id,
-                text: opt.text,
-                votes: opt.votes,
-              })),
-            }));
+            setPoll((prev) => {
+              const isDifferent = prev.id !== p.id;
+              const formatted: Poll = {
+                id: p.id,
+                sessionId: p.sessionId || prev.sessionId,
+                question: p.question || prev.question,
+                status: (p.status as any) || prev.status,
+                totalVotes: typeof p.totalVotes === 'number' ? p.totalVotes : prev.totalVotes,
+                voterIds: isDifferent ? (p.hasVoted && currentUser?.id ? [currentUser.id] : []) : (p.hasVoted && currentUser?.id && !prev.voterIds.includes(currentUser.id) ? [...prev.voterIds, currentUser.id] : prev.voterIds),
+                hasVoted: Boolean(p.hasVoted),
+                votedOptionId: p.votedOptionId || (isDifferent ? null : prev.votedOptionId),
+                options: p.options.map((opt: any) => ({
+                  id: opt.id,
+                  text: opt.text,
+                  votes: opt.votes ?? opt.voteCount ?? 0,
+                })),
+              };
+              try {
+                localStorage.setItem(STORAGE_ACTIVE_POLL_KEY, JSON.stringify(formatted));
+              } catch {}
+              return formatted;
+            });
           }
         })
         .catch((err) => {
-          console.warn('Backend active poll fetch skipped:', err);
+          console.warn('Backend active poll fetch skipped, preserving cached poll:', err);
         });
     }
   }, [hasAccessConfirmed, currentUser?.id]);
@@ -884,7 +951,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           if (livePoll && livePoll.options) {
             setPoll((prev) => {
               const isDifferentPoll = prev.id !== livePoll.id && Boolean(livePoll.id);
-              return {
+              const updated: Poll = {
                 id: livePoll.id || prev.id,
                 sessionId: livePoll.sessionId || prev.sessionId,
                 question: livePoll.question || prev.question,
@@ -896,9 +963,49 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 options: livePoll.options.map((opt: any) => ({
                   id: opt.id,
                   text: opt.text,
-                  votes: opt.votes,
+                  votes: opt.votes ?? opt.voteCount ?? 0,
                 })),
               };
+              try {
+                localStorage.setItem(STORAGE_ACTIVE_POLL_KEY, JSON.stringify(updated));
+              } catch {}
+              return updated;
+            });
+
+            // Also guarantee that the poll exists in customPolls list across refreshes
+            setCustomPolls((prev) => {
+              const exists = prev.some((p) => p.id === livePoll.id);
+              if (exists) {
+                const updated = prev.map((p) => (p.id === livePoll.id ? {
+                  ...p,
+                  question: livePoll.question || p.question,
+                  status: (livePoll.status as any) || p.status,
+                  totalVotes: typeof livePoll.totalVotes === 'number' ? livePoll.totalVotes : p.totalVotes,
+                  options: livePoll.options.map((opt: any) => ({
+                    id: opt.id,
+                    text: opt.text,
+                    votes: opt.votes ?? opt.voteCount ?? 0,
+                  })),
+                } : p));
+                try { localStorage.setItem(STORAGE_CUSTOM_POLLS_KEY, JSON.stringify(updated)); } catch {}
+                return updated;
+              }
+              const newEntry: Poll = {
+                id: livePoll.id,
+                sessionId: livePoll.sessionId || 'mpss26-d1-01',
+                question: livePoll.question || '',
+                status: (livePoll.status as any) || 'open',
+                totalVotes: typeof livePoll.totalVotes === 'number' ? livePoll.totalVotes : 0,
+                voterIds: [],
+                options: (livePoll.options || []).map((opt: any) => ({
+                  id: opt.id,
+                  text: opt.text,
+                  votes: opt.votes ?? opt.voteCount ?? 0,
+                })),
+              };
+              const updated = [newEntry, ...prev];
+              try { localStorage.setItem(STORAGE_CUSTOM_POLLS_KEY, JSON.stringify(updated)); } catch {}
+              return updated;
             });
           }
         } catch (err) {
@@ -1726,6 +1833,104 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     showToast('Poll reset to initial state ✓', 'info');
   }, [poll.id, currentUser?.id, showToast]);
 
+  // Create New Poll (Organizer)
+  const createPoll = useCallback(async (data: { sessionId: string; question: string; options: string[] }): Promise<Poll> => {
+    const localId = 'poll_' + Math.random().toString(36).substring(2, 10);
+    const fallbackPoll: Poll = {
+      id: localId,
+      sessionId: data.sessionId,
+      question: data.question,
+      status: 'open',
+      totalVotes: 0,
+      voterIds: [],
+      options: data.options.map((text, idx) => ({
+        id: `opt_${localId}_${idx + 1}`,
+        text,
+        votes: 0,
+      })),
+    };
+
+    let finalPoll = fallbackPoll;
+
+    try {
+      const created = await api.organizer.createPoll(data);
+      if (created && created.id) {
+        finalPoll = {
+          id: created.id,
+          sessionId: created.sessionId || data.sessionId,
+          question: created.question || data.question,
+          status: (created.status as any) || 'open',
+          totalVotes: created.totalVotes || 0,
+          voterIds: [],
+          options: (created.options || []).map((opt: any) => ({
+            id: opt.id,
+            text: opt.text,
+            votes: opt.votes ?? opt.voteCount ?? 0,
+          })),
+        };
+      }
+    } catch (err) {
+      console.warn('Backend createPoll call failed, saving locally:', err);
+    }
+
+    setPoll(finalPoll);
+    setCustomPolls((prev) => {
+      const filtered = prev.filter((p) => p.id !== finalPoll.id);
+      const next = [finalPoll, ...filtered];
+      try {
+        localStorage.setItem(STORAGE_CUSTOM_POLLS_KEY, JSON.stringify(next));
+      } catch {}
+      return next;
+    });
+    try {
+      localStorage.setItem(STORAGE_ACTIVE_POLL_KEY, JSON.stringify(finalPoll));
+    } catch {}
+
+    return finalPoll;
+  }, []);
+
+  // Activate Poll (Organizer)
+  const activatePoll = useCallback(async (pollId: string): Promise<void> => {
+    // 1. Find from customPolls, current poll, or INITIAL_POLL
+    let target = customPolls.find((p) => p.id === pollId);
+    if (!target && poll.id === pollId) target = poll;
+    if (!target && INITIAL_POLL.id === pollId) target = INITIAL_POLL;
+
+    if (target) {
+      const activated: Poll = { ...target, status: 'open' };
+      setPoll(activated);
+      try {
+        localStorage.setItem(STORAGE_ACTIVE_POLL_KEY, JSON.stringify(activated));
+      } catch {}
+    }
+
+    // 2. Call backend to activate on server
+    try {
+      const res = await api.organizer.activatePoll(pollId);
+      if (res && res.id) {
+        const formatted: Poll = {
+          id: res.id,
+          sessionId: res.sessionId || target?.sessionId || 'mpss26-d1-01',
+          question: res.question || target?.question || '',
+          status: (res.status as any) || 'open',
+          totalVotes: typeof res.totalVotes === 'number' ? res.totalVotes : target?.totalVotes || 0,
+          voterIds: [],
+          options: (res.options || []).map((opt: any) => ({
+            id: opt.id,
+            text: opt.text,
+            votes: opt.votes ?? opt.voteCount ?? 0,
+          })),
+        };
+        setPoll(formatted);
+        try {
+          localStorage.setItem(STORAGE_ACTIVE_POLL_KEY, JSON.stringify(formatted));
+        } catch {}
+      }
+    } catch (err) {
+      console.warn('Backend activatePoll call failed, activated locally:', err);
+    }
+  }, [customPolls, poll]);
+
   // Toggle check-in (Organizer)
   const toggleCheckIn = useCallback(async (personId: string) => {
     let nextCheckedInState = false;
@@ -2064,6 +2269,10 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     questions,
     poll,
     setPoll,
+    customPolls,
+    setCustomPolls,
+    createPoll,
+    activatePoll,
     exhibitors,
     interestedVisitors,
     connectWith,
@@ -2135,6 +2344,10 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     questions,
     poll,
     setPoll,
+    customPolls,
+    setCustomPolls,
+    createPoll,
+    activatePoll,
     exhibitors,
     interestedVisitors,
     connectWith,
