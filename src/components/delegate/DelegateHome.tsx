@@ -25,6 +25,7 @@ import {
   Rocket,
   GraduationCap,
   Linkedin,
+  Building2,
 } from 'lucide-react';
 
 const EVENT_PARTNERS = [
@@ -70,7 +71,7 @@ const FOUNDERS = [
     id: 'att-hari-gupta',
     name: 'Hari Gupta',
     role: 'Co-Founder',
-    avatar: 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792442670/hari_gupta.png',
+    avatar: 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792450462/hari.png',
     linkedin: 'https://www.linkedin.com/in/hari-gupta-159948330',
   },
   {
@@ -331,7 +332,7 @@ export const DelegateHome: React.FC = () => {
                 <strong className="text-white font-semibold">{event.totalRegistered || attendees.length}</strong> attendees
               </span>
               <span className="bg-[#1E293B]/70 border border-slate-700/60 text-slate-300 px-2 py-0.5 rounded-md shrink-0">
-                <strong className="text-white font-semibold">{event.totalSpeakers || 46}</strong> speakers
+                <strong className="text-white font-semibold">{event.totalSpeakers || 65}</strong> speakers
               </span>
               <span className="bg-[#1E293B]/70 border border-slate-700/60 text-slate-300 px-2 py-0.5 rounded-md shrink-0">
                 <strong className="text-white font-semibold">50+</strong> exhibitors
@@ -624,7 +625,7 @@ export const DelegateHome: React.FC = () => {
         <div className="grid grid-cols-4 gap-2">
           {[
             { id: 'speakers', label: 'Speakers', icon: Users, path: '/delegate/speakers' },
-            { id: 'polls', label: 'Poll', icon: BarChart2, path: '/delegate/polls' },
+            { id: 'organizers', label: 'Organizers', icon: Building2, path: '/delegate/about' },
             { id: 'map', label: 'Map', icon: Map, path: '/delegate/map' },
             { id: 'sponsors', label: 'Sponsors', icon: Star, path: '/delegate/sponsors' },
           ].map((item) => (
@@ -642,21 +643,21 @@ export const DelegateHome: React.FC = () => {
         </div>
       </div>
 
-      {/* Speakers Section on Home Page */}
+      {/* People You Should Meet Section */}
       {recommendedPeople.length > 0 && (
         <div className="space-y-2 pt-1">
           <div className="flex items-center justify-between px-0.5">
             <h3
-              onClick={() => router.push('/delegate/speakers')}
+              onClick={() => router.push('/delegate/people')}
               className="text-[17px] font-bold text-[#111827] tracking-tight cursor-pointer hover:text-[#B51F32] transition-colors"
             >
-              Speakers
+              People You Should Meet
             </h3>
             <button
-              onClick={() => router.push('/delegate/speakers')}
+              onClick={() => router.push('/delegate/people')}
               className="text-[13px] font-semibold text-[#111827] flex items-center gap-0.5 hover:underline"
             >
-              <span>View all ({recommendedPeople.length})</span>
+              <span>View all</span>
               <ChevronRight className="w-4 h-4 stroke-[2]" />
             </button>
           </div>

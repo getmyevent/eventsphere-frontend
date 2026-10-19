@@ -14,7 +14,7 @@ export const DelegateFounders: React.FC = () => {
       id: 'att-hari-gupta',
       name: 'Hari Gupta',
       role: 'Co-Founder',
-      avatar: 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792442670/hari_gupta.png',
+      avatar: 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792450462/hari.png',
       linkedin: 'https://www.linkedin.com/in/hari-gupta-159948330',
     },
     {
@@ -40,7 +40,7 @@ export const DelegateFounders: React.FC = () => {
       name: 'Prof. Vaibhav Neema',
       role: 'Professor',
       institution: 'IET DAVV',
-      avatar: 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792442671/vaibhav_neema.png',
+      avatar: 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792451701/vaibhav.png',
       linkedin: 'https://www.linkedin.com/in/dr-vaibhav-neema-5981677a/',
     },
     {
