@@ -191,7 +191,7 @@ class ApiClient {
       headers,
     });
 
-    if (response.status === 401 && !endpoint.includes('/auth/access') && !this.token?.startsWith('mpss26-delegate-token-')) {
+    if (response.status === 401 && !endpoint.includes('/auth') && !this.token?.startsWith('mpss26-delegate-token-')) {
       this.clearAuth();
       if (typeof window !== 'undefined') {
         try {
@@ -254,7 +254,7 @@ class ApiClient {
       headers,
     });
 
-    if (response.status === 401 && !endpoint.includes('/auth/access') && !this.token?.startsWith('mpss26-delegate-token-')) {
+    if (response.status === 401 && !endpoint.includes('/auth') && !this.token?.startsWith('mpss26-delegate-token-')) {
       this.clearAuth();
       if (typeof window !== 'undefined') {
         try {
@@ -372,15 +372,18 @@ class ApiClient {
     },
     sendEmailOtp: async (eventId: string, email: string): Promise<{ success: boolean; message: string; demoOtp?: string }> => {
       try {
-        return await this.request<{ success: boolean; message: string; demoOtp?: string }>('/api/v1/auth/email/send-otp', {
+        return await this.request<{ success: boolean; message: string; demoOtp?: string }>('/api/v1/auth/email/request-otp', {
           method: 'POST',
           body: JSON.stringify({ eventId, email }),
         });
-      } catch {
+      } catch (err: any) {
+        if (err?.message && !err.message.includes('Failed to fetch') && !err.message.includes('NetworkError')) {
+          throw err;
+        }
         return {
           success: true,
           message: 'OTP sent to registered email address.',
-          demoOtp: '1234',
+          demoOtp: '123456',
         };
       }
     },

@@ -33,6 +33,7 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/icon-192.png" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <script src="https://accounts.google.com/gsi/client" async defer></script>
       </head>
       <body className="h-[100dvh] antialiased selection:bg-[#3563F6]/20 selection:text-inherit">
         <StoreProvider>
