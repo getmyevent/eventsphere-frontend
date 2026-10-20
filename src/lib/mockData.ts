@@ -4276,11 +4276,12 @@ export const INITIAL_SESSIONS: Session[] = [
     "day": 2,
     "timeRange": "15:00 – 15:50",
     "room": "Imperial Hall · 1st Floor",
-    "speakerName": "Nitin Kishor (Moderator), Sumedha Limaye & 4 others",
+    "speakerName": "John Kingsley A.R, IAS (Chair), Nitin Kishor (Moderator) & 5 others",
     "speakerDesignation": "GCC & Design Services Panel",
-    "speakerCompany": "Truechip Solutions, Quest Global, Mirafra, UST Global, Digicomm, LeadSoc",
-    "speakerId": "speaker-nitin-kishor",
+    "speakerCompany": "Govt. of MP, Truechip Solutions, Quest Global, Mirafra, UST Global, Digicomm, LeadSoc",
+    "speakerId": "speaker-john-kingsley",
     "speakerIds": [
+      "speaker-john-kingsley",
       "speaker-nitin-kishor",
       "speaker-sumedha-limaye",
       "speaker-alok-kuchlous",
@@ -4289,6 +4290,13 @@ export const INITIAL_SESSIONS: Session[] = [
       "speaker-suman-dwivedi"
     ],
     "panelists": [
+      {
+        "name": "John Kingsley A.R, IAS",
+        "role": "Chair",
+        "designation": "Secretary, MSME",
+        "company": "Govt. of MP",
+        "speakerId": "speaker-john-kingsley"
+      },
       {
         "name": "Nitin Kishor",
         "role": "Moderator",
