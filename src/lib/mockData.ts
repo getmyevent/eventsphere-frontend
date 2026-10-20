@@ -2885,29 +2885,29 @@ export const INITIAL_SESSIONS: Session[] = [
     "day": 1,
     "timeRange": "15:00 – 15:50",
     "room": "Grand Hall · Ground Floor",
-    "speakerName": "Arundhati Sanath (Moderator), Charan Gurumoorthy & 4 others",
-    "speakerDesignation": "Industry Leadership Panel",
-    "speakerCompany": "LAM Research, Tata Electronics, Paras Semi, RRP & more",
-    "speakerId": "speaker-arundhati-sanath",
+    "speakerName": "Ashok Barnwal, IAS (Chair), Charan Gurumoorthy (Moderator) & 4 others",
+    "speakerDesignation": "Advanced Packaging & Testing Panel",
+    "speakerCompany": "Govt. of MP, Tata Electronics, Paras Semiconductor, RRP Electronics, H-SEMI, N Cube Semicon",
+    "speakerId": "speaker-charan-gurumoorthy",
     "speakerIds": [
-      "speaker-arundhati-sanath",
+      "speaker-ashok-barnwal",
       "speaker-charan-gurumoorthy",
       "speaker-santosh-kumar",
       "speaker-apoorva-raut",
-      "speaker-charu-chandra-tripathi",
-      "speaker-binit-k-singh"
+      "speaker-binit-k-singh",
+      "speaker-sudhir-naik"
     ],
     "panelists": [
       {
-        "name": "Arundhati Sanath",
-        "role": "Moderator",
-        "designation": "Director",
-        "company": "LAM Research",
-        "speakerId": "speaker-arundhati-sanath"
+        "name": "Ashok Barnwal, IAS",
+        "role": "Chair",
+        "designation": "Chief Secretary",
+        "company": "Govt. of MP",
+        "speakerId": "speaker-ashok-barnwal"
       },
       {
         "name": "Charan Gurumoorthy",
-        "role": "Panelist",
+        "role": "Moderator",
         "designation": "Senior Vice President",
         "company": "Tata Electronics",
         "speakerId": "speaker-charan-gurumoorthy"
@@ -2927,18 +2927,18 @@ export const INITIAL_SESSIONS: Session[] = [
         "speakerId": "speaker-apoorva-raut"
       },
       {
-        "name": "Charu Chandra Tripathi",
-        "role": "Panelist",
-        "designation": "Director",
-        "company": "NITTTR Bhopal",
-        "speakerId": "speaker-charu-chandra-tripathi"
-      },
-      {
         "name": "Binit K Singh",
         "role": "Panelist",
         "designation": "CEO & Managing Director",
         "company": "H-SEMI Products, Singapore",
         "speakerId": "speaker-binit-k-singh"
+      },
+      {
+        "name": "Sudhir Naik",
+        "role": "Panelist",
+        "designation": "Founder & CEO",
+        "company": "N Cube Semicon Pvt. Ltd.",
+        "speakerId": "speaker-sudhir-naik"
       }
     ],
     "description": "Strategic panel examining infrastructure requirements, fiscal incentives, and skill capabilities necessary to establish Madhya Pradesh as a premier hub for Advanced Packaging (OSAT/ATMP) and Testing.",
@@ -2959,16 +2959,15 @@ export const INITIAL_SESSIONS: Session[] = [
     "day": 1,
     "timeRange": "15:00 – 15:50",
     "room": "Jamawar Hall · Ground Floor",
-    "speakerName": "MP Govt (Chair), Mohit Bansal (Co-Chair) & 17 participants",
-    "speakerDesignation": "Round Table Panel",
-    "speakerCompany": "Synopsys, NXP, Ambient Scientific, IIT Indore & more",
+    "speakerName": "Sanjay Dubey, IAS (Chair), Mohit Bansal (Co-Chair) & 21 participants",
+    "speakerDesignation": "AI Infrastructure Leadership Round Table",
+    "speakerCompany": "Govt. of MP, Marvell, Synopsys, NXP, Ambient Scientific, Cisco, IIT Indore & more",
     "speakerId": "speaker-madhavendra-shaan-bhatnagar",
     "speakerIds": [
       "speaker-madhavendra-shaan-bhatnagar",
       "speaker-swapnil-sapre",
       "speaker-abhishek-lal",
       "speaker-abhishek-saxena",
-      "speaker-jawar-singh",
       "speaker-ashish-lachhwani",
       "speaker-paruchuri-srijith",
       "speaker-pratibha-verma",
@@ -2978,16 +2977,16 @@ export const INITIAL_SESSIONS: Session[] = [
     ],
     "panelists": [
       {
-        "name": "MP Govt",
+        "name": "Sanjay Dubey, IAS",
         "role": "Chair",
-        "designation": "Government Representation",
-        "company": "Government of Madhya Pradesh"
+        "designation": "Additional Chief Secretary, Urban Development & Housing Deptt.",
+        "company": "Govt. of MP"
       },
       {
         "name": "Mohit Bansal",
         "role": "Co-Chair",
-        "designation": "SVP",
-        "company": "Eximietas Design"
+        "designation": "Director - Rack Scale Switch BU",
+        "company": "Marvell Technology"
       },
       {
         "name": "Madhavendra Shaan Bhatnagar",
@@ -3018,17 +3017,10 @@ export const INITIAL_SESSIONS: Session[] = [
         "speakerId": "speaker-abhishek-saxena"
       },
       {
-        "name": "Anima Saxena",
+        "name": "Dr. Anima Saxena",
         "role": "Panelist",
-        "designation": "Chief Operating Officer",
+        "designation": "Chief operating officer",
         "company": "Anims Tech. Learn"
-      },
-      {
-        "name": "Jawar Singh",
-        "role": "Panelist",
-        "designation": "Chief Scientist",
-        "company": "Phynomy",
-        "speakerId": "speaker-jawar-singh"
       },
       {
         "name": "Ashish Lachhwani",
@@ -3038,7 +3030,7 @@ export const INITIAL_SESSIONS: Session[] = [
         "speakerId": "speaker-ashish-lachhwani"
       },
       {
-        "name": "Paruchuri Srijith",
+        "name": "Paruchuri Srijith.",
         "role": "Panelist",
         "designation": "Managing Director",
         "company": "Spintronics AI",
@@ -3062,13 +3054,13 @@ export const INITIAL_SESSIONS: Session[] = [
         "name": "Pramod Kumar",
         "role": "Panelist",
         "designation": "Defense & Strategic Technologies",
-        "company": "Indian Army"
+        "company": "India Army"
       },
       {
-        "name": "Pratik Sharda",
+        "name": "Yatendra Bhargava",
         "role": "Panelist",
-        "designation": "Co Founder & CEO",
-        "company": "Craftif AI"
+        "designation": "Head of Firmware Platform",
+        "company": "Craftifai"
       },
       {
         "name": "Gaurav Mahesh Gupta",
@@ -3079,7 +3071,7 @@ export const INITIAL_SESSIONS: Session[] = [
       {
         "name": "Ranveer Singh",
         "role": "Panelist",
-        "designation": "Assistant Marketing Manager",
+        "designation": "Assistant Marking Manager",
         "company": "TrueChip Solution",
         "speakerId": "speaker-ranveer-singh"
       },
@@ -3101,6 +3093,36 @@ export const INITIAL_SESSIONS: Session[] = [
         "role": "Panelist",
         "designation": "Scientist F",
         "company": "CSIR CEERI Pilani"
+      },
+      {
+        "name": "Vivian D",
+        "role": "Panelist",
+        "designation": "Technical Leadership",
+        "company": "CDAC Bangalore"
+      },
+      {
+        "name": "Sajid Khan",
+        "role": "Panelist",
+        "designation": "ASIC/SoC Verification Engineer",
+        "company": "Cisco"
+      },
+      {
+        "name": "Saurabh Sharma",
+        "role": "Panelist",
+        "designation": "FPGA Design Engineer, Mentor at 1 TOPs",
+        "company": "eInfochips / VSI"
+      },
+      {
+        "name": "Sankalp Singh",
+        "role": "Panelist",
+        "designation": "EDA & AI Systems Engineer",
+        "company": "Synopsys"
+      },
+      {
+        "name": "Aruna Tiwari",
+        "role": "Panelist",
+        "designation": "Professor",
+        "company": "IIT Indore"
       }
     ],
     "description": "High-level round table addressing compute infrastructure, sovereign AI clusters, high-bandwidth memory (HBM) integration, and hardware accelerators for national AI workloads.",
@@ -3145,19 +3167,26 @@ export const INITIAL_SESSIONS: Session[] = [
     "day": 1,
     "timeRange": "16:20 – 17:10",
     "room": "Grand Hall · Ground Floor",
-    "speakerName": "Satya Gupta (Moderator), Jaswinder Ahuja & 5 others",
+    "speakerName": "Neeraj Mandloi, IAS (Chair), Satya Gupta (Moderator) & 5 others",
     "speakerDesignation": "Fabless Leadership Panel",
-    "speakerCompany": "VLSI Society of India, ISM, Seafund, INDRIS, Netrasemi, IMEC, MPSEDC",
+    "speakerCompany": "Govt. of MP, VLSI Society of India, ISM, INDRIS, Netrasemi, IMEC, Seafund",
     "speakerId": "speaker-satya-gupta",
     "speakerIds": [
+      "speaker-neeraj-mandloi",
       "speaker-satya-gupta",
       "speaker-jaswinder-ahuja",
-      "speaker-narendra-bhandari",
       "speaker-sanjay-gupta",
       "speaker-jyothis-indirabhai",
       "speaker-jatinder-singh"
     ],
     "panelists": [
+      {
+        "name": "Neeraj Mandloi, IAS",
+        "role": "Chair",
+        "designation": "Additional Chief Secretary, Department of Industrial Policy and Investment Promotion (DIPIP)",
+        "company": "Govt. of MP",
+        "speakerId": "speaker-neeraj-mandloi"
+      },
       {
         "name": "Satya Gupta",
         "role": "Moderator",
@@ -3171,13 +3200,6 @@ export const INITIAL_SESSIONS: Session[] = [
         "designation": "Advisor",
         "company": "India Semiconductor Mission",
         "speakerId": "speaker-jaswinder-ahuja"
-      },
-      {
-        "name": "Narendra Bhandari",
-        "role": "Panelist",
-        "designation": "VC. General Partner",
-        "company": "Seafund",
-        "speakerId": "speaker-narendra-bhandari"
       },
       {
         "name": "Sanjay Gupta",
@@ -3201,10 +3223,10 @@ export const INITIAL_SESSIONS: Session[] = [
         "speakerId": "speaker-jatinder-singh"
       },
       {
-        "name": "MPSEDC PS/MD/ED",
+        "name": "Manoj Agarwal",
         "role": "Panelist",
-        "designation": "Executive Leadership",
-        "company": "MPSEDC, Government of Madhya Pradesh"
+        "designation": "General Partner",
+        "company": "Seafund"
       }
     ],
     "description": "Industry leaders discuss venture capital access, EDA tooling, MPW shuttle access, IP creation, and policy levers needed to nurture world-class fabless semiconductor startups in Madhya Pradesh.",
@@ -3225,11 +3247,12 @@ export const INITIAL_SESSIONS: Session[] = [
     "day": 1,
     "timeRange": "16:20 – 17:10",
     "room": "Jamawar Hall · Ground Floor",
-    "speakerName": "ACS/PS Technical Education (Chair), Rakesh Singhai (Co-Chair) & 23 Academic Leaders",
+    "speakerName": "Rajiv Dixit (Chair), Rakesh Singhai (Co-Chair) & 24 Academic Leaders",
     "speakerDesignation": "Higher Education Leadership",
-    "speakerCompany": "DAVV, SGSITS, Bhoj, Medicaps, VIT Bhopal, MANIT & more",
+    "speakerCompany": "AIGGPA, DAVV, SGSITS, Bhoj, Medicaps, VIT Bhopal, MANIT & more",
     "speakerId": "speaker-rakesh-singhai",
     "speakerIds": [
+      "speaker-prof-rajeev-dixit",
       "speaker-rakesh-singhai",
       "speaker-vaibhav-neema",
       "speaker-puneet-mittal",
@@ -3238,10 +3261,11 @@ export const INITIAL_SESSIONS: Session[] = [
     ],
     "panelists": [
       {
-        "name": "ACS/PS Technical Education",
+        "name": "Rajiv Dixit",
         "role": "Chair",
-        "designation": "Additional Chief Secretary / Principal Secretary",
-        "company": "Technical Education, Govt. of MP"
+        "designation": "Vice Chairman",
+        "company": "AIGGPA Bhopal",
+        "speakerId": "speaker-prof-rajeev-dixit"
       },
       {
         "name": "Rakesh Singhai",
@@ -3391,6 +3415,12 @@ export const INITIAL_SESSIONS: Session[] = [
         "role": "Panelist",
         "designation": "Chancellor",
         "company": "IES University Bhopal"
+      },
+      {
+        "name": "Bithika Gorai",
+        "role": "Panelist",
+        "designation": "Associate Professor",
+        "company": "ICW, University of Delhi"
       }
     ],
     "description": "Deliberations between university leadership, chancellors, and industry experts on aligning academic curricula with 2nm/3nm VLSI design, semiconductor packaging, and cleanroom technician skills.",
@@ -3411,22 +3441,27 @@ export const INITIAL_SESSIONS: Session[] = [
     "day": 1,
     "timeRange": "17:10 – 18:00",
     "room": "Grand Hall · Ground Floor",
-    "speakerName": "Kamaljeet Singh (Moderator), Mukesh Kumar & 5 others",
+    "speakerName": "Manu Shrivastava, IAS (Chair), Kamaljeet Singh (Moderator) & 4 others",
     "speakerDesignation": "Manufacturing & Supply Chain Panel",
-    "speakerCompany": "SCL Mohali, IIT Indore, ISM, Teradyne, RIR & Silicon Power, Applied Materials, MPSEDC",
+    "speakerCompany": "Government of Madhya Pradesh, SCL Mohali, IIT Indore, ISM, Teradyne, RIR Power Semiconductors",
     "speakerId": "speaker-dr-kamaljeet-singh",
     "speakerIds": [
       "speaker-dr-kamaljeet-singh",
       "speaker-mukesh-kumar",
       "speaker-dr-manish-hooda",
-      "speaker-alpa-sood",
-      "speaker-dr-harshad-mehta"
+      "speaker-alpa-sood"
     ],
     "panelists": [
       {
+        "name": "Manu Shrivastava, IAS",
+        "role": "Chair",
+        "designation": "Additional Chief Secretary, New & Renewable Energy Department",
+        "company": "Government of Madhya Pradesh"
+      },
+      {
         "name": "Kamaljeet Singh",
         "role": "Moderator",
-        "designation": "Director",
+        "designation": "Director General",
         "company": "SCL Mohali",
         "speakerId": "speaker-dr-kamaljeet-singh"
       },
@@ -3452,23 +3487,10 @@ export const INITIAL_SESSIONS: Session[] = [
         "speakerId": "speaker-alpa-sood"
       },
       {
-        "name": "Harshad Mehta",
+        "name": "Ramesh Trasi",
         "role": "Panelist",
-        "designation": "President",
-        "company": "RIR & Silicon Power",
-        "speakerId": "speaker-dr-harshad-mehta"
-      },
-      {
-        "name": "AMAT Representative",
-        "role": "Panelist",
-        "designation": "Applied Materials Representative",
-        "company": "Applied Materials"
-      },
-      {
-        "name": "MPSEDC PS/MD/ED",
-        "role": "Panelist",
-        "designation": "Senior Leadership (One to One)",
-        "company": "MPSEDC, Government of Madhya Pradesh"
+        "designation": "CTO",
+        "company": "RIR Power Semiconductors"
       }
     ],
     "description": "In-depth exploration of semiconductor manufacturing supply chains, ultrapure gases, chemicals, wafer handling equipment, and the critical infrastructure required for mega-fab resilience.",
@@ -3489,9 +3511,9 @@ export const INITIAL_SESSIONS: Session[] = [
     "day": 1,
     "timeRange": "17:10 – 18:00",
     "room": "Jamawar Hall · Ground Floor",
-    "speakerName": "MPSEDC PS/MD/ED (Chair), Krishna Thakur (Co-Chair) & 19 IP Leaders",
+    "speakerName": "Anshuman Raj, IAS (Chair), Krishna Thakur (Co-Chair) & 21 IP Leaders",
     "speakerDesignation": "Fabless Product & IP Round Table",
-    "speakerCompany": "Signitude, eInfochips, SAC-ISRO, Nanodroits, Bhanashree, Maven Silicon & more",
+    "speakerCompany": "MPSEDC, Ex-ST/NXP, IIT Indore, eInfochips, SAC-ISRO, Intel, Softude, HCL Tech & more",
     "speakerId": "speaker-krishna-thakur",
     "speakerIds": [
       "speaker-krishna-thakur",
@@ -3503,23 +3525,22 @@ export const INITIAL_SESSIONS: Session[] = [
       "speaker-shrihar-pandey",
       "speaker-neha-maheshwari",
       "speaker-shivakumar",
-      "speaker-jawar-singh",
       "speaker-avddesh-sharma",
       "speaker-paruchuri-srijith",
       "speaker-nitin-dodia"
     ],
     "panelists": [
       {
-        "name": "MPSEDC PS/MD/ED",
+        "name": "Anshuman Raj, IAS",
         "role": "Chair",
-        "designation": "Executive Leadership",
-        "company": "MPSEDC, Government of Madhya Pradesh"
+        "designation": "Managing Director",
+        "company": "MPSEDC"
       },
       {
         "name": "Krishna Thakur",
         "role": "Co-Chair",
         "designation": "Semiconductor Leader",
-        "company": "Ex-ST, NXP, L&T Semi",
+        "company": "Ex-ST,NXP,L&T Semi",
         "speakerId": "speaker-krishna-thakur"
       },
       {
@@ -3537,7 +3558,7 @@ export const INITIAL_SESSIONS: Session[] = [
         "speakerId": "speaker-pulkit-dube"
       },
       {
-        "name": "Harishankar Gupta",
+        "name": "Hahrishankar Gupta",
         "role": "Panelist",
         "designation": "Scientist-SG",
         "company": "SAC-ISRO",
@@ -3597,13 +3618,6 @@ export const INITIAL_SESSIONS: Session[] = [
         "speakerId": "speaker-shivakumar"
       },
       {
-        "name": "Jawar Singh",
-        "role": "Panelist",
-        "designation": "Chief Scientist",
-        "company": "Phynomy",
-        "speakerId": "speaker-jawar-singh"
-      },
-      {
         "name": "Avddesh Sharma",
         "role": "Panelist",
         "designation": "Technical Partner - DV",
@@ -3617,7 +3631,7 @@ export const INITIAL_SESSIONS: Session[] = [
         "company": "Kishkindha International"
       },
       {
-        "name": "Paruchuri Srijith",
+        "name": "Paruchuri Srijith.",
         "role": "Panelist",
         "designation": "Managing Director",
         "company": "Spintronics AI",
@@ -3640,7 +3654,31 @@ export const INITIAL_SESSIONS: Session[] = [
         "name": "M Santosh",
         "role": "Panelist",
         "designation": "Scientist F",
-        "company": "CSIR CEERI Pilani"
+        "company": "CSIR CEERI PIlani"
+      },
+      {
+        "name": "Narendra Dhakad",
+        "role": "Panelist",
+        "designation": "EDA Tools Hardware Engineer",
+        "company": "Intel"
+      },
+      {
+        "name": "Sunil Rawat",
+        "role": "Panelist",
+        "designation": "Founder & Managing Director",
+        "company": "Softude"
+      },
+      {
+        "name": "Gaurav Kaushal",
+        "role": "Panelist",
+        "designation": "Assistant Professor",
+        "company": "ABV-IIITM Gwalior"
+      },
+      {
+        "name": "Syed Imran Ali",
+        "role": "Panelist",
+        "designation": "Associate Group Manager - Semi",
+        "company": "HCL Tech"
       }
     ],
     "description": "Specialized roundtable bringing together indigenous silicon product companies, IP creators, verification leaders, and government stakeholders to accelerate Indian silicon commercialization.",
@@ -3769,9 +3807,9 @@ export const INITIAL_SESSIONS: Session[] = [
     "day": 2,
     "timeRange": "11:00 – 11:50",
     "room": "Imperial Hall · 1st Floor",
-    "speakerName": "Chitra Hariharan (Moderator), Arpan Sircar & 5 others",
+    "speakerName": "Anshuman Raj, IAS (Chair), Chitra Hariharan (Moderator) & 5 others",
     "speakerDesignation": "AI & Silicon Leadership Panel",
-    "speakerCompany": "Renesas, Intel, Maieutic, Synopsys, Analog Devices, Cadence, MPSEDC",
+    "speakerCompany": "MPSEDC, Renesas, Intel, Maieutic, Synopsys, Analog Devices, Cadence",
     "speakerId": "speaker-chitra-hariharan",
     "speakerIds": [
       "speaker-chitra-hariharan",
@@ -3782,6 +3820,12 @@ export const INITIAL_SESSIONS: Session[] = [
       "speaker-channakeshav-ananth"
     ],
     "panelists": [
+      {
+        "name": "Anshuman Raj, IAS",
+        "role": "Chair",
+        "designation": "Managing Director",
+        "company": "MPSEDC"
+      },
       {
         "name": "Chitra Hariharan",
         "role": "Moderator",
@@ -3823,12 +3867,6 @@ export const INITIAL_SESSIONS: Session[] = [
         "designation": "Sr. Group Director",
         "company": "Cadence",
         "speakerId": "speaker-channakeshav-ananth"
-      },
-      {
-        "name": "MPSEDC PS/MD/ED",
-        "role": "Panelist",
-        "designation": "Executive Leadership",
-        "company": "MPSEDC, Government of Madhya Pradesh"
       }
     ],
     "description": "Dual-focus panel exploring how AI algorithms transform EDA synthesis and place-and-route, while novel silicon architectures are purpose-built to accelerate generative AI workloads.",
@@ -3873,9 +3911,9 @@ export const INITIAL_SESSIONS: Session[] = [
     "day": 2,
     "timeRange": "12:20 – 13:10",
     "room": "Imperial Hall · 1st Floor",
-    "speakerName": "Sanjeev Sehgal (Moderator), Ranvir Singh Rathore & 5 others",
+    "speakerName": "Swatantra Kumar Singh, IAS (Chair), Sanjeev Sehgal (Moderator) & 5 others",
     "speakerDesignation": "Electronics Manufacturing & OEM Panel",
-    "speakerCompany": "Sparsh CCTV, Genus Power, SwadesIC, SAC-ISRO, HLBS Tech, Workie, MPSEDC",
+    "speakerCompany": "Govt. of M.P., Sparsh CCTV, Genus Power, SwadesIC, SAC-ISRO, HLBS Tech, Workie",
     "speakerId": "speaker-sanjeev-sehgal",
     "speakerIds": [
       "speaker-sanjeev-sehgal",
@@ -3886,6 +3924,12 @@ export const INITIAL_SESSIONS: Session[] = [
       "speaker-sawan-laddha"
     ],
     "panelists": [
+      {
+        "name": "Swatantra Kumar Singh, IAS",
+        "role": "Chair",
+        "designation": "Secretary, Fishermen Welfare & Fisheries Development Department",
+        "company": "Govt. of M.P."
+      },
       {
         "name": "Sanjeev Sehgal",
         "role": "Moderator",
@@ -3927,12 +3971,6 @@ export const INITIAL_SESSIONS: Session[] = [
         "designation": "Founder",
         "company": "Workie",
         "speakerId": "speaker-sawan-laddha"
-      },
-      {
-        "name": "MPSEDC PS/MD/ED",
-        "role": "Panelist",
-        "designation": "Executive Leadership",
-        "company": "MPSEDC, Government of Madhya Pradesh"
       }
     ],
     "description": "Shifting India from electronics assembly to indigenous product creation. Discussion covers smart metering, surveillance electronics, telecom hardware, and indigenous component integration.",
@@ -3953,9 +3991,9 @@ export const INITIAL_SESSIONS: Session[] = [
     "day": 2,
     "timeRange": "12:20 – 13:10",
     "room": "Lilac · 2nd Floor",
-    "speakerName": "ACS/PS (Chair), Mukesh Kumar (Moderator) & 18 Experts",
+    "speakerName": "Anshuman Raj, IAS (Chair), Santosh Kumar Vishvakarma (Co-Chair) & 22 Experts",
     "speakerDesignation": "Photonics & Quantum Round Table",
-    "speakerCompany": "IIT Indore, IIT Roorkee, Pramatra Space, QNu Labs, RRCAT, DRDO & more",
+    "speakerCompany": "MPSEDC, IIT Indore, IIT Roorkee, Pramatra Space, QNu Labs, RRCAT, DRDO & more",
     "speakerId": "speaker-mukesh-kumar",
     "speakerIds": [
       "speaker-mukesh-kumar",
@@ -3972,10 +4010,16 @@ export const INITIAL_SESSIONS: Session[] = [
     ],
     "panelists": [
       {
-        "name": "ACS/PS",
+        "name": "Anshuman Raj, IAS",
         "role": "Chair",
-        "designation": "Additional Chief Secretary / Principal Secretary",
-        "company": "Government of Madhya Pradesh"
+        "designation": "Managing Director",
+        "company": "MPSEDC"
+      },
+      {
+        "name": "Santosh Kumar Vishvakarma",
+        "role": "Co-Chair",
+        "designation": "Professor",
+        "company": "IIT Indore"
       },
       {
         "name": "Mukesh Kumar",
@@ -4101,6 +4145,24 @@ export const INITIAL_SESSIONS: Session[] = [
         "role": "Panelist",
         "designation": "Faculty",
         "company": "MCTE"
+      },
+      {
+        "name": "Nitesh Kashyap",
+        "role": "Panelist",
+        "designation": "Assistant Professor",
+        "company": "NIT Jalandhar"
+      },
+      {
+        "name": "Mr William Dobson",
+        "role": "Panelist",
+        "designation": "CMD",
+        "company": "Intelligence Ltd"
+      },
+      {
+        "name": "Tanmay Gupta, PhD",
+        "role": "Panelist",
+        "designation": "Founder and Director",
+        "company": "Oxbridge Frontier Intelligence"
       }
     ],
     "description": "Specialized roundtable examining quantum key distribution (QKD), photonic integrated circuits, quantum processors, and defense applications.",
@@ -4533,19 +4595,35 @@ export const INITIAL_SESSIONS: Session[] = [
     "day": 2,
     "timeRange": "16:20 – 17:10",
     "room": "Imperial Hall · 1st Floor",
-    "speakerName": "Atul Gautam, Akshay K. Waghmode & 6 others",
+    "speakerName": "Chandramauli Shukla (Chair), Anand Kumar (Moderator) & 6 others",
     "speakerDesignation": "Industry Bodies & Consulting Panel",
-    "speakerCompany": "Free Press, E&Y, ISIG India, PWC, ICEA, SemiIndia, ELCINA, CIMEI",
-    "speakerId": "speaker-jairaj-srinivas",
+    "speakerCompany": "MPIDC, STMicroelectronics, Free Press, E&Y, ISIG India, PWC, ICEA, ELCINA",
+    "speakerId": "speaker-anand-kumar-panel",
     "speakerIds": [
+      "speaker-anand-kumar-panel",
       "speaker-akshay-k-waghmode",
       "speaker-shalu-agarwal",
-      "speaker-jairaj-srinivas"
+      "speaker-amit-rai",
+      "speaker-aashish-saurikhia",
+      "speaker-sundeep-saxena"
     ],
     "panelists": [
       {
-        "name": "Atul Gautam",
+        "name": "Chandramauli Shukla",
+        "role": "Chair",
+        "designation": "MD, MPIDC",
+        "company": "MPIDC"
+      },
+      {
+        "name": "Anand Kumar",
         "role": "Moderator",
+        "designation": "Managing Director",
+        "company": "STMicroelectronics",
+        "speakerId": "speaker-anand-kumar-panel"
+      },
+      {
+        "name": "Atul Gautam",
+        "role": "Panelist",
         "designation": "Indore City Chief",
         "company": "Free Press"
       },
@@ -4564,35 +4642,25 @@ export const INITIAL_SESSIONS: Session[] = [
         "speakerId": "speaker-shalu-agarwal"
       },
       {
-        "name": "PWC (Satya)",
+        "name": "Amit Rai",
         "role": "Panelist",
-        "designation": "Partner / Strategy Lead",
-        "company": "PWC"
+        "designation": "Director",
+        "company": "PWC",
+        "speakerId": "speaker-amit-rai"
       },
       {
-        "name": "Pankaj Mohindroo",
+        "name": "Aashish Saurikhia",
         "role": "Panelist",
-        "designation": "President",
-        "company": "ICEA"
+        "designation": "Senior Director - Public Policy",
+        "company": "ICEA",
+        "speakerId": "speaker-aashish-saurikhia"
       },
       {
-        "name": "Ashok Chandak",
+        "name": "Sundeep Saxena",
         "role": "Panelist",
-        "designation": "President",
-        "company": "SemiIndia"
-      },
-      {
-        "name": "Rajoo Goel",
-        "role": "Panelist",
-        "designation": "President",
-        "company": "ELCINA"
-      },
-      {
-        "name": "Jairaj Srinivas",
-        "role": "Panelist",
-        "designation": "Director General",
-        "company": "CIMEI",
-        "speakerId": "speaker-jairaj-srinivas"
+        "designation": "Secretary & Chief Services Officer",
+        "company": "ELCINA",
+        "speakerId": "speaker-sundeep-saxena"
       }
     ],
     "description": "Perspectives from leading national industry associations (ICEA, ELCINA, CIMEI, SemiIndia, ISIG) and Big 4 advisors on national policy coordination, state competitiveness, and global investor attraction.",
@@ -4613,9 +4681,9 @@ export const INITIAL_SESSIONS: Session[] = [
     "day": 2,
     "timeRange": "17:10 – 18:00",
     "room": "Imperial Hall · 1st Floor",
-    "speakerName": "M. M. Tripathi (Moderator), Yogesh Chauhan & 5 others",
+    "speakerName": "Manish Singh, IAS (Chair), M. M. Tripathi (Moderator) & 5 others",
     "speakerDesignation": "Education, R&D & Innovation Panel",
-    "speakerCompany": "NIELIT MeitY, IIT Kanpur, GlobalFoundries, DUK, 1-TOPS by VSI, Maven Silicon, MP Govt",
+    "speakerCompany": "Govt. of MP, NIELIT MeitY, IIT Kanpur, GlobalFoundries, DUK, 1-TOPS by VSI, Maven Silicon",
     "speakerId": "speaker-prof-m-m-tripathi",
     "speakerIds": [
       "speaker-prof-m-m-tripathi",
@@ -4625,6 +4693,12 @@ export const INITIAL_SESSIONS: Session[] = [
       "speaker-shivakumar"
     ],
     "panelists": [
+      {
+        "name": "Manish Singh, IAS",
+        "role": "Chair",
+        "designation": "Principal Secretary, Technical Education, Skill Development & Employment Deptt & Principal Secretary, Govt. of M.P., Energy Deptt. (Addl. Charge)",
+        "company": "Govt. of MP"
+      },
       {
         "name": "M. M. Tripathi",
         "role": "Moderator",
@@ -4665,12 +4739,6 @@ export const INITIAL_SESSIONS: Session[] = [
         "designation": "CEO",
         "company": "Maven Silicon",
         "speakerId": "speaker-shivakumar"
-      },
-      {
-        "name": "Technical Education ACS/PS",
-        "role": "Panelist",
-        "designation": "Additional Chief Secretary / Principal Secretary",
-        "company": "Government of Madhya Pradesh"
       }
     ],
     "description": "Formulating a 100,000-strong VLSI engineering workforce roadmap through NIELIT, premier IITs, global foundry mentorship, and industry-certified finishing schools.",
