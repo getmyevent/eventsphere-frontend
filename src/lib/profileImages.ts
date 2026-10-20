@@ -3,6 +3,8 @@
  * Provides hosted Cloudinary profile photos for summit speakers, dignitaries, and attendees.
  */
 
+import { getOptimizedAvatarUrl, optimizeCloudinaryUrl } from './cloudinary';
+
 export const CLOUDINARY_PROFILE_PHOTOS: Record<string, string> = {
   'yatendra-bhargava': 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792441697/yatendra-bhargava.png',
   'shivakumar': 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792441695/shivakumar.jpg',
@@ -212,7 +214,7 @@ Object.entries(ALIASES).forEach(([alias, targetKey]) => {
 /**
  * Resolves Cloudinary profile photo URL by name, id, or legacy image path.
  */
-export function getCloudinaryProfileUrl(query?: string | null): string | undefined {
+export function getCloudinaryProfileUrl(query?: string | null, size: number = 240): string | undefined {
   if (!query) return undefined;
   
   // If query is or contains a ui-avatars placeholder, return undefined
@@ -220,9 +222,9 @@ export function getCloudinaryProfileUrl(query?: string | null): string | undefin
     return undefined;
   }
 
-  // If already a Cloudinary URL, return as-is
+  // If already a Cloudinary URL, optimize and return
   if (query.includes('res.cloudinary.com')) {
-    return query;
+    return getOptimizedAvatarUrl(query, size);
   }
 
   const clean = normalizeKey(query);
@@ -230,26 +232,27 @@ export function getCloudinaryProfileUrl(query?: string | null): string | undefin
     return undefined;
   }
 
+  let matchedUrl: string | undefined = undefined;
+
   // 1. Direct normalized lookup
   if (NORMALIZED_LOOKUP[clean]) {
-    return NORMALIZED_LOOKUP[clean];
-  }
-
-  // 2. Direct alias lookup
-  if (ALIASES[clean] && NORMALIZED_LOOKUP[normalizeKey(ALIASES[clean])]) {
-    return NORMALIZED_LOOKUP[normalizeKey(ALIASES[clean])];
-  }
-
-  // 3. Substring matching for full titles (e.g. query is "Hon'ble Chief Minister Dr. Mohan Yadav")
-  // ONLY if clean (the query) includes a full normKey of length >= 8.
-  // NEVER do normKey.includes(clean), which mistakenly matches short/partial names to other people!
-  for (const [normKey, url] of Object.entries(NORMALIZED_LOOKUP)) {
-    if (normKey.length >= 8 && clean.includes(normKey)) {
-      return url;
+    matchedUrl = NORMALIZED_LOOKUP[clean];
+  } else if (ALIASES[clean] && NORMALIZED_LOOKUP[normalizeKey(ALIASES[clean])]) {
+    // 2. Direct alias lookup
+    matchedUrl = NORMALIZED_LOOKUP[normalizeKey(ALIASES[clean])];
+  } else {
+    // 3. Substring matching for full titles (e.g. query is "Hon'ble Chief Minister Dr. Mohan Yadav")
+    // ONLY if clean (the query) includes a full normKey of length >= 8.
+    // NEVER do normKey.includes(clean), which mistakenly matches short/partial names to other people!
+    for (const [normKey, url] of Object.entries(NORMALIZED_LOOKUP)) {
+      if (normKey.length >= 8 && clean.includes(normKey)) {
+        matchedUrl = url;
+        break;
+      }
     }
   }
 
-  return undefined;
+  return matchedUrl ? getOptimizedAvatarUrl(matchedUrl, size) : undefined;
 }
 
 /**
@@ -347,7 +350,7 @@ export function getProfileAvatar(
     avatar !== '/images/mentors/vaibhav-neema.jpg' &&
     !avatar.startsWith('/images/founders/hari-gupta')
   ) {
-    return avatar;
+    return optimizeCloudinaryUrl(avatar, { width: 240, height: 240, crop: 'fill', gravity: 'face' });
   }
 
   // 3. Fallback to clean initials avatar

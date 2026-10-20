@@ -6,6 +6,7 @@ import { Search, ChevronLeft, MapPin } from 'lucide-react';
 import { useStore } from '../../lib/store';
 import { getExhibitorSlug } from '../../lib/exhibitorSlug';
 import { sortExhibitors } from '../../lib/exhibitorSort';
+import { getOptimizedThumbnailUrl } from '../../lib/cloudinary';
 
 export const DelegateCompanies: React.FC = () => {
   const router = useRouter();
@@ -122,8 +123,10 @@ export const DelegateCompanies: React.FC = () => {
                 <div className="flex items-center gap-3 flex-1 min-w-0">
                   {company.logo ? (
                     <img
-                      src={company.logo}
+                      src={getOptimizedThumbnailUrl(company.logo, 100)}
                       alt={company.company}
+                      loading="lazy"
+                      decoding="async"
                       className="w-11 h-11 rounded-xl object-contain p-1 border border-[#E5E7EB] flex-shrink-0 bg-white"
                       onError={(e) => {
                         e.currentTarget.onerror = null;

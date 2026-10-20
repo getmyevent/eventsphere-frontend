@@ -10,6 +10,7 @@ import {
 import { useStore } from '../../lib/store';
 import { Person } from '../../types';
 import { getCloudinaryProfileUrl } from '../../lib/profileImages';
+import { getOptimizedAvatarUrl, optimizeCloudinaryUrl } from '../../lib/cloudinary';
 
 export const DelegateSpeakers: React.FC = () => {
   const router = useRouter();
@@ -134,8 +135,10 @@ export const DelegateSpeakers: React.FC = () => {
               {cmSpeaker.avatar || getCloudinaryProfileUrl(cmSpeaker.name) ? (
                 <>
                   <img
-                    src={cmSpeaker.avatar || getCloudinaryProfileUrl(cmSpeaker.name)}
+                    src={getOptimizedAvatarUrl(cmSpeaker.avatar || getCloudinaryProfileUrl(cmSpeaker.name), 260)}
                     alt={cmSpeaker.name}
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-contain object-center transition-transform duration-300 group-hover:scale-105"
                     onError={(e) => {
                       e.currentTarget.style.display = 'none';
@@ -205,8 +208,10 @@ export const DelegateSpeakers: React.FC = () => {
                     {speaker.avatar || getCloudinaryProfileUrl(speaker.name) ? (
                       <>
                         <img
-                          src={speaker.avatar || getCloudinaryProfileUrl(speaker.name)}
+                          src={getOptimizedAvatarUrl(speaker.avatar || getCloudinaryProfileUrl(speaker.name), 220)}
                           alt={speaker.name}
+                          loading="lazy"
+                          decoding="async"
                           className="w-full h-full object-cover object-top transition-transform duration-300 group-hover:scale-105"
                           onError={(e) => {
                             e.currentTarget.style.display = 'none';

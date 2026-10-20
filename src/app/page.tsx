@@ -3,43 +3,46 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useStore } from '../lib/store';
+import dynamic from 'next/dynamic';
 import { DemoBar } from '../components/shell/DemoBar';
 import { AddToHomeScreenBanner } from '../components/shell/AddToHomeScreenBanner';
 import { PhoneFrame } from '../components/shell/PhoneFrame';
 import { AccessScreen } from '../components/auth/AccessScreen';
 
-// Delegate views
+// Core default delegate views
 import { DelegateHome } from '../components/delegate/DelegateHome';
-import { DelegatePeople } from '../components/delegate/DelegatePeople';
-import { DelegateFocus } from '../components/delegate/DelegateFocus';
-import { DelegateSchedule } from '../components/delegate/DelegateSchedule';
-import { DelegateProfile } from '../components/delegate/DelegateProfile';
-import { DelegateEditProfile } from '../components/delegate/DelegateEditProfile';
 import { DelegateBottomNav } from '../components/delegate/DelegateBottomNav';
-import { DelegateCompanies } from '../components/delegate/DelegateCompanies';
-import { DelegateCompanyDetail } from '../components/delegate/DelegateCompanyDetail';
-import { DelegateAIRecommendations } from '../components/delegate/DelegateAIRecommendations';
-import { DelegateSpeakers } from '../components/delegate/DelegateSpeakers';
-import { DelegatePolls } from '../components/delegate/DelegatePolls';
-import { DelegateMap } from '../components/delegate/DelegateMap';
-import { DelegateSponsors } from "../components/delegate/DelegateSponsors";
-import { DelegateSupport } from '../components/delegate/DelegateSupport';
 
-// Exhibitor views
-import { ExhibitorHome } from '../components/exhibitor/ExhibitorHome';
-import { ExhibitorLeads } from '../components/exhibitor/ExhibitorLeads';
-import { ExhibitorScan } from '../components/exhibitor/ExhibitorScan';
-import { ExhibitorProducts } from '../components/exhibitor/ExhibitorProducts';
-import { ExhibitorMore } from '../components/exhibitor/ExhibitorMore';
-import { ExhibitorBottomNav } from '../components/exhibitor/ExhibitorBottomNav';
+// Dynamically loaded delegate secondary views (loaded on demand)
+const DelegatePeople = dynamic(() => import('../components/delegate/DelegatePeople').then(m => m.DelegatePeople));
+const DelegateFocus = dynamic(() => import('../components/delegate/DelegateFocus').then(m => m.DelegateFocus));
+const DelegateSchedule = dynamic(() => import('../components/delegate/DelegateSchedule').then(m => m.DelegateSchedule));
+const DelegateProfile = dynamic(() => import('../components/delegate/DelegateProfile').then(m => m.DelegateProfile));
+const DelegateEditProfile = dynamic(() => import('../components/delegate/DelegateEditProfile').then(m => m.DelegateEditProfile));
+const DelegateCompanies = dynamic(() => import('../components/delegate/DelegateCompanies').then(m => m.DelegateCompanies));
+const DelegateCompanyDetail = dynamic(() => import('../components/delegate/DelegateCompanyDetail').then(m => m.DelegateCompanyDetail));
+const DelegateAIRecommendations = dynamic(() => import('../components/delegate/DelegateAIRecommendations').then(m => m.DelegateAIRecommendations));
+const DelegateSpeakers = dynamic(() => import('../components/delegate/DelegateSpeakers').then(m => m.DelegateSpeakers));
+const DelegatePolls = dynamic(() => import('../components/delegate/DelegatePolls').then(m => m.DelegatePolls));
+const DelegateMap = dynamic(() => import('../components/delegate/DelegateMap').then(m => m.DelegateMap));
+const DelegateSponsors = dynamic(() => import('../components/delegate/DelegateSponsors').then(m => m.DelegateSponsors));
+const DelegateSupport = dynamic(() => import('../components/delegate/DelegateSupport').then(m => m.DelegateSupport));
 
-// Organizer console
-import { OrganizerConsole } from '../components/organizer/OrganizerConsole';
+// Exhibitor views (dynamically loaded on demand)
+const ExhibitorHome = dynamic(() => import('../components/exhibitor/ExhibitorHome').then(m => m.ExhibitorHome), { ssr: false });
+const ExhibitorLeads = dynamic(() => import('../components/exhibitor/ExhibitorLeads').then(m => m.ExhibitorLeads), { ssr: false });
+const ExhibitorScan = dynamic(() => import('../components/exhibitor/ExhibitorScan').then(m => m.ExhibitorScan), { ssr: false });
+const ExhibitorProducts = dynamic(() => import('../components/exhibitor/ExhibitorProducts').then(m => m.ExhibitorProducts), { ssr: false });
+const ExhibitorMore = dynamic(() => import('../components/exhibitor/ExhibitorMore').then(m => m.ExhibitorMore), { ssr: false });
+const ExhibitorBottomNav = dynamic(() => import('../components/exhibitor/ExhibitorBottomNav').then(m => m.ExhibitorBottomNav), { ssr: false });
 
-// Modals
-import { ContactPrivacyModal } from '../components/modals/ContactPrivacyModal';
-import { PersonDetailModal } from '../components/modals/PersonDetailModal';
-import { MyQRCodeModal } from '../components/modals/MyQRCodeModal';
+// Organizer console (dynamically loaded on demand)
+const OrganizerConsole = dynamic(() => import('../components/organizer/OrganizerConsole').then(m => m.OrganizerConsole), { ssr: false });
+
+// Modals (dynamically loaded on demand)
+const ContactPrivacyModal = dynamic(() => import('../components/modals/ContactPrivacyModal').then(m => m.ContactPrivacyModal), { ssr: false });
+const PersonDetailModal = dynamic(() => import('../components/modals/PersonDetailModal').then(m => m.PersonDetailModal), { ssr: false });
+const MyQRCodeModal = dynamic(() => import('../components/modals/MyQRCodeModal').then(m => m.MyQRCodeModal), { ssr: false });
 import { CheckCircle2, Info, AlertCircle } from 'lucide-react';
 
 export default function App() {
@@ -51,6 +54,7 @@ export default function App() {
     setRole,
     activeDelegateTab,
     activeExhibitorTab,
+    selectedPersonId,
     toast,
   } = useStore();
 
@@ -68,16 +72,20 @@ export default function App() {
 
 
       {/* Modals for Delegate Experience */}
-      <ContactPrivacyModal
-        isOpen={isPrivacyModalOpen}
-        onClose={() => setIsPrivacyModalOpen(false)}
-      />
-      <MyQRCodeModal
-        isOpen={isQRModalOpen}
-        onClose={() => setIsQRModalOpen(false)}
-        onOpenPrivacy={() => setIsPrivacyModalOpen(true)}
-      />
-      <PersonDetailModal />
+      {isPrivacyModalOpen && (
+        <ContactPrivacyModal
+          isOpen={isPrivacyModalOpen}
+          onClose={() => setIsPrivacyModalOpen(false)}
+        />
+      )}
+      {isQRModalOpen && (
+        <MyQRCodeModal
+          isOpen={isQRModalOpen}
+          onClose={() => setIsQRModalOpen(false)}
+          onOpenPrivacy={() => setIsPrivacyModalOpen(true)}
+        />
+      )}
+      {selectedPersonId && <PersonDetailModal />}
 
       {/* Floating Feedback Toast Notification for Organizer */}
       {toast && role === 'organizer' && (

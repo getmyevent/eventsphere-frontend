@@ -709,72 +709,82 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   }, [role, hasAccessConfirmed]);
 
-  // Sync live attendees from MySQL backend
+  // Sync live attendees from MySQL backend (deferred slightly to prioritize critical UI paint)
   useEffect(() => {
     if (hasAccessConfirmed) {
-      api.attendees.getAll()
-        .then((backendAttendees) => {
-          if (backendAttendees && Array.isArray(backendAttendees) && backendAttendees.length > 0) {
-            setAttendees((prev) => {
-              const bMap = new Map(backendAttendees.map((a: any) => [a.id, a]));
-              const updated = prev.map((a) => {
-                const b = bMap.get(a.id);
-                if (b) {
-                  return {
-                    ...a,
-                    checkedIn: b.checkedIn ?? a.checkedIn,
-                    name: b.name || a.name,
-                    designation: b.designation || a.designation,
-                    company: b.company || a.company,
-                    bio: b.bio || a.bio,
-                    avatar: b.avatar || b.avatarUrl || a.avatar,
-                    linkedin: b.linkedin || a.linkedin,
-                    twitter: b.twitter || a.twitter,
-                    email: b.email || a.email,
-                    mobile: b.mobile || a.mobile,
-                    interests: (b.interests && b.interests.length > 0) ? b.interests : a.interests,
-                    skills: (b.skills && b.skills.length > 0) ? b.skills : a.skills,
-                    ticketType: b.ticketType || a.ticketType,
-                    registrationId: b.registrationId || a.registrationId,
-                  };
-                }
-                return a;
+      let isCancelled = false;
+      const fetchAttendees = () => {
+        api.attendees.getAll()
+          .then((backendAttendees) => {
+            if (isCancelled) return;
+            if (backendAttendees && Array.isArray(backendAttendees) && backendAttendees.length > 0) {
+              setAttendees((prev) => {
+                const bMap = new Map(backendAttendees.map((a: any) => [a.id, a]));
+                const updated = prev.map((a) => {
+                  const b = bMap.get(a.id);
+                  if (b) {
+                    return {
+                      ...a,
+                      checkedIn: b.checkedIn ?? a.checkedIn,
+                      name: b.name || a.name,
+                      designation: b.designation || a.designation,
+                      company: b.company || a.company,
+                      bio: b.bio || a.bio,
+                      avatar: b.avatar || b.avatarUrl || a.avatar,
+                      linkedin: b.linkedin || a.linkedin,
+                      twitter: b.twitter || a.twitter,
+                      email: b.email || a.email,
+                      mobile: b.mobile || a.mobile,
+                      interests: (b.interests && b.interests.length > 0) ? b.interests : a.interests,
+                      skills: (b.skills && b.skills.length > 0) ? b.skills : a.skills,
+                      ticketType: b.ticketType || a.ticketType,
+                      registrationId: b.registrationId || a.registrationId,
+                    };
+                  }
+                  return a;
+                });
+                const existingIds = new Set(prev.map((e) => e.id));
+                const brandNew = backendAttendees
+                  .filter((b: any) => !existingIds.has(b.id))
+                  .map((b: any) => ({
+                    id: b.id,
+                    name: b.name,
+                    designation: b.designation || '',
+                    company: b.company || '',
+                    role: (b.category as any) || (b.role as any) || 'delegate',
+                    bio: b.bio || `Professional at ${b.company || 'the summit'} focusing on tech innovation.`,
+                    interests: (b.interests && b.interests.length > 0) ? b.interests : ['Semiconductors', 'Technology'],
+                    skills: (b.skills && b.skills.length > 0) ? b.skills : ['Engineering', 'Architecture'],
+                    email: b.email || '',
+                    mobile: b.mobile || '',
+                    avatar: b.avatar || b.avatarUrl || '',
+                    linkedin: b.linkedin || '',
+                    twitter: b.twitter || '',
+                    checkedIn: Boolean(b.checkedIn),
+                    registrationId: b.registrationId || `#${b.id.slice(-4)}`,
+                    ticketType: b.ticketType || 'Delegate',
+                    privacy: {
+                      preset: 'Connections Only' as const,
+                      shareEmail: true,
+                      sharePhone: true,
+                      shareLinkedIn: true,
+                      shareTwitter: false,
+                    },
+                  }));
+                return [...updated, ...brandNew];
               });
-              const existingIds = new Set(prev.map((a) => a.id));
-              const brandNew = backendAttendees
-                .filter((b: any) => !existingIds.has(b.id))
-                .map((b: any) => ({
-                  id: b.id,
-                  name: b.name,
-                  designation: b.designation || '',
-                  company: b.company || '',
-                  role: (b.category as any) || (b.role as any) || 'delegate',
-                  bio: b.bio || `Professional at ${b.company || 'the summit'} focusing on tech innovation.`,
-                  interests: (b.interests && b.interests.length > 0) ? b.interests : ['Semiconductors', 'Technology'],
-                  skills: (b.skills && b.skills.length > 0) ? b.skills : ['Engineering', 'Architecture'],
-                  email: b.email || '',
-                  mobile: b.mobile || '',
-                  avatar: b.avatar || b.avatarUrl || '',
-                  linkedin: b.linkedin || '',
-                  twitter: b.twitter || '',
-                  checkedIn: Boolean(b.checkedIn),
-                  registrationId: b.registrationId || `#${b.id.slice(-4)}`,
-                  ticketType: b.ticketType || 'Delegate',
-                  privacy: {
-                    preset: 'Connections Only' as const,
-                    shareEmail: true,
-                    sharePhone: true,
-                    shareLinkedIn: true,
-                    shareTwitter: false,
-                  },
-                }));
-              return [...updated, ...brandNew];
-            });
-          }
-        })
-        .catch((err) => {
-          console.warn('Backend attendees fetch skipped:', err);
-        });
+            }
+          })
+          .catch((err) => {
+            console.warn('Backend attendees fetch skipped:', err);
+          });
+      };
+
+      const timer = setTimeout(fetchAttendees, 600);
+      return () => {
+        isCancelled = true;
+        clearTimeout(timer);
+      };
     }
   }, [role, hasAccessConfirmed]);
 
