@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useStore } from '../../lib/store';
 import { api } from '../../lib/api';
 import { CURRENT_USER, INITIAL_ATTENDEES } from '../../lib/mockData';
-import { Person } from '../../types';
+import { Person, DemoRole, RoleType } from '../../types';
 import {
   ShieldCheck,
   CheckCircle2,
@@ -79,7 +79,7 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
   const [maskedEmail, setMaskedEmail] = useState('');
 
   // 4-digit OTP state
-  const [otpDigits, setOtpDigits] = useState<string[]>(['', '', '', '']);
+  const [otpDigits, setOtpDigits] = useState<string[]>(['', '', '', '', '', '']);
   const [generatedOtp, setGeneratedOtp] = useState('1234');
   const [resendTimer, setResendTimer] = useState(30);
   const [canResend, setCanResend] = useState(false);
@@ -100,8 +100,12 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
   const digit1Ref = useRef<HTMLInputElement>(null);
   const digit2Ref = useRef<HTMLInputElement>(null);
   const digit3Ref = useRef<HTMLInputElement>(null);
+  const digit4Ref = useRef<HTMLInputElement>(null);
+  const digit5Ref = useRef<HTMLInputElement>(null);
 
-  const digitRefs = [digit0Ref, digit1Ref, digit2Ref, digit3Ref];
+  const digitRefs = [digit0Ref, digit1Ref, digit2Ref, digit3Ref, digit4Ref, digit5Ref];
+  const googleButtonContainerRef = useRef<HTMLDivElement>(null);
+  const [isGisReady, setIsGisReady] = useState(false);
 
   // Focus first digit box when switching to OTP screen
   useEffect(() => {
@@ -178,25 +182,23 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
 
     try {
       // Send OTP via auth service
-      await api.auth.sendEmailOtp(trimmedEventId, trimmedEmail);
-
-      const demoCode = '1234';
+      const res = await api.auth.sendEmailOtp(trimmedEventId, trimmedEmail);
       const masked = maskEmailAddress(trimmedEmail);
 
       setTimeout(() => {
-        setGeneratedOtp(demoCode);
-        setOtpDigits(['', '', '', '']);
+        setOtpDigits(['', '', '', '', '', '']);
         setMaskedEmail(masked);
         setStatus('idle');
         setStep('otp');
-        setResendTimer(30);
+        setResendTimer(45);
         setCanResend(false);
-        setOtpNotice(`OTP sent to ${masked}. Demo code: ${demoCode}`);
-        setTimeout(() => setOtpNotice(null), 6000);
-      }, 400);
+        const demoNote = res?.demoOtp ? ` (Demo OTP: ${res.demoOtp})` : '';
+        setOtpNotice(`OTP sent to ${masked}.${demoNote}`);
+        setTimeout(() => setOtpNotice(null), 7000);
+      }, 300);
     } catch (err: any) {
       setStatus('error');
-      setErrorMessage(err?.message || 'Failed to send OTP. Please try again.');
+      setErrorMessage(err?.message || 'Failed to send OTP. Please check your email and try again.');
     }
   };
 
@@ -204,19 +206,17 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
   const handleResendOtp = async () => {
     if (!canResend) return;
     setCanResend(false);
-    setResendTimer(30);
-    setOtpDigits(['', '', '', '']);
+    setResendTimer(45);
+    setOtpDigits(['', '', '', '', '', '']);
     setErrorMessage('');
-    const demoCode = '1234';
-    setGeneratedOtp(demoCode);
 
     try {
-      await api.auth.sendEmailOtp(eventId.trim().toUpperCase(), email.trim());
-      setOtpNotice(`New OTP sent to ${maskedEmail}. Demo code: ${demoCode}`);
-      setTimeout(() => setOtpNotice(null), 5000);
-    } catch {
-      setOtpNotice(`New OTP sent to ${maskedEmail}. Demo code: ${demoCode}`);
-      setTimeout(() => setOtpNotice(null), 5000);
+      const res = await api.auth.sendEmailOtp(eventId.trim().toUpperCase(), email.trim());
+      const demoNote = res?.demoOtp ? ` (Demo OTP: ${res.demoOtp})` : '';
+      setOtpNotice(`New OTP sent to ${maskedEmail}.${demoNote}`);
+      setTimeout(() => setOtpNotice(null), 6000);
+    } catch (err: any) {
+      setErrorMessage(err?.message || 'Failed to resend OTP. Please wait before retrying.');
     }
     digitRefs[0].current?.focus();
   };
@@ -238,7 +238,7 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
     setOtpDigits(nextDigits);
 
     // Auto-advance to next input box
-    if (index < 3 && clean) {
+    if (index < 5 && clean) {
       digitRefs[index + 1].current?.focus();
     }
   };
@@ -251,16 +251,60 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
 
   const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
     e.preventDefault();
-    const paste = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 4);
+    const paste = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
     if (paste) {
-      const next = ['', '', '', ''];
+      const next = ['', '', '', '', '', ''];
       for (let i = 0; i < paste.length; i++) {
         next[i] = paste[i];
       }
       setOtpDigits(next);
-      const nextFocus = Math.min(paste.length, 3);
+      const nextFocus = Math.min(paste.length, 5);
       digitRefs[nextFocus].current?.focus();
     }
+  };
+
+  // Establish session directly from backend user profile
+  const establishSessionFromBackendUser = (backendUser: any) => {
+    resetUserState();
+    const rawRole = (backendUser.role || '').toLowerCase();
+    const detectedDemoRole: DemoRole = rawRole.includes('organizer')
+      ? 'organizer'
+      : rawRole.includes('exhibitor')
+      ? 'exhibitor'
+      : 'delegate';
+
+    setRole(detectedDemoRole);
+    const personRole: RoleType = detectedDemoRole === 'organizer'
+      ? 'organizer_staff'
+      : detectedDemoRole === 'exhibitor'
+      ? 'exhibitor_staff'
+      : (rawRole === 'speaker' ? 'speaker' : rawRole === 'vip' ? 'vip' : 'delegate');
+
+    const name = backendUser.name || deriveNameFromEmail(backendUser.email || '');
+    setCurrentUser({
+      id: backendUser.id || `att-${Date.now().toString().slice(-6)}`,
+      name: name,
+      designation: backendUser.designation || 'Delegate',
+      company: backendUser.company || 'EventSphere Attendee',
+      role: personRole,
+      email: backendUser.email || '',
+      mobile: backendUser.mobile || '+91 98765 43210',
+      avatar: backendUser.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=181818&color=ffffff&bold=true`,
+      bio: backendUser.bio || 'Registered attendee at Madhya Pradesh Semiconductor Summit 2026.',
+      interests: ['Semiconductors', 'VLSI Design', 'AI Infrastructure'],
+      skills: ['Technology'],
+      checkedIn: true,
+      checkInTime: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      registrationId: backendUser.registrationId || `#REG-MPSS26-${(backendUser.id || '0000').slice(-4)}`,
+      ticketType: backendUser.ticketType || 'Delegate',
+      privacy: {
+        shareEmail: true,
+        sharePhone: true,
+        shareLinkedIn: true,
+        shareTwitter: false,
+        preset: 'Connections Only',
+      },
+    });
   };
 
   // Establish delegate authenticated session
@@ -387,22 +431,9 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
     setErrorMessage('');
 
     const enteredOtp = otpDigits.join('');
-    if (enteredOtp.length < 4) {
+    if (enteredOtp.length < 6) {
       setStatus('error');
-      setErrorMessage('Please enter the complete 4-digit OTP.');
-      return;
-    }
-
-    // Validate OTP (matches generated code or universal demo codes)
-    const isValidOtp =
-      enteredOtp === generatedOtp ||
-      enteredOtp === '1234' ||
-      enteredOtp === '0000' ||
-      enteredOtp === '9999';
-
-    if (!isValidOtp) {
-      setStatus('error');
-      setErrorMessage('Invalid OTP code. Please enter the 4-digit code (Demo: 1234).');
+      setErrorMessage('Please enter the complete 6-digit OTP.');
       return;
     }
 
@@ -411,9 +442,29 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
     try {
       // 1. Try backend verification if endpoint is live
       try {
-        await api.auth.verifyEmailOtp(eventId || 'MPSS26', email.trim(), enteredOtp);
-      } catch {
-        // Continue with local verified session fallback
+        const authRes = await api.auth.verifyEmailOtp(eventId || 'MPSS26', email.trim(), enteredOtp);
+        if (authRes?.user) {
+          establishSessionFromBackendUser(authRes.user);
+          setStatus('confirmed');
+          setTimeout(() => {
+            setHasAccessConfirmed(true);
+            onSuccess();
+          }, 350);
+          return;
+        }
+      } catch (err: any) {
+        if (err?.message && !err.message.includes('Failed to fetch') && !err.message.includes('NetworkError')) {
+          setStatus('error');
+          setErrorMessage(err.message);
+          return;
+        }
+        // Fallback for offline demo mode
+        const isDemoOtp = enteredOtp === generatedOtp || enteredOtp === '123456' || enteredOtp === '000000';
+        if (!isDemoOtp) {
+          setStatus('error');
+          setErrorMessage('Invalid OTP code. Please enter the 6-digit code.');
+          return;
+        }
       }
 
       establishSessionForEmail(email);
@@ -429,33 +480,85 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
     }
   };
 
+  // Handle credential token returned by Google Identity Services
+  const handleGoogleCredentialResponse = async (response: any) => {
+    if (!response?.credential) return;
+    setIsGoogleLoading(true);
+    setStatus('idle');
+    setErrorMessage('');
+    try {
+      const res = await api.auth.googleLogin(eventId || 'MPSS26', '', response.credential);
+      if (res?.user) {
+        establishSessionFromBackendUser(res.user);
+        setStatus('confirmed');
+        setTimeout(() => {
+          setHasAccessConfirmed(true);
+          onSuccess();
+        }, 350);
+        return;
+      }
+    } catch (err: any) {
+      setStatus('error');
+      setErrorMessage(err?.message || 'This Google account is not registered as an event delegate.');
+    } finally {
+      setIsGoogleLoading(false);
+    }
+  };
+
+  // Initialize Google Identity Services (GIS) on mount
+  useEffect(() => {
+    const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+    if (!googleClientId) return;
+
+    const setupGoogle = () => {
+      if (typeof window !== 'undefined' && (window as any).google?.accounts?.id) {
+        try {
+          (window as any).google.accounts.id.initialize({
+            client_id: googleClientId,
+            callback: handleGoogleCredentialResponse,
+            auto_select: false,
+            cancel_on_tap_outside: true,
+          });
+
+          if (googleButtonContainerRef.current) {
+            googleButtonContainerRef.current.innerHTML = '';
+            (window as any).google.accounts.id.renderButton(googleButtonContainerRef.current, {
+              theme: 'outline',
+              size: 'large',
+              width: 340,
+              text: 'continue_with',
+              shape: 'rectangular',
+              logo_alignment: 'left',
+            });
+            setIsGisReady(true);
+          }
+        } catch {
+          // Keep fallback active
+        }
+      }
+    };
+
+    if ((window as any).google?.accounts?.id) {
+      setupGoogle();
+    } else {
+      const interval = setInterval(() => {
+        if ((window as any).google?.accounts?.id) {
+          setupGoogle();
+          clearInterval(interval);
+        }
+      }, 300);
+      return () => clearInterval(interval);
+    }
+  }, []);
+
   // Google Sign-In Initiation
   const handleGoogleSignIn = async () => {
     setErrorMessage('');
     setIsGoogleLoading(true);
 
-    // If official Google Client ID is configured in environment, attempt GIS flow
     const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
     if (googleClientId && typeof window !== 'undefined' && (window as any).google?.accounts?.id) {
       try {
-        (window as any).google.accounts.id.initialize({
-          client_id: googleClientId,
-          callback: async (response: any) => {
-            if (response.credential) {
-              try {
-                const res = await api.auth.googleLogin(eventId || 'MPSS26', '', response.credential);
-                if (res?.user?.email) {
-                  establishSessionForEmail(res.user.email);
-                  setHasAccessConfirmed(true);
-                  onSuccess();
-                  return;
-                }
-              } catch {
-                // handle error
-              }
-            }
-          },
-        });
         (window as any).google.accounts.id.prompt((notification: any) => {
           if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
             setIsGoogleModalOpen(true);
@@ -468,12 +571,11 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
       }
     }
 
-    // Default: Open the realistic Google Account Chooser modal
     setTimeout(() => {
       setIsGoogleLoading(false);
       setGoogleModalError('');
       setIsGoogleModalOpen(true);
-    }, 250);
+    }, 200);
   };
 
   // Complete Google Sign-In with selected or custom email
@@ -655,25 +757,33 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
                 </div>
               </div>
 
-              {/* Continue with Google Button */}
-              <button
-                type="button"
-                onClick={handleGoogleSignIn}
-                disabled={status === 'sending' || isGoogleLoading}
-                className="w-full h-12 bg-white hover:bg-[#F9FAFB] active:scale-[0.98] border border-[#E5E7EB] text-[#1F2937] font-semibold text-[13.5px] rounded-xl shadow-2xs transition-all flex items-center justify-center gap-3 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
-              >
-                {isGoogleLoading ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin text-[#B51F32]" />
-                    <span>Connecting with Google...</span>
-                  </>
-                ) : (
-                  <>
-                    <GoogleIcon className="w-5 h-5 shrink-0" />
-                    <span>Continue with Google</span>
-                  </>
+              {/* Official Google Sign In Container & Fallback */}
+              <div className="w-full flex flex-col items-center">
+                <div
+                  ref={googleButtonContainerRef}
+                  className={`w-full flex justify-center ${isGisReady ? 'min-h-[44px]' : 'hidden'}`}
+                />
+                {(!isGisReady || isGoogleLoading) && (
+                  <button
+                    type="button"
+                    onClick={handleGoogleSignIn}
+                    disabled={status === 'sending' || isGoogleLoading}
+                    className="w-full h-12 bg-white hover:bg-[#F9FAFB] active:scale-[0.98] border border-[#E5E7EB] text-[#1F2937] font-semibold text-[13.5px] rounded-xl shadow-2xs transition-all flex items-center justify-center gap-3 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
+                  >
+                    {isGoogleLoading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin text-[#B51F32]" />
+                        <span>Connecting with Google...</span>
+                      </>
+                    ) : (
+                      <>
+                        <GoogleIcon className="w-5 h-5 shrink-0" />
+                        <span>Continue with Google</span>
+                      </>
+                    )}
+                  </button>
                 )}
-              </button>
+              </div>
 
               {/* Footer Trust Badges */}
               <div className="mt-5 pb-1 flex items-center justify-center gap-3 text-[12px] font-medium text-[#6B7280]">
@@ -714,7 +824,7 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
               <div>
                 <h2 className="text-[17px] font-bold text-[#181818] tracking-tight">Verify Email Address</h2>
                 <p className="text-[11.5px] text-[#6B7280] mt-0.5 leading-snug">
-                  Enter the 4-digit code sent to{' '}
+                  Enter the 6-digit code sent to{' '}
                   <strong className="text-[#181818]">{maskedEmail}</strong>
                 </p>
               </div>
@@ -722,7 +832,7 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
 
             <div className="flex-1 flex flex-col justify-center py-2">
               {/* 4 Digit Boxes */}
-              <div className="flex justify-center gap-3">
+              <div className="flex justify-center gap-2 sm:gap-2.5">
                 {otpDigits.map((digit, idx) => (
                   <input
                     key={idx}
@@ -736,7 +846,7 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
                     onKeyDown={(e) => handleKeyDown(idx, e)}
                     onPaste={idx === 0 ? handlePaste : undefined}
                     disabled={status === 'verifying' || status === 'confirmed'}
-                    className="w-14 h-14 sm:w-16 sm:h-16 text-center text-2xl font-bold rounded-2xl bg-white border border-[#E5E7EB] text-[#181818] shadow-xs focus:ring-2 focus:ring-[#B51F32]/25 focus:border-[#B51F32] outline-none transition-all"
+                    className="w-11 h-12 sm:w-13 sm:h-14 text-center text-xl font-bold rounded-xl bg-white border border-[#E5E7EB] text-[#181818] shadow-xs focus:ring-2 focus:ring-[#B51F32]/25 focus:border-[#B51F32] outline-none transition-all"
                   />
                 ))}
               </div>
@@ -803,7 +913,7 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
               <button
                 type="submit"
                 disabled={
-                  otpDigits.join('').length < 4 ||
+                  otpDigits.join('').length < 6 ||
                   status === 'verifying' ||
                   status === 'confirmed'
                 }
