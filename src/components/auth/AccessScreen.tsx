@@ -24,8 +24,14 @@ interface AccessScreenProps {
 }
 
 // Google 4-Color Icon
-const GoogleIcon: React.FC<{ className?: string }> = ({ className = 'w-5 h-5' }) => (
-  <svg className={className} viewBox="0 0 24 24">
+const GoogleIcon: React.FC<{ className?: string; size?: number }> = ({ className = 'w-[18px] h-[18px]', size = 18 }) => (
+  <svg
+    width={size}
+    height={size}
+    className={`shrink-0 ${className}`}
+    style={{ width: `${size}px`, height: `${size}px`, minWidth: `${size}px`, minHeight: `${size}px`, maxWidth: `${size}px`, maxHeight: `${size}px` }}
+    viewBox="0 0 24 24"
+  >
     <path
       fill="#4285F4"
       d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"
@@ -75,6 +81,7 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
 
   const [step, setStep] = useState<'details' | 'otp'>('details');
   const [eventId, setEventId] = useState('MPSS26');
+  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [maskedEmail, setMaskedEmail] = useState('');
 
@@ -95,6 +102,7 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
   const [googleModalError, setGoogleModalError] = useState('');
   const [showCustomGoogleInput, setShowCustomGoogleInput] = useState(false);
 
+  const fullNameInputRef = useRef<HTMLInputElement>(null);
   const emailInputRef = useRef<HTMLInputElement>(null);
   const digit0Ref = useRef<HTMLInputElement>(null);
   const digit1Ref = useRef<HTMLInputElement>(null);
@@ -162,7 +170,22 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
       return;
     }
 
-    // 2. Validate Registered Email Address
+    // 2. Validate Full Name
+    const trimmedName = fullName.trim();
+    if (!trimmedName) {
+      setStatus('error');
+      setErrorMessage('Please enter your full name.');
+      fullNameInputRef.current?.focus();
+      return;
+    }
+    if (trimmedName.length < 2) {
+      setStatus('error');
+      setErrorMessage('Please enter a valid full name (at least 2 characters).');
+      fullNameInputRef.current?.focus();
+      return;
+    }
+
+    // 3. Validate Registered Email Address
     const trimmedEmail = email.trim();
     if (!trimmedEmail) {
       setStatus('error');
@@ -308,8 +331,9 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
   };
 
   // Establish delegate authenticated session
-  const establishSessionForEmail = (userEmail: string) => {
+  const establishSessionForEmail = (userEmail: string, userName?: string) => {
     const cleanEmail = userEmail.trim().toLowerCase();
+    const cleanName = userName?.trim();
 
     // 1. Founder specific shortcuts
     if (
@@ -323,7 +347,7 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
       setCurrentUser({
         ...(hariAttendee || CURRENT_USER),
         id: 'att-hari-gupta',
-        name: 'Hari Gupta',
+        name: cleanName || 'Hari Gupta',
         company: 'GetMyEvent',
         designation: 'Co-Founder',
         email: 'harigupta@getmyevent.in',
@@ -350,7 +374,7 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
       setCurrentUser({
         ...(pushpitAttendee || CURRENT_USER),
         id: 'att-pushpit-upadhyay',
-        name: 'Pushpit Upadhyay',
+        name: cleanName || 'Pushpit Upadhyay',
         company: 'GetMyEvent',
         designation: 'Co-Founder',
         email: 'pushpitupadhya@getmyevent.in',
@@ -383,6 +407,7 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
       setRole(detectedRole);
       setCurrentUser({
         ...matchedAttendee,
+        name: cleanName || matchedAttendee.name,
         email: userEmail.trim(),
         checkedIn: true,
       });
@@ -392,7 +417,7 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
     // 3. New registered delegate session
     resetUserState();
     setRole('delegate');
-    const derivedName = deriveNameFromEmail(userEmail);
+    const derivedName = cleanName || deriveNameFromEmail(userEmail);
     const newAttendee: Person = {
       id: `att-${Date.now().toString().slice(-6)}`,
       name: derivedName,
@@ -467,7 +492,7 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
         }
       }
 
-      establishSessionForEmail(email);
+      establishSessionForEmail(email, fullName);
 
       setStatus('confirmed');
       setTimeout(() => {
@@ -659,20 +684,20 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
         {step === 'details' && (
           <form onSubmit={handleSendOtp} className="flex-1 flex flex-col">
             {/* Header with Red Accent Bar */}
-            <div className="flex items-start gap-3 mb-4">
-              <div className="w-1 self-stretch min-h-[38px] bg-[#B51F32] rounded-full shrink-0 mt-0.5" />
+            <div className="flex items-start gap-3 mb-3">
+              <div className="w-1 self-stretch min-h-[34px] bg-[#B51F32] rounded-full shrink-0 mt-0.5" />
               <div>
-                <h2 className="text-[17px] font-bold text-[#181818] tracking-tight">Enter your event</h2>
-                <p className="text-[11.5px] text-[#6B7280] mt-0.5 leading-snug">
-                  Use your Event ID and registered email address to continue.
+                <h2 className="text-[16.5px] font-bold text-[#181818] tracking-tight">Enter your event</h2>
+                <p className="text-[11px] text-[#6B7280] mt-0.5 leading-snug">
+                  Use your Event ID, full name, and registered email address to continue.
                 </p>
               </div>
             </div>
 
-            <div className="space-y-3.5 flex-1">
+            <div className="space-y-2.5 flex-1">
               {/* Event ID Field */}
               <div>
-                <label className="block text-[12px] font-semibold text-[#181818] mb-1.5">Event ID</label>
+                <label className="block text-[11.5px] font-semibold text-[#181818] mb-1">Event ID</label>
                 <div className="relative flex items-center">
                   <input
                     type="text"
@@ -680,23 +705,48 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
                     onChange={(e) => setEventId(e.target.value.toUpperCase())}
                     placeholder="MPSS26"
                     disabled={status === 'sending'}
-                    className="w-full h-11 px-3.5 rounded-xl bg-white border border-[#E5E7EB] text-[13.5px] font-bold tracking-wider text-[#181818] shadow-xs focus:ring-2 focus:ring-[#B51F32]/20 focus:border-[#B51F32] outline-none transition-all uppercase"
+                    className="w-full h-[38px] px-3 rounded-xl bg-white border border-[#E5E7EB] text-[13px] font-bold tracking-wider text-[#181818] shadow-xs focus:ring-2 focus:ring-[#B51F32]/20 focus:border-[#B51F32] outline-none transition-all uppercase"
                   />
-                  <div className="absolute right-3.5 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
-                    <CheckCircle2 className="w-5 h-5 text-[#B51F32]" />
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
+                    <CheckCircle2 className="w-4 h-4 text-[#B51F32]" />
                   </div>
+                </div>
+              </div>
+
+              {/* Full Name Field */}
+              <div>
+                <label className="block text-[11.5px] font-semibold text-[#181818] mb-1">
+                  Full Name
+                </label>
+                <div className="flex h-[38px] rounded-xl bg-white border border-[#E5E7EB] shadow-xs focus-within:ring-2 focus-within:ring-[#B51F32]/20 focus-within:border-[#B51F32] transition-all overflow-hidden">
+                  <div className="w-[38px] h-full flex items-center justify-center border-r border-[#E5E7EB] bg-[#FAFAFA] shrink-0 text-[#9CA3AF]">
+                    <User className="w-3.5 h-3.5 stroke-[1.8]" />
+                  </div>
+                  <input
+                    ref={fullNameInputRef}
+                    type="text"
+                    value={fullName}
+                    onChange={(e) => {
+                      setFullName(e.target.value);
+                      if (status === 'error') setStatus('idle');
+                    }}
+                    placeholder="Enter your full name"
+                    disabled={status === 'sending'}
+                    className="flex-1 min-w-0 h-full px-3 text-[13px] font-medium text-[#181818] bg-transparent focus:outline-none placeholder-[#9CA3AF]"
+                    autoComplete="name"
+                  />
                 </div>
               </div>
 
               {/* Email Address Field */}
               <div>
-                <label className="block text-[12px] font-semibold text-[#181818] mb-1.5">
+                <label className="block text-[11.5px] font-semibold text-[#181818] mb-1">
                   Email Address
                 </label>
-                <div className="flex h-11 rounded-xl bg-white border border-[#E5E7EB] shadow-xs focus-within:ring-2 focus-within:ring-[#B51F32]/20 focus-within:border-[#B51F32] transition-all overflow-hidden">
+                <div className="flex h-[38px] rounded-xl bg-white border border-[#E5E7EB] shadow-xs focus-within:ring-2 focus-within:ring-[#B51F32]/20 focus-within:border-[#B51F32] transition-all overflow-hidden">
                   {/* Mail Icon Prefix Box */}
-                  <div className="w-11 h-full flex items-center justify-center border-r border-[#E5E7EB] bg-[#FAFAFA] shrink-0 text-[#9CA3AF]">
-                    <Mail className="w-4 h-4 stroke-[1.8]" />
+                  <div className="w-[38px] h-full flex items-center justify-center border-r border-[#E5E7EB] bg-[#FAFAFA] shrink-0 text-[#9CA3AF]">
+                    <Mail className="w-3.5 h-3.5 stroke-[1.8]" />
                   </div>
 
                   {/* Email Input */}
@@ -710,7 +760,7 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
                     }}
                     placeholder="Enter your email address"
                     disabled={status === 'sending'}
-                    className="flex-1 min-w-0 h-full px-3.5 text-[13.5px] font-medium text-[#181818] bg-transparent focus:outline-none placeholder-[#9CA3AF]"
+                    className="flex-1 min-w-0 h-full px-3 text-[13px] font-medium text-[#181818] bg-transparent focus:outline-none placeholder-[#9CA3AF]"
                     autoComplete="email"
                   />
                 </div>
@@ -726,11 +776,11 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
             </div>
 
             {/* Submit Action: Send OTP */}
-            <div className="mt-4 pt-1">
+            <div className="mt-3.5 pt-0.5">
               <button
                 type="submit"
                 disabled={status === 'sending' || isGoogleLoading}
-                className="w-full h-12 bg-[#B51F32] hover:bg-[#9C1A2B] active:scale-[0.98] text-white font-semibold text-[14px] rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed"
+                className="w-full h-[42px] bg-[#B51F32] hover:bg-[#9C1A2B] active:scale-[0.98] text-white font-semibold text-[13.5px] rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed"
               >
                 {status === 'sending' ? (
                   <>
@@ -746,17 +796,36 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
               </button>
 
               {/* Centered OR Divider */}
-              <div className="relative my-3.5 flex items-center justify-center">
+              <div className="relative my-3 flex items-center justify-center">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-[#E5E7EB]" />
                 </div>
                 <div className="relative bg-[#FAF9F6] px-3">
-                  <span className="text-[11px] font-semibold uppercase tracking-wider text-[#9CA3AF]">
+                  <span className="text-[10.5px] font-semibold uppercase tracking-wider text-[#9CA3AF]">
                     OR
                   </span>
                 </div>
               </div>
 
+<<<<<<< HEAD
+              {/* Continue with Google Button */}
+              <button
+                type="button"
+                onClick={handleGoogleSignIn}
+                disabled={status === 'sending' || isGoogleLoading}
+                className="w-full h-[42px] bg-white hover:bg-[#F9FAFB] active:scale-[0.98] border border-[#E5E7EB] text-[#1F2937] font-semibold text-[13px] rounded-xl shadow-2xs transition-all flex items-center justify-center gap-3 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
+              >
+                {isGoogleLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin text-[#B51F32]" />
+                    <span>Connecting with Google...</span>
+                  </>
+                ) : (
+                  <>
+                    <GoogleIcon size={18} className="w-[18px] h-[18px] shrink-0" />
+                    <span>Continue with Google</span>
+                  </>
+=======
               {/* Official Google Sign In Container & Fallback */}
               <div className="w-full flex flex-col items-center">
                 <div
@@ -782,18 +851,19 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
                       </>
                     )}
                   </button>
+>>>>>>> 7d626f7193bc9a7d9cbb52f99c4b6df0ef14c1c8
                 )}
               </div>
 
               {/* Footer Trust Badges */}
-              <div className="mt-5 pb-1 flex items-center justify-center gap-3 text-[12px] font-medium text-[#6B7280]">
+              <div className="mt-3.5 pb-0.5 flex items-center justify-center gap-3 text-[11px] font-medium text-[#6B7280]">
                 <div className="flex items-center gap-1.5">
-                  <Lock className="w-3.5 h-3.5 text-[#6B7280]" />
+                  <Lock className="w-3 h-3 text-[#6B7280]" />
                   <span>Secure sign-in</span>
                 </div>
                 <span className="text-[#D1D5DB]">|</span>
                 <div className="flex items-center gap-1.5">
-                  <ShieldCheck className="w-3.5 h-3.5 text-[#6B7280]" />
+                  <ShieldCheck className="w-3 h-3 text-[#6B7280]" />
                   <span>Registration verified</span>
                 </div>
               </div>
@@ -973,7 +1043,7 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
 
             {/* Header */}
             <div className="flex flex-col items-center text-center pt-1 mb-4">
-              <GoogleIcon className="w-7 h-7 mb-2" />
+              <GoogleIcon size={28} className="w-7 h-7 mb-2" />
               <h3 className="text-[16px] font-bold text-gray-900">Sign in with Google</h3>
               <p className="text-[12px] text-gray-500 mt-0.5">
                 Choose an account to continue to <span className="font-semibold text-gray-800">GetMyEvent MPSS26</span>

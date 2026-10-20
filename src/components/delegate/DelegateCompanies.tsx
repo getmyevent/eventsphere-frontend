@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Search, ChevronLeft, MapPin } from 'lucide-react';
 import { useStore } from '../../lib/store';
 import { getExhibitorSlug } from '../../lib/exhibitorSlug';
+import { sortExhibitors } from '../../lib/exhibitorSort';
 
 export const DelegateCompanies: React.FC = () => {
   const router = useRouter();
@@ -19,17 +20,21 @@ export const DelegateCompanies: React.FC = () => {
 
   const [searchQuery, setSearchQuery] = useState('');
 
-  const filteredExhibitors = exhibitors.filter((company) => {
-    if (viewSavedCompaniesOnly && !savedCompanyIds.includes(company.id)) return false;
+  const filteredExhibitors = useMemo(() => {
+    const list = exhibitors.filter((company) => {
+      if (viewSavedCompaniesOnly && !savedCompanyIds.includes(company.id)) return false;
 
-    const matchesSearch =
-      searchQuery === '' ||
-      company.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (company.booth && company.booth.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      (company.category && company.category.toLowerCase().includes(searchQuery.toLowerCase()));
+      const matchesSearch =
+        searchQuery === '' ||
+        company.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (company.booth && company.booth.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (company.category && company.category.toLowerCase().includes(searchQuery.toLowerCase()));
 
-    return matchesSearch;
-  });
+      return matchesSearch;
+    });
+
+    return sortExhibitors(list);
+  }, [exhibitors, viewSavedCompaniesOnly, savedCompanyIds, searchQuery]);
 
   return (
     <div className="flex-1 min-h-0 h-full bg-[#F8F7F4] select-none flex flex-col overflow-hidden">

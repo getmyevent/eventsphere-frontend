@@ -1,9 +1,10 @@
 'use client';
-import React, { useState, useEffect, useRef, Suspense } from "react";
+import React, { useState, useEffect, useRef, Suspense, useMemo } from "react";
 
 import { ArrowUpRight, BarChart2, Briefcase, Building, Building2, Calendar, Download, LineChart, Mic, User, Users } from 'lucide-react';
 import { useStore } from '../../lib/store';
 import { api, OrganizerExhibitor } from '../../lib/api';
+import { sortExhibitors } from '../../lib/exhibitorSort';
 
 export const OrganizerExhibitors: React.FC = () => {
   const { exhibitors, showToast } = useStore();
@@ -21,15 +22,18 @@ export const OrganizerExhibitors: React.FC = () => {
       });
   }, []);
 
-  const displayList = organizerExhibitors.length > 0
-    ? organizerExhibitors.map((e) => ({
-        id: e.id,
-        company: e.company,
-        booth: e.booth,
-        category: e.category,
-        leads: typeof e.leadCount === 'number' ? e.leadCount : 0,
-      }))
-    : exhibitors;
+  const displayList = useMemo(() => {
+    const raw = organizerExhibitors.length > 0
+      ? organizerExhibitors.map((e) => ({
+          id: e.id,
+          company: e.company,
+          booth: e.booth,
+          category: e.category,
+          leads: typeof e.leadCount === 'number' ? e.leadCount : 0,
+        }))
+      : exhibitors;
+    return sortExhibitors(raw);
+  }, [organizerExhibitors, exhibitors]);
 
   const PAGE_SIZE = 11;
   const [currentPage, setCurrentPage] = useState(1);
