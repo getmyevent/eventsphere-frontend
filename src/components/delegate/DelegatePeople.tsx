@@ -12,6 +12,7 @@ import { useStore } from '../../lib/store';
 import { RECOMMENDED_PEOPLE_IDS } from '../../lib/mockData';
 import { Person } from '../../types';
 
+
 export const DelegatePeople: React.FC = () => {
   const router = useRouter();
   const {
