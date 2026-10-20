@@ -844,26 +844,7 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
                 </div>
               </div>
 
-<<<<<<< HEAD
-              {/* Continue with Google Button */}
-              <button
-                type="button"
-                onClick={handleGoogleSignIn}
-                disabled={status === 'sending' || isGoogleLoading}
-                className="w-full h-[42px] bg-white hover:bg-[#F9FAFB] active:scale-[0.98] border border-[#E5E7EB] text-[#1F2937] font-semibold text-[13px] rounded-xl shadow-2xs transition-all flex items-center justify-center gap-3 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
-              >
-                {isGoogleLoading ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin text-[#B51F32]" />
-                    <span>Connecting with Google...</span>
-                  </>
-                ) : (
-                  <>
-                    <GoogleIcon size={18} className="w-[18px] h-[18px] shrink-0" />
-                    <span>Continue with Google</span>
-                  </>
-=======
-              {/* Google Sign In Container */}
+{/* Google Sign In Container */}
               <div className="w-full flex flex-col items-center justify-center min-h-[44px]">
                 <div
                   ref={googleButtonContainerRef}
@@ -889,9 +870,8 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
                       </>
                     )}
                   </button>
->>>>>>> 80db30b828435bf2117406cab27c65b0e680ec96
                 )}
-              </button>
+              </div>
 
               {/* Footer Trust Badges */}
               <div className="mt-3.5 pb-0.5 flex items-center justify-center gap-3 text-[11px] font-medium text-[#6B7280]">
