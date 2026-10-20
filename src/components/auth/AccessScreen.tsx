@@ -79,7 +79,10 @@ const deriveNameFromEmail = (email: string): string => {
 export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
   const { setRole, setHasAccessConfirmed, setCurrentUser, resetUserState } = useStore();
 
-  const [step, setStep] = useState<'details' | 'otp'>('details');
+  const [step, setStep] = useState<'details' | 'otp' | 'create_profile'>('details');
+  const [pendingEmail, setPendingEmail] = useState('');
+  const [profileName, setProfileName] = useState('');
+  const profileNameInputRef = useRef<HTMLInputElement>(null);
   const [eventId, setEventId] = useState('MPSS26');
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
@@ -115,6 +118,11 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
     if (step === 'otp') {
       const timer = setTimeout(() => {
         digitRefs[0].current?.focus();
+      }, 150);
+      return () => clearTimeout(timer);
+    } else if (step === 'create_profile') {
+      const timer = setTimeout(() => {
+        profileNameInputRef.current?.focus();
       }, 150);
       return () => clearTimeout(timer);
     }
@@ -165,22 +173,7 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
       return;
     }
 
-    // 2. Validate Full Name
-    const trimmedName = fullName.trim();
-    if (!trimmedName) {
-      setStatus('error');
-      setErrorMessage('Please enter your full name.');
-      fullNameInputRef.current?.focus();
-      return;
-    }
-    if (trimmedName.length < 2) {
-      setStatus('error');
-      setErrorMessage('Please enter a valid full name (at least 2 characters).');
-      fullNameInputRef.current?.focus();
-      return;
-    }
-
-    // 3. Validate Registered Email Address
+    // 2. Validate Registered Email Address
     const trimmedEmail = email.trim();
     if (!trimmedEmail) {
       setStatus('error');
@@ -463,6 +456,13 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
       // 1. Try backend verification if endpoint is live
       try {
         const authRes = await api.auth.verifyEmailOtp(eventId || 'MPSS26', email.trim(), enteredOtp);
+        if (authRes?.isNewUser || authRes?.newUser) {
+          setPendingEmail(authRes.user?.email || email.trim());
+          setProfileName('');
+          setStatus('idle');
+          setStep('create_profile');
+          return;
+        }
         if (authRes?.user) {
           establishSessionFromBackendUser(authRes.user);
           setStatus('confirmed');
@@ -506,8 +506,31 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
     setIsGoogleLoading(true);
     setStatus('idle');
     setErrorMessage('');
+
+    // Extract payload from Google JWT for smooth profile pre-population
+    let googleEmail = '';
+    let googleName = '';
+    try {
+      const payloadBase64 = response.credential.split('.')[1];
+      const decoded = JSON.parse(atob(payloadBase64.replace(/-/g, '+').replace(/_/g, '/')));
+      googleEmail = decoded.email || '';
+      googleName = decoded.name || '';
+    } catch (e) {
+      // ignore
+    }
+
     try {
       const res = await api.auth.googleLogin(eventId || 'MPSS26', '', response.credential);
+      if (res?.isNewUser || res?.newUser) {
+        const targetEmail = res.user?.email || googleEmail || email.trim();
+        const targetName = res.user?.name || googleName || '';
+        setPendingEmail(targetEmail);
+        setProfileName(targetName);
+        setStatus('idle');
+        setStep('create_profile');
+        return;
+      }
+
       if (res?.user) {
         establishSessionFromBackendUser(res.user);
         setStatus('confirmed');
@@ -518,10 +541,70 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
         return;
       }
     } catch (err: any) {
+      const errMsg = err?.message || '';
+      if (errMsg.toLowerCase().includes('not registered') || errMsg.toLowerCase().includes('not found') || errMsg.includes('404')) {
+        const targetEmail = googleEmail || email.trim();
+        if (targetEmail) {
+          setPendingEmail(targetEmail);
+          setProfileName(googleName || deriveNameFromEmail(targetEmail));
+          setStatus('idle');
+          setStep('create_profile');
+          return;
+        }
+      }
       setStatus('error');
-      setErrorMessage(err?.message || 'This Google account is not registered as an event delegate.');
+      setErrorMessage(errMsg || 'This Google account is not registered as an event delegate.');
     } finally {
       setIsGoogleLoading(false);
+    }
+  };
+
+  // Step 3: Complete Profile & Activate Delegate Pass
+  const handleCreateProfile = async (e?: React.FormEvent) => {
+    if (e && typeof e.preventDefault === 'function') {
+      e.preventDefault();
+    }
+    if (status === 'verifying' || status === 'confirmed') return;
+
+    setErrorMessage('');
+    const trimmedName = profileName.trim();
+    if (!trimmedName) {
+      setStatus('error');
+      setErrorMessage('Please enter your full name.');
+      profileNameInputRef.current?.focus();
+      return;
+    }
+    if (trimmedName.length < 2) {
+      setStatus('error');
+      setErrorMessage('Please enter a valid full name (at least 2 characters).');
+      profileNameInputRef.current?.focus();
+      return;
+    }
+
+    setStatus('verifying');
+    try {
+      const targetEmail = pendingEmail.trim() || email.trim();
+      const authRes = await api.auth.register(eventId || 'MPSS26', targetEmail, trimmedName);
+      if (authRes?.user) {
+        establishSessionFromBackendUser(authRes.user);
+        setStatus('confirmed');
+        setTimeout(() => {
+          setHasAccessConfirmed(true);
+          onSuccess();
+        }, 350);
+        return;
+      }
+
+      // Offline fallback session
+      establishSessionForEmail(targetEmail, trimmedName);
+      setStatus('confirmed');
+      setTimeout(() => {
+        setHasAccessConfirmed(true);
+        onSuccess();
+      }, 350);
+    } catch (err: any) {
+      setStatus('error');
+      setErrorMessage(err?.message || 'Failed to complete profile. Please try again.');
     }
   };
 
@@ -666,7 +749,7 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
               <div>
                 <h2 className="text-[16.5px] font-bold text-[#181818] tracking-tight">Enter your event</h2>
                 <p className="text-[11px] text-[#6B7280] mt-0.5 leading-snug">
-                  Use your Event ID, full name, and registered email address to continue.
+                  Enter your Event ID and email address to continue.
                 </p>
               </div>
             </div>
@@ -690,30 +773,7 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
                 </div>
               </div>
 
-              {/* Full Name Field */}
-              <div>
-                <label className="block text-[11.5px] font-semibold text-[#181818] mb-1">
-                  Full Name
-                </label>
-                <div className="flex h-[38px] rounded-xl bg-white border border-[#E5E7EB] shadow-xs focus-within:ring-2 focus-within:ring-[#B51F32]/20 focus-within:border-[#B51F32] transition-all overflow-hidden">
-                  <div className="w-[38px] h-full flex items-center justify-center border-r border-[#E5E7EB] bg-[#FAFAFA] shrink-0 text-[#9CA3AF]">
-                    <User className="w-3.5 h-3.5 stroke-[1.8]" />
-                  </div>
-                  <input
-                    ref={fullNameInputRef}
-                    type="text"
-                    value={fullName}
-                    onChange={(e) => {
-                      setFullName(e.target.value);
-                      if (status === 'error') setStatus('idle');
-                    }}
-                    placeholder="Enter your full name"
-                    disabled={status === 'sending'}
-                    className="flex-1 min-w-0 h-full px-3 text-[13px] font-medium text-[#181818] bg-transparent focus:outline-none placeholder-[#9CA3AF]"
-                    autoComplete="name"
-                  />
-                </div>
-              </div>
+
 
               {/* Email Address Field */}
               <div>
@@ -975,6 +1035,136 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
                 <div className="flex items-center gap-1.5">
                   <ShieldCheck className="w-3.5 h-3.5 text-[#6B7280]" />
                   <span>Registration verified</span>
+                </div>
+              </div>
+            </div>
+          </form>
+        )}
+        {/* STEP 3: Create Profile (Only asks for Name) */}
+        {step === 'create_profile' && (
+          <form onSubmit={handleCreateProfile} className="flex-1 flex flex-col animate-in fade-in slide-in-from-right-3 duration-200">
+            {/* Back Button */}
+            <button
+              type="button"
+              onClick={() => {
+                setStep('details');
+                setStatus('idle');
+                setErrorMessage('');
+              }}
+              className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-[#6B7280] hover:text-[#181818] mb-3 transition-colors cursor-pointer w-fit"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Back to sign-in</span>
+            </button>
+
+            {/* Header with Red Accent Bar */}
+            <div className="flex items-start gap-3 mb-3">
+              <div className="w-1 self-stretch min-h-[38px] bg-[#B51F32] rounded-full shrink-0 mt-0.5" />
+              <div>
+                <h2 className="text-[17px] font-bold text-[#181818] tracking-tight">Create your profile</h2>
+                <p className="text-[11.5px] text-[#6B7280] mt-0.5 leading-snug">
+                  Welcome to MP Semiconductor Summit 2026. Only your name is needed to activate your delegate pass.
+                </p>
+              </div>
+            </div>
+
+            {/* Verified Email Badge */}
+            <div className="mb-3 px-3 py-2 bg-[#F3F4F6] border border-[#E5E7EB] rounded-xl flex items-center justify-between text-[12px]">
+              <div className="flex items-center gap-2 text-[#4B5563] min-w-0">
+                <Mail className="w-3.5 h-3.5 text-[#6B7280] shrink-0" />
+                <span className="font-medium truncate">{pendingEmail || email}</span>
+              </div>
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10.5px] font-semibold bg-emerald-100 text-emerald-800 shrink-0">
+                <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                Verified
+              </span>
+            </div>
+
+            <div className="space-y-3 flex-1">
+              {/* Full Name Field (The ONLY input asked) */}
+              <div>
+                <label className="block text-[11.5px] font-semibold text-[#181818] mb-1">
+                  Full Name
+                </label>
+                <div className="flex h-[42px] rounded-xl bg-white border border-[#E5E7EB] shadow-xs focus-within:ring-2 focus-within:ring-[#B51F32]/20 focus-within:border-[#B51F32] transition-all overflow-hidden">
+                  <div className="w-[42px] h-full flex items-center justify-center border-r border-[#E5E7EB] bg-[#FAFAFA] shrink-0 text-[#9CA3AF]">
+                    <User className="w-4 h-4 stroke-[1.8]" />
+                  </div>
+                  <input
+                    ref={profileNameInputRef}
+                    type="text"
+                    value={profileName}
+                    onChange={(e) => {
+                      setProfileName(e.target.value);
+                      if (status === 'error') setStatus('idle');
+                    }}
+                    placeholder="Enter your full name"
+                    disabled={status === 'verifying' || status === 'confirmed'}
+                    className="flex-1 min-w-0 h-full px-3 text-[13.5px] font-medium text-[#181818] bg-transparent focus:outline-none placeholder-[#9CA3AF]"
+                    autoComplete="name"
+                    autoFocus
+                  />
+                </div>
+                <p className="text-[11px] text-[#9CA3AF] mt-1.5 pl-0.5">
+                  This name will appear on your summit delegate badge and networking pass.
+                </p>
+              </div>
+
+              {/* Error Message */}
+              {status === 'error' && (
+                <div className="p-2.5 bg-red-50 border border-red-200 rounded-xl text-xs text-red-800 flex items-start gap-2 animate-in fade-in">
+                  <AlertCircle className="w-4 h-4 text-red-600 mt-0.5 shrink-0" />
+                  <p className="font-semibold">{errorMessage}</p>
+                </div>
+              )}
+
+              {/* Confirmed Message */}
+              {status === 'confirmed' && (
+                <div className="p-2.5 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-800 flex items-center gap-2 animate-in fade-in">
+                  <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+                  <div>
+                    <p className="font-bold text-[12px] text-emerald-900">Profile Created ✓</p>
+                    <p className="text-[11px] text-emerald-700">Entering summit...</p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Submit Button */}
+            <div className="mt-4 pt-1">
+              <button
+                type="submit"
+                disabled={status === 'verifying' || status === 'confirmed' || !profileName.trim()}
+                className="w-full h-12 bg-[#B51F32] hover:bg-[#9C1A2B] active:scale-[0.98] text-white font-semibold text-[14px] rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {status === 'verifying' ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Activating Delegate Pass...</span>
+                  </>
+                ) : status === 'confirmed' ? (
+                  <>
+                    <CheckCircle2 className="w-4 h-4 text-white" />
+                    <span>Welcome to MPSS26 ✓</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Complete Profile & Enter</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
+              </button>
+
+              {/* Footer Trust Badges */}
+              <div className="mt-4 pb-1 flex items-center justify-center gap-3 text-[11px] font-medium text-[#6B7280]">
+                <div className="flex items-center gap-1.5">
+                  <Lock className="w-3 h-3 text-[#6B7280]" />
+                  <span>Instant badge generation</span>
+                </div>
+                <span className="text-[#D1D5DB]">|</span>
+                <div className="flex items-center gap-1.5">
+                  <ShieldCheck className="w-3 h-3 text-[#6B7280]" />
+                  <span>Official MPSS26 Delegate</span>
                 </div>
               </div>
             </div>

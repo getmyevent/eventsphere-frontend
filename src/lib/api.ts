@@ -27,10 +27,12 @@ export interface ApiUser {
 }
 
 export interface AuthResponse {
-  token: string;
-  tokenType: string;
-  expiresIn: number;
-  user: ApiUser;
+  token?: string;
+  tokenType?: string;
+  expiresIn?: number;
+  user?: ApiUser;
+  isNewUser?: boolean;
+  newUser?: boolean;
 }
 
 export interface OrganizerMetrics {
@@ -115,8 +117,8 @@ class ApiClient {
     }
   }
 
-  public setToken(token: string | null) {
-    this.token = token;
+  public setToken(token?: string | null) {
+    this.token = token || null;
     if (typeof window !== 'undefined') {
       try {
         if (token) {
@@ -392,6 +394,27 @@ class ApiClient {
         const res = await this.request<AuthResponse>('/api/v1/auth/email/verify-otp', {
           method: 'POST',
           body: JSON.stringify({ eventId, email, otp }),
+        });
+        if (res && res.token) {
+          this.setToken(res.token);
+          if (typeof window !== 'undefined') {
+            try {
+              localStorage.setItem(USER_KEY, JSON.stringify(res.user));
+            } catch {
+              // ignore
+            }
+          }
+        }
+        return res;
+      } catch (err) {
+        throw err;
+      }
+    },
+    register: async (eventId: string, email: string, name: string): Promise<AuthResponse> => {
+      try {
+        const res = await this.request<AuthResponse>('/api/v1/auth/register', {
+          method: 'POST',
+          body: JSON.stringify({ eventId, email, name }),
         });
         if (res && res.token) {
           this.setToken(res.token);
