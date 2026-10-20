@@ -1,14 +1,20 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useStore } from '../../lib/store';
 import { calculateProfileCompletion } from '../../lib/mockData';
-import { ArrowLeft, Camera, Lock, Save } from 'lucide-react';
+import {
+  getStoredProfileImage,
+  saveStoredProfileImage,
+  removeStoredProfileImage,
+  compressImageFile,
+} from '../../lib/profileImageStorage';
+import { ArrowLeft, Camera, Loader2, Lock, Save } from 'lucide-react';
 
 export const DelegateEditProfile: React.FC = () => {
   const router = useRouter();
-  const { currentUser, updateCurrentUser, showToast } = useStore();
+  const { currentUser, setCurrentUser, updateCurrentUser, showToast } = useStore();
   
   const [formData, setFormData] = useState({
     name: currentUser.name || '',
@@ -22,6 +28,23 @@ export const DelegateEditProfile: React.FC = () => {
     avatar: currentUser.avatar || '',
   });
 
+  const [isProcessingPhoto, setIsProcessingPhoto] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Sync profile image from email-scoped localStorage on mount and when user's email changes
+  useEffect(() => {
+    const userEmail = currentUser?.email;
+    if (userEmail) {
+      const storedImage = getStoredProfileImage(userEmail);
+      if (storedImage) {
+        setFormData((prev) => ({ ...prev, avatar: storedImage }));
+        return;
+      }
+    }
+    // If no stored image for this specific email, fallback to default/initial avatar
+    setFormData((prev) => ({ ...prev, avatar: currentUser?.avatar || '' }));
+  }, [currentUser?.email, currentUser?.avatar]);
+
   const completionPercentage = calculateProfileCompletion(formData);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -29,33 +52,72 @@ export const DelegateEditProfile: React.FC = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  /**
+   * Processes uploaded photo using HTML5 Canvas, compresses to <=300x300 at 0.7 quality,
+   * and saves to email-scoped localStorage without making any database/API calls.
+   */
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      if (file.size > 3 * 1024 * 1024) {
-        showToast('Image size should be under 3MB', 'error');
+    if (!file) return;
+
+    const userEmail = currentUser?.email;
+    if (!userEmail) {
+      showToast('Please log in with a valid email address to save a profile photo.', 'error');
+      return;
+    }
+
+    // Reset input so user can choose the same file again if desired
+    e.target.value = '';
+
+    setIsProcessingPhoto(true);
+    try {
+      // 1. Resize and compress via HTML5 Canvas (max 300x300, 0.7 quality WebP/JPEG)
+      const compressedBase64 = await compressImageFile(file, 300, 300, 0.7);
+
+      // 2. Save to email-scoped localStorage key (e.g. profile_image_user@domain.com)
+      const saveResult = saveStoredProfileImage(userEmail, compressedBase64);
+      if (!saveResult.success) {
+        showToast(saveResult.error || 'Failed to save image to browser storage.', 'error');
         return;
       }
-      const reader = new FileReader();
-      reader.onload = () => {
-        if (typeof reader.result === 'string') {
-          setFormData((prev) => ({ ...prev, avatar: reader.result as string }));
-          showToast('Profile photo updated ✓', 'success');
-        }
-      };
-      reader.readAsDataURL(file);
+
+      // 3. Immediately update UI state without making any database/API upload calls
+      setFormData((prev) => ({ ...prev, avatar: compressedBase64 }));
+      setCurrentUser((prev) => ({ ...prev, avatar: compressedBase64 }));
+
+      showToast('Profile photo updated ✓', 'success');
+    } catch (err: any) {
+      showToast(err?.message || 'Failed to process image. Please try another file.', 'error');
+    } finally {
+      setIsProcessingPhoto(false);
     }
   };
 
-  const [isSaving, setIsSaving] = useState(false);
+  /**
+   * Removes the profile photo from email-scoped localStorage and resets the avatar state.
+   */
+  const handleRemovePhoto = () => {
+    const userEmail = currentUser?.email;
+    if (userEmail) {
+      removeStoredProfileImage(userEmail);
+    }
+    setFormData((prev) => ({ ...prev, avatar: '' }));
+    setCurrentUser((prev) => ({ ...prev, avatar: '' }));
+    showToast('Profile photo removed', 'info');
+  };
 
+  /**
+   * Saves text fields to backend profile, excluding large Base64 avatar payload.
+   */
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      await updateCurrentUser(formData);
+      // Exclude base64 avatar from backend API payload (avatar is managed locally via localStorage)
+      const { avatar, ...profileFields } = formData;
+      await updateCurrentUser(profileFields);
       router.push('/delegate/profile');
     } catch {
-      // toast shown by store
+      // error toast handled by store
     } finally {
       setIsSaving(false);
     }
@@ -76,7 +138,7 @@ export const DelegateEditProfile: React.FC = () => {
         </div>
         <button
           onClick={handleSave}
-          disabled={isSaving}
+          disabled={isSaving || isProcessingPhoto}
           className="bg-[#181818] hover:bg-[#333] text-white text-[11.5px] font-semibold px-3.5 py-1.5 rounded-full flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs active:scale-95 disabled:opacity-50"
         >
           <Save className="w-3.5 h-3.5" />
@@ -119,22 +181,28 @@ export const DelegateEditProfile: React.FC = () => {
               </div>
             )}
             <label className="absolute -bottom-1 -right-1 w-6 h-6 bg-[#181818] hover:bg-[#333] text-white rounded-full flex items-center justify-center shadow-md transition-colors cursor-pointer">
-              <Camera className="w-3.5 h-3.5" />
+              {isProcessingPhoto ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              ) : (
+                <Camera className="w-3.5 h-3.5" />
+              )}
               <input 
                 type="file" 
                 accept="image/*" 
                 className="hidden" 
+                disabled={isProcessingPhoto}
                 onChange={handlePhotoUpload} 
               />
             </label>
           </div>
           <div className="flex items-center gap-2 mt-2 text-[12px]">
             <label className="font-semibold text-[#181818] hover:underline cursor-pointer">
-              Change Photo
+              {isProcessingPhoto ? 'Compressing...' : 'Change Photo'}
               <input 
                 type="file" 
                 accept="image/*" 
                 className="hidden" 
+                disabled={isProcessingPhoto}
                 onChange={handlePhotoUpload} 
               />
             </label>
@@ -143,8 +211,9 @@ export const DelegateEditProfile: React.FC = () => {
                 <span className="text-[#D1D5DB]">·</span>
                 <button
                   type="button"
-                  onClick={() => setFormData((prev) => ({ ...prev, avatar: '' }))}
-                  className="font-medium text-[#DC2626] hover:underline cursor-pointer"
+                  onClick={handleRemovePhoto}
+                  disabled={isProcessingPhoto}
+                  className="font-medium text-[#DC2626] hover:underline cursor-pointer disabled:opacity-50"
                 >
                   Remove
                 </button>

@@ -1,11 +1,12 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Building, Calendar, ChevronRight, HelpCircle, LogOut, Pencil, Star } from 'lucide-react';
 
 import { useStore } from '../../lib/store';
 import { calculateProfileCompletion } from '../../lib/mockData';
+import { getStoredProfileImage } from '../../lib/profileImageStorage';
 
 interface DelegateProfileProps {
   onOpenPrivacyModal?: () => void;
@@ -16,6 +17,7 @@ export const DelegateProfile: React.FC<DelegateProfileProps> = () => {
   const router = useRouter();
   const {
     currentUser,
+    setCurrentUser,
     savedPeopleIds,
     sessions,
     showToast,
@@ -28,10 +30,21 @@ export const DelegateProfile: React.FC<DelegateProfileProps> = () => {
     setScheduleSubTab,
   } = useStore();
 
-  const handleLogout = () => {
+    const handleLogout = () => {
     logout();
     router.push('/delegate/home');
   };
+
+  // Sync email-scoped profile image from localStorage
+  useEffect(() => {
+    const userEmail = currentUser?.email;
+    if (userEmail) {
+      const storedImage = getStoredProfileImage(userEmail);
+      if (storedImage && storedImage !== currentUser.avatar) {
+        setCurrentUser((prev) => ({ ...prev, avatar: storedImage }));
+      }
+    }
+  }, [currentUser?.email]);
 
   const savedSessionsCount = sessions.filter((s) => s.isBookmarked).length;
   const profileCompletion = calculateProfileCompletion(currentUser); 

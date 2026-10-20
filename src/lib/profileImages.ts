@@ -327,6 +327,11 @@ export function getProfileAvatar(
     id = person.id || '';
   }
 
+  // If avatar is already a local Base64 Data URL, return directly
+  if (avatar && avatar.startsWith('data:')) {
+    return avatar;
+  }
+
   // 1. Try Cloudinary match by person name, id, or avatar path
   const cloudUrl =
     getCloudinaryProfileUrl(name) ||

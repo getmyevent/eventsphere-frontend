@@ -31,6 +31,7 @@ import {
   INITIAL_INTERESTED_VISITORS
 } from './mockData';
 import { api } from './api';
+import { getStoredProfileImage } from './profileImageStorage';
 
 
 export const EMPTY_USER: Person = {
@@ -377,6 +378,12 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         const parsed = JSON.parse(saved);
         if (parsed.currentUser && parsed.currentUser.id === authUser.id) {
           const u = { ...EMPTY_USER, ...parsed.currentUser };
+          if (u.email) {
+            const storedImg = getStoredProfileImage(u.email);
+            if (storedImg) {
+              u.avatar = storedImg;
+            }
+          }
           if (!u.privacy || (u.privacy.preset as any) === 'Private') {
             u.privacy = {
               preset: 'Connections Only',

@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useStore } from '../../lib/store';
 import { api } from '../../lib/api';
+import { getStoredProfileImage } from '../../lib/profileImageStorage';
 import { CURRENT_USER, INITIAL_ATTENDEES } from '../../lib/mockData';
 import { Person, DemoRole, RoleType } from '../../types';
 import {
@@ -300,7 +301,7 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
       role: personRole,
       email: backendUser.email || '',
       mobile: backendUser.mobile || '',
-      avatar: backendUser.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=181818&color=ffffff&bold=true`,
+      avatar: getStoredProfileImage(backendUser.email) || backendUser.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=181818&color=ffffff&bold=true`,
       bio: backendUser.bio || '',
       linkedin: backendUser.linkedin || '',
       twitter: backendUser.twitter || '',
@@ -335,7 +336,7 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
       mobile: '',
       linkedin: '',
       twitter: '',
-      avatar: userAvatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(derivedName)}&background=181818&color=ffffff&bold=true`,
+      avatar: getStoredProfileImage(userEmail) || userAvatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(derivedName)}&background=181818&color=ffffff&bold=true`,
       bio: '',
       interests: ['Semiconductors', 'VLSI Design', 'AI Infrastructure'],
       skills: ['Technology'],
