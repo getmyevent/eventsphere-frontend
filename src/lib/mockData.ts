@@ -1,4 +1,5 @@
 import { GENERATED_ATTENDEES, GENERATED_EXHIBITORS, GENERATED_PRODUCTS } from "./generatedData";
+import { sortExhibitors } from "./exhibitorSort";
 import {
   EventMetadata,
   Person,
@@ -4795,9 +4796,9 @@ export const INITIAL_POLL: Poll = {
   ],
 };
 
-export const INITIAL_EXHIBITORS: ExhibitorStats[] = [
+export const INITIAL_EXHIBITORS: ExhibitorStats[] = sortExhibitors([
   ...GENERATED_EXHIBITORS,
-];
+]);
 
 export const INITIAL_LEADS: Lead[] = [
   {
