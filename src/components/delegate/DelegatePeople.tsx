@@ -11,6 +11,7 @@ import {
 import { useStore } from '../../lib/store';
 import { RECOMMENDED_PEOPLE_IDS } from '../../lib/mockData';
 import { Person } from '../../types';
+import { getOptimizedAvatarUrl } from '../../lib/cloudinary';
 
 
 
@@ -201,8 +202,10 @@ export const DelegatePeople: React.FC = () => {
                 <div className="flex items-center gap-3 overflow-hidden flex-1 min-w-0">
                   {person.avatar ? (
                     <img
-                      src={person.avatar}
+                      src={getOptimizedAvatarUrl(person.avatar, 96)}
                       alt={person.name}
+                      loading="lazy"
+                      decoding="async"
                       className="w-12 h-12 rounded-full object-cover object-top flex-shrink-0 shadow-xs border border-[#E5E7EB]"
                     />
                   ) : (

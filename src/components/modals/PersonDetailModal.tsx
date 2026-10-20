@@ -319,6 +319,7 @@ export const PersonDetailModal: React.FC = () => {
                   <img
                     src={getProfileAvatar(person)}
                     alt={person.name}
+                    decoding="async"
                     className="w-full h-full object-cover"
                     onError={(e) => {
                       e.currentTarget.style.display = 'none';

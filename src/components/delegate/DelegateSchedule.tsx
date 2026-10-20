@@ -19,6 +19,7 @@ import { useStore } from '../../lib/store';
 import { INITIAL_ATTENDEES, INITIAL_SESSIONS } from '../../lib/mockData';
 import { Session, Person, SessionSpeakerInfo } from '../../types';
 import { getCloudinaryProfileUrl } from '../../lib/profileImages';
+import { getOptimizedAvatarUrl } from '../../lib/cloudinary';
 
 const getSessionImage = (session: Session) => {
   const stageImages = [
@@ -466,8 +467,10 @@ export const DelegateSchedule: React.FC = () => {
                     <div className="flex items-center gap-3 min-w-0 flex-1">
                       {spk.avatar ? (
                         <img
-                          src={spk.avatar}
+                          src={getOptimizedAvatarUrl(spk.avatar, 96)}
                           alt={spk.name}
+                          loading="lazy"
+                          decoding="async"
                           className="w-12 h-12 rounded-full object-cover border border-[#E5E7EB] flex-shrink-0 shadow-xs group-hover:ring-2 group-hover:ring-[#DC2626]/20 transition-all"
                         />
                       ) : (

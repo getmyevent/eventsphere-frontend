@@ -1,18 +1,32 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { usePathname, useRouter } from 'next/navigation';
 import { useStore } from '../../lib/store';
 import { PhoneFrame } from '../../components/shell/PhoneFrame';
 import { DelegateBottomNavRouted } from '../../components/delegate/DelegateBottomNavRouted';
-import { PersonDetailModal } from '../../components/modals/PersonDetailModal';
-import { ContactPrivacyModal } from '../../components/modals/ContactPrivacyModal';
-import { MyQRCodeModal } from '../../components/modals/MyQRCodeModal';
-import { AccessScreen } from '../../components/auth/AccessScreen';
 import { CheckCircle2, Info, AlertCircle } from 'lucide-react';
 
+const PersonDetailModal = dynamic(
+  () => import('../../components/modals/PersonDetailModal').then((mod) => mod.PersonDetailModal),
+  { ssr: false }
+);
+const ContactPrivacyModal = dynamic(
+  () => import('../../components/modals/ContactPrivacyModal').then((mod) => mod.ContactPrivacyModal),
+  { ssr: false }
+);
+const MyQRCodeModal = dynamic(
+  () => import('../../components/modals/MyQRCodeModal').then((mod) => mod.MyQRCodeModal),
+  { ssr: false }
+);
+const AccessScreen = dynamic(
+  () => import('../../components/auth/AccessScreen').then((mod) => mod.AccessScreen),
+  { ssr: false }
+);
+
 export default function DelegateLayout({ children }: { children: React.ReactNode }) {
-  const { role, hasAccessConfirmed, setHasAccessConfirmed, toast } = useStore();
+  const { role, hasAccessConfirmed, setHasAccessConfirmed, selectedPersonId, toast } = useStore();
   const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
   const [isQRModalOpen, setIsQRModalOpen] = useState(false);
   const router = useRouter();
@@ -36,16 +50,20 @@ export default function DelegateLayout({ children }: { children: React.ReactNode
   return (
     <div className="bg-[#F6F4F0] min-h-[100dvh] flex flex-col font-sans">
       {/* Modals */}
-      <ContactPrivacyModal
-        isOpen={isPrivacyModalOpen}
-        onClose={() => setIsPrivacyModalOpen(false)}
-      />
-      <MyQRCodeModal
-        isOpen={isQRModalOpen}
-        onClose={() => setIsQRModalOpen(false)}
-        onOpenPrivacy={() => setIsPrivacyModalOpen(true)}
-      />
-      <PersonDetailModal />
+      {isPrivacyModalOpen && (
+        <ContactPrivacyModal
+          isOpen={isPrivacyModalOpen}
+          onClose={() => setIsPrivacyModalOpen(false)}
+        />
+      )}
+      {isQRModalOpen && (
+        <MyQRCodeModal
+          isOpen={isQRModalOpen}
+          onClose={() => setIsQRModalOpen(false)}
+          onOpenPrivacy={() => setIsPrivacyModalOpen(true)}
+        />
+      )}
+      {selectedPersonId && <PersonDetailModal />}
 
       <PhoneFrame>
         {/* Mobile Toast */}

@@ -28,14 +28,18 @@ import {
   Building2,
   Handshake,
 } from 'lucide-react';
-
+import {
+  getOptimizedAvatarUrl,
+  getOptimizedThumbnailUrl,
+  getOptimizedCardImageUrl,
+} from '../../lib/cloudinary';
 
 const FOUNDERS = [
   {
     id: 'att-hari-gupta',
     name: 'Hari Gupta',
     role: 'Co-Founder',
-    avatar: 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792450462/hari.png',
+    avatar: getOptimizedAvatarUrl('https://res.cloudinary.com/vc0wtqtw/image/upload/v1792450462/hari.png', 300),
     linkedin: 'https://www.linkedin.com/in/hari-gupta-159948330',
   },
   {
@@ -604,8 +608,10 @@ export const DelegateHome: React.FC = () => {
                       <div className="flex items-center gap-2.5">
                         {person.avatar ? (
                            <img
-                            src={person.avatar}
+                            src={getOptimizedAvatarUrl(person.avatar, 70)}
                             alt={person.name}
+                            loading="lazy"
+                            decoding="async"
                             className="w-[34px] h-[34px] rounded-full object-cover flex-shrink-0"
                           />
                         ) : (
@@ -677,8 +683,10 @@ export const DelegateHome: React.FC = () => {
                     <div className="w-9 h-9 rounded-xl bg-white border border-[#E5E7EB] overflow-hidden flex items-center justify-center font-bold text-sm text-[#181818] flex-shrink-0">
                       {company.logo ? (
                         <img
-                          src={company.logo}
+                          src={getOptimizedThumbnailUrl(company.logo, 80)}
                           alt={company.company}
+                          loading="lazy"
+                          decoding="async"
                           className="w-full h-full object-contain p-0.5"
                           onError={(e) => {
                             e.currentTarget.onerror = null;
@@ -746,8 +754,10 @@ export const DelegateHome: React.FC = () => {
               {/* Photo Container */}
               <div className="relative w-full aspect-[4/3] rounded-[14px] overflow-hidden bg-slate-100 shrink-0 border border-slate-200/70">
                 <img
-                  src={founder.avatar}
+                  src={getOptimizedCardImageUrl(founder.avatar, 300)}
                   alt={founder.name}
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover object-top transition-transform duration-300 group-hover:scale-105"
                   onError={(e) => {
                     e.currentTarget.onerror = null;

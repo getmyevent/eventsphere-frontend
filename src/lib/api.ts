@@ -170,67 +170,131 @@ class ApiClient {
     }
   }
 
-  private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-    const url = endpoint.startsWith('http') ? endpoint : `${API_BASE_URL}${endpoint}`;
-    const token = this.getToken();
+  private inFlightRequests = new Map<string, Promise<any>>();
+  private cache = new Map<string, { data: any; expiry: number }>();
 
-    const headers: Record<string, string> = {
-      ...(options.headers as Record<string, string>),
-    };
-
-    if (!(options.body instanceof FormData) && !headers['Content-Type']) {
-      headers['Content-Type'] = 'application/json';
+  public invalidateCache(pattern?: string) {
+    if (!pattern) {
+      this.cache.clear();
+      return;
     }
-
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
-
-    const response = await fetch(url, {
-      ...options,
-      headers,
+    this.cache.forEach((_, key) => {
+      if (key.includes(pattern)) {
+        this.cache.delete(key);
+      }
     });
+  }
 
-    if (response.status === 401 && !endpoint.includes('/auth') && !this.token?.startsWith('mpss26-delegate-token-')) {
-      this.clearAuth();
-      if (typeof window !== 'undefined') {
-        try {
-          localStorage.removeItem('eventsphere_mpss26_store_v13');
-          window.dispatchEvent(new CustomEvent('eventsphere:unauthorized'));
-        } catch {
-          // ignore
+  private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+    const method = (options.method || 'GET').toUpperCase();
+    const isGet = method === 'GET';
+
+    // If mutation (POST/PUT/DELETE/PATCH), invalidate cache
+    if (!isGet) {
+      this.cache.clear();
+    }
+
+    const token = this.getToken();
+    const cacheKey = `${token || 'anon'}:${method}:${endpoint}`;
+
+    // Return cached response if valid and not expired
+    if (isGet) {
+      const cached = this.cache.get(cacheKey);
+      if (cached && cached.expiry > Date.now()) {
+        return Promise.resolve(cached.data as T);
+      }
+
+      // Deduplicate in-flight GET requests
+      const inFlight = this.inFlightRequests.get(cacheKey);
+      if (inFlight) {
+        return inFlight as Promise<T>;
+      }
+    }
+
+    const fetchPromise = (async () => {
+      try {
+        const url = endpoint.startsWith('http') ? endpoint : `${API_BASE_URL}${endpoint}`;
+        const headers: Record<string, string> = {
+          ...(options.headers as Record<string, string>),
+        };
+
+        if (!(options.body instanceof FormData) && !headers['Content-Type']) {
+          headers['Content-Type'] = 'application/json';
+        }
+
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+
+        const response = await fetch(url, {
+          ...options,
+          headers,
+        });
+
+        if (response.status === 401 && !endpoint.includes('/auth') && !this.token?.startsWith('mpss26-delegate-token-')) {
+          this.clearAuth();
+          if (typeof window !== 'undefined') {
+            try {
+              localStorage.removeItem('eventsphere_mpss26_store_v13');
+              window.dispatchEvent(new CustomEvent('eventsphere:unauthorized'));
+            } catch {
+              // ignore
+            }
+          }
+          throw new Error('Session expired or unauthorized. Please log in.');
+        }
+
+        if (response.status === 204) {
+          return {} as T;
+        }
+
+        const contentType = response.headers.get('content-type') || '';
+        const isJson = contentType.includes('application/json');
+
+        if (!response.ok) {
+          let errorMessage = `Request failed with status ${response.status}`;
+          if (isJson) {
+            try {
+              const errData = await response.json();
+              errorMessage = errData.message || errData.error || errorMessage;
+            } catch {
+              // ignore
+            }
+          } else {
+            const text = await response.text();
+            if (text) errorMessage = text;
+          }
+          throw new Error(errorMessage);
+        }
+
+        let result: T;
+        if (isJson) {
+          result = (await response.json()) as T;
+        } else {
+          result = (await response.text()) as unknown as T;
+        }
+
+        // Cache GET responses for 5 seconds (5000ms)
+        if (isGet) {
+          this.cache.set(cacheKey, {
+            data: result,
+            expiry: Date.now() + 5000,
+          });
+        }
+
+        return result;
+      } finally {
+        if (isGet) {
+          this.inFlightRequests.delete(cacheKey);
         }
       }
-      throw new Error('Session expired or unauthorized. Please log in.');
+    })();
+
+    if (isGet) {
+      this.inFlightRequests.set(cacheKey, fetchPromise);
     }
 
-    if (response.status === 204) {
-      return {} as T;
-    }
-
-    const contentType = response.headers.get('content-type') || '';
-    const isJson = contentType.includes('application/json');
-
-    if (!response.ok) {
-      let errorMessage = `Request failed with status ${response.status}`;
-      if (isJson) {
-        try {
-          const errData = await response.json();
-          errorMessage = errData.message || errData.error || errorMessage;
-        } catch {
-          // ignore
-        }
-      } else {
-        const text = await response.text();
-        if (text) errorMessage = text;
-      }
-      throw new Error(errorMessage);
-    }
-
-    if (isJson) {
-      return response.json() as Promise<T>;
-    }
-    return response.text() as unknown as Promise<T>;
+    return fetchPromise;
   }
 
   private async requestWithResponse<T>(endpoint: string, options: RequestInit = {}): Promise<{ data: T; headers: Headers }> {

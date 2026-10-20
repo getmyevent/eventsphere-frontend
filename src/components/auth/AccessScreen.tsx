@@ -807,7 +807,6 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
                 </div>
               </div>
 
-<<<<<<< HEAD
               {/* Continue with Google Button */}
               <button
                 type="button"
@@ -825,35 +824,8 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
                     <GoogleIcon size={18} className="w-[18px] h-[18px] shrink-0" />
                     <span>Continue with Google</span>
                   </>
-=======
-              {/* Official Google Sign In Container & Fallback */}
-              <div className="w-full flex flex-col items-center">
-                <div
-                  ref={googleButtonContainerRef}
-                  className={`w-full flex justify-center ${isGisReady ? 'min-h-[44px]' : 'hidden'}`}
-                />
-                {(!isGisReady || isGoogleLoading) && (
-                  <button
-                    type="button"
-                    onClick={handleGoogleSignIn}
-                    disabled={status === 'sending' || isGoogleLoading}
-                    className="w-full h-12 bg-white hover:bg-[#F9FAFB] active:scale-[0.98] border border-[#E5E7EB] text-[#1F2937] font-semibold text-[13.5px] rounded-xl shadow-2xs transition-all flex items-center justify-center gap-3 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
-                  >
-                    {isGoogleLoading ? (
-                      <>
-                        <Loader2 className="w-4 h-4 animate-spin text-[#B51F32]" />
-                        <span>Connecting with Google...</span>
-                      </>
-                    ) : (
-                      <>
-                        <GoogleIcon className="w-5 h-5 shrink-0" />
-                        <span>Continue with Google</span>
-                      </>
-                    )}
-                  </button>
->>>>>>> 7d626f7193bc9a7d9cbb52f99c4b6df0ef14c1c8
                 )}
-              </div>
+              </button>
 
               {/* Footer Trust Badges */}
               <div className="mt-3.5 pb-0.5 flex items-center justify-center gap-3 text-[11px] font-medium text-[#6B7280]">
