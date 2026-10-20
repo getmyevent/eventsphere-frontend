@@ -78,13 +78,33 @@ export const CLOUDINARY_PROFILE_PHOTOS: Record<string, string> = {
   'ashok-barnwal': 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792435975/ashok-barnwal.jpg',
   'dr-mohan-yadav': 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792435195/dr-mohan-yadav.jpg',
   'hari-gupta': 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792450462/hari.png',
-  'hari': 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792450462/hari.png',
   'pratosh-bansal': 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792442670/pratosh_bansal.png',
   'rochak-gunavdiya': 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792442670/rochak_gunavdiya.png',
   'sagar-kature': 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792442670/sagar_kature.png',
   'vaibhav-neema': 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792451701/vaibhav.png',
-  'vaibhav': 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792451701/vaibhav.png',
   'vipul-jaiswal': 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792442671/vipul_jaiswal.png',
+  'm-selvendran': 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792502525/m-selvendran.jpg',
+  'mahip-kishore-tejasvi': 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792502526/mahip-kishore-tejasvi.jpg',
+  'avantika-verma': 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792502498/avantika-verma.jpg',
+  'avinash-sharma': 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792502497/avinash-sharma.jpg',
+  'manoj-sethiya': 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792502531/manoj-sethiya.jpg',
+  'abhishek-pandit': 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792502570/abhishek-pandit.png',
+  'shailendra-raghuwanshi': 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792502537/shailendra-raghuwanshi.jpg',
+  'mayank-nagar': 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792502533/mayank-nagar.png',
+  'ashish-tiwari': 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792502537/ashish-tiwari.png',
+  'shivangi-kushwah': 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792502571/shivangi-kushwah.png',
+  'dhwaj-sharma': 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792502513/dhwaj-sharma.jpg',
+  'rishi-pandey': 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792502536/rishi-pandey.png',
+  'prof-santosh-kumar-vishvakarma': 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792502537/prof-santosh-kumar-vishvakarma.png',
+  'priyanka-gajbhiye': 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792502535/priyanka-gajbhiye.jpg',
+  'jaya-r-koshta': 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792502517/jaya-r-koshta.png',
+  'swati-chauhan': 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792502538/swati-chauhan.jpg',
+  'anshul-puriya': 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792502487/anshul-puriya.jpg',
+  'horil-dev-rajak': 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792502509/horil-dev-rajak.jpg',
+  'akshay-verma': 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792502511/akshay-verma.png',
+  'kishan-kumar': 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792502556/kishan-kumar.png',
+  'devendra-gwal': 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792502494/devendra-gwal.jpg',
+  'devesh-kumar-basal': 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792502532/devesh-kumar-basal.png',
   'sarthak-bouddh': 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792442671/sarthak_bouddh.png',
   'akarshan-tyagi': 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792442853/akarshan_tyagi.png',
   'alok-kuchlous': 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792449620/alok-kuchlous.png',
@@ -124,6 +144,10 @@ export const CLOUDINARY_PROFILE_PHOTOS: Record<string, string> = {
 function normalizeKey(str: string): string {
   if (!str) return '';
   let s = str.toLowerCase().trim();
+  // If it's a ui-avatars.com URL, return empty string so it's never treated as a real photo path
+  if (s.includes('ui-avatars.com')) {
+    return '';
+  }
   // Strip url / path
   if (s.includes('/')) {
     s = s.split('/').pop() || s;
@@ -146,7 +170,9 @@ const NORMALIZED_LOOKUP: Record<string, string> = {};
 
 Object.entries(CLOUDINARY_PROFILE_PHOTOS).forEach(([key, url]) => {
   const norm = normalizeKey(key);
-  NORMALIZED_LOOKUP[norm] = url;
+  if (norm) {
+    NORMALIZED_LOOKUP[norm] = url;
+  }
 });
 
 // Common name aliases and speaker variations
@@ -189,24 +215,87 @@ Object.entries(ALIASES).forEach(([alias, targetKey]) => {
 export function getCloudinaryProfileUrl(query?: string | null): string | undefined {
   if (!query) return undefined;
   
+  // If query is or contains a ui-avatars placeholder, return undefined
+  if (query.includes('ui-avatars.com')) {
+    return undefined;
+  }
+
   // If already a Cloudinary URL, return as-is
   if (query.includes('res.cloudinary.com')) {
     return query;
   }
 
   const clean = normalizeKey(query);
+  if (!clean || clean.length < 3) {
+    return undefined;
+  }
+
+  // 1. Direct normalized lookup
   if (NORMALIZED_LOOKUP[clean]) {
     return NORMALIZED_LOOKUP[clean];
   }
 
-  // Substring matching for full names (e.g. "Dr. Mohan Yadav")
+  // 2. Direct alias lookup
+  if (ALIASES[clean] && NORMALIZED_LOOKUP[normalizeKey(ALIASES[clean])]) {
+    return NORMALIZED_LOOKUP[normalizeKey(ALIASES[clean])];
+  }
+
+  // 3. Substring matching for full titles (e.g. query is "Hon'ble Chief Minister Dr. Mohan Yadav")
+  // ONLY if clean (the query) includes a full normKey of length >= 8.
+  // NEVER do normKey.includes(clean), which mistakenly matches short/partial names to other people!
   for (const [normKey, url] of Object.entries(NORMALIZED_LOOKUP)) {
-    if (clean.includes(normKey) || normKey.includes(clean)) {
+    if (normKey.length >= 8 && clean.includes(normKey)) {
       return url;
     }
   }
 
   return undefined;
+}
+
+/**
+ * Determines whether a person actually has a genuine profile photo
+ * (either hosted on Cloudinary or a valid non-placeholder image).
+ */
+export function hasRealProfilePhoto(
+  person: { name?: string; avatar?: string; id?: string } | string | null | undefined
+): boolean {
+  if (!person) return false;
+  let name = '';
+  let avatar = '';
+  let id = '';
+
+  if (typeof person === 'string') {
+    name = person;
+    avatar = person;
+  } else {
+    name = person.name || '';
+    avatar = person.avatar || '';
+    id = person.id || '';
+  }
+
+  const cloudUrl =
+    getCloudinaryProfileUrl(name) ||
+    getCloudinaryProfileUrl(id) ||
+    (avatar && !avatar.includes('ui-avatars.com') ? getCloudinaryProfileUrl(avatar) : undefined);
+
+  if (cloudUrl) return true;
+
+  if (
+    avatar &&
+    !avatar.includes('ui-avatars.com') &&
+    !avatar.startsWith('/images/speakers/default') &&
+    !avatar.startsWith('/images/avatars/default') &&
+    avatar !== '/images/avatars/santosh-kumar.png' &&
+    avatar !== '/images/avatars/hari-gupta.jpg' &&
+    avatar !== '/images/avatars/hari-gupta.png' &&
+    avatar !== '/images/mentors/pratosh-bansal.jpg' &&
+    avatar !== '/images/mentors/vaibhav-neema.jpg' &&
+    !avatar.startsWith('/images/founders/hari-gupta')
+  ) {
+    return true;
+  }
+
+  return false;
 }
 
 /**
@@ -235,21 +324,22 @@ export function getProfileAvatar(
     id = person.id || '';
   }
 
-  // 1. Try Cloudinary match by avatar path, id, or person name
+  // 1. Try Cloudinary match by person name, id, or avatar path
   const cloudUrl =
-    getCloudinaryProfileUrl(avatar) ||
     getCloudinaryProfileUrl(name) ||
-    getCloudinaryProfileUrl(id);
+    getCloudinaryProfileUrl(id) ||
+    (avatar && !avatar.includes('ui-avatars.com') ? getCloudinaryProfileUrl(avatar) : undefined);
 
   if (cloudUrl) {
     return cloudUrl;
   }
 
-  // 2. If avatar is an external URL (e.g. unsplash) or a founder/mentor photo, use it
+  // 2. If avatar is a real photo URL (hosted or external, but NOT ui-avatars.com placeholder)
   if (
     avatar &&
-    !avatar.startsWith('/images/speakers/') &&
-    !avatar.startsWith('/images/team/') &&
+    !avatar.includes('ui-avatars.com') &&
+    !avatar.startsWith('/images/speakers/default') &&
+    !avatar.startsWith('/images/avatars/default') &&
     avatar !== '/images/avatars/santosh-kumar.png' &&
     avatar !== '/images/avatars/hari-gupta.jpg' &&
     avatar !== '/images/avatars/hari-gupta.png' &&

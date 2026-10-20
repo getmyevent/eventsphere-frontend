@@ -192,18 +192,6 @@ export const DelegateEditProfile: React.FC = () => {
               className="w-full px-3 py-2 rounded-lg border border-[#DEDCD7] text-[12.5px] focus:outline-none focus:ring-1 focus:ring-[#181818]"
             />
           </div>
-
-          <div className="space-y-1">
-            <label className="text-[11.5px] font-semibold text-[#6B6B6B]">Bio</label>
-            <textarea
-              name="bio"
-              placeholder="A brief bio about yourself and your work..."
-              value={formData.bio}
-              onChange={handleChange}
-              rows={3}
-              className="w-full px-3 py-2 rounded-lg border border-[#DEDCD7] text-[12.5px] focus:outline-none focus:ring-1 focus:ring-[#181818] resize-none"
-            />
-          </div>
         </div>
 
         {/* Contact & Social Links */}

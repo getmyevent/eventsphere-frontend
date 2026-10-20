@@ -11,49 +11,39 @@ import {
   X,
   MapPin,
   ExternalLink,
-  Layers,
-  FileImage,
   Sparkles,
   Info,
   Maximize2,
   Minimize2,
+  Download,
 } from 'lucide-react';
 import { FLOOR_PLAN_BOOTHS, FloorBooth } from '@/data/floorPlanData';
 import { useStore } from '@/lib/store';
 import { findExhibitorBySlug, getCompanySlug } from '@/lib/exhibitorSlug';
-
-type CategoryFilter = 'All' | 'Semiconductor & Design' | 'Government & Nodal' | 'Academia & Research' | 'Instrumentation & Test' | 'IoT, Cloud & Robotics';
-type ActiveView = 'blueprint' | 'original';
 
 export const DelegateMap: React.FC = () => {
   const router = useRouter();
   const { exhibitors, setSelectedCompanyId } = useStore();
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<CategoryFilter>('All');
   const [selectedBooth, setSelectedBooth] = useState<FloorBooth | null>(null);
-  const [activeView, setActiveView] = useState<ActiveView>('blueprint');
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
-  const [origZoom, setOrigZoom] = useState(1);
-  const [origPan, setOrigPan] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
-  // Filtered booths based on search query and category
+  // Filtered booths based on search query
   const filteredBooths = useMemo(() => {
+    if (!searchQuery.trim()) return FLOOR_PLAN_BOOTHS;
+    const q = searchQuery.toLowerCase().trim();
     return FLOOR_PLAN_BOOTHS.filter((b) => {
-      const matchesCategory = selectedCategory === 'All' || b.category === selectedCategory;
-      if (!matchesCategory) return false;
-
-      if (!searchQuery.trim()) return true;
-      const q = searchQuery.toLowerCase().trim();
       const numStr = String(b.number).toLowerCase();
       const nameStr = b.name.toLowerCase();
       const descStr = (b.description || '').toLowerCase();
-      return numStr.includes(q) || nameStr.includes(q) || descStr.includes(q);
+      const catStr = (b.category || '').toLowerCase();
+      return numStr.includes(q) || nameStr.includes(q) || descStr.includes(q) || catStr.includes(q);
     });
-  }, [searchQuery, selectedCategory]);
+  }, [searchQuery]);
 
   const matchingIds = useMemo(() => {
     return new Set(filteredBooths.map((b) => b.id));
@@ -65,35 +55,7 @@ export const DelegateMap: React.FC = () => {
   panRef.current = pan;
   zoomRef.current = zoom;
 
-  const origContainerRef = useRef<HTMLDivElement>(null);
-  const origPanRef = useRef(origPan);
-  const origZoomRef = useRef(origZoom);
-  origPanRef.current = origPan;
-  origZoomRef.current = origZoom;
-  const [isOrigDragging, setIsOrigDragging] = useState(false);
-  const [origDragStart, setOrigDragStart] = useState({ x: 0, y: 0 });
-
   const gestureRef = useRef<{
-    isDragging: boolean;
-    dragStart: { x: number; y: number };
-    isPinching: boolean;
-    initialDistance: number;
-    initialZoom: number;
-    initialPan: { x: number; y: number };
-    initialMidpoint: { x: number; y: number };
-    lastTapTime: number;
-  }>({
-    isDragging: false,
-    dragStart: { x: 0, y: 0 },
-    isPinching: false,
-    initialDistance: 0,
-    initialZoom: 1,
-    initialPan: { x: 0, y: 0 },
-    initialMidpoint: { x: 0, y: 0 },
-    lastTapTime: 0,
-  });
-
-  const origGestureRef = useRef<{
     isDragging: boolean;
     dragStart: { x: number; y: number };
     isPinching: boolean;
@@ -121,34 +83,25 @@ export const DelegateMap: React.FC = () => {
     setPan({ x: 0, y: 0 });
   };
 
-  // Original view mouse handlers
-  const handleOrigMouseDown = (e: React.MouseEvent) => {
-    if (activeView !== 'original') return;
-    setIsOrigDragging(true);
-    setOrigDragStart({ x: e.clientX - origPan.x, y: e.clientY - origPan.y });
-  };
-
-  const handleOrigMouseMove = (e: React.MouseEvent) => {
-    if (!isOrigDragging || activeView !== 'original') return;
-    setOrigPan({
-      x: e.clientX - origDragStart.x,
-      y: e.clientY - origDragStart.y,
-    });
-  };
-
-  const handleOrigMouseUp = () => {
-    setIsOrigDragging(false);
+  // Download map image
+  const handleDownloadMap = () => {
+    const link = document.createElement('a');
+    link.href = '/images/floorplan/official-blueprint.png';
+    link.download = 'MPSS26-Floor-Plan-Map.png';
+    link.target = '_blank';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   // Drag-to-pan handlers (Mouse on desktop)
   const handleMouseDown = (e: React.MouseEvent) => {
-    if (activeView !== 'blueprint') return;
     setIsDragging(true);
     setDragStart({ x: e.clientX - pan.x, y: e.clientY - pan.y });
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging || activeView !== 'blueprint') return;
+    if (!isDragging) return;
     setPan({
       x: e.clientX - dragStart.x,
       y: e.clientY - dragStart.y,
@@ -162,7 +115,7 @@ export const DelegateMap: React.FC = () => {
   // Multi-touch gestures (Pinch-to-zoom with fingers + 1-finger pan + double-tap)
   useEffect(() => {
     const container = containerRef.current;
-    if (!container || activeView !== 'blueprint') return;
+    if (!container) return;
 
     const onTouchStart = (e: TouchEvent) => {
       if (e.touches.length === 1) {
@@ -280,126 +233,7 @@ export const DelegateMap: React.FC = () => {
       container.removeEventListener('touchcancel', onTouchEnd);
       container.removeEventListener('wheel', onWheel);
     };
-  }, [activeView]);
-
-  // Multi-touch gestures for Original Blueprint view (Pinch-to-zoom + 1-finger pan + double-tap + wheel)
-  useEffect(() => {
-    const container = origContainerRef.current;
-    if (!container || activeView !== 'original') return;
-
-    const onTouchStart = (e: TouchEvent) => {
-      if (e.touches.length === 1) {
-        const now = Date.now();
-        const touch = e.touches[0];
-
-        // Double-tap zoom detection (<300ms)
-        if (now - origGestureRef.current.lastTapTime < 300) {
-          e.preventDefault();
-          setOrigZoom((prev) => {
-            if (prev > 1.3) {
-              setOrigPan({ x: 0, y: 0 });
-              return 1.0;
-            } else {
-              return 2.5;
-            }
-          });
-          origGestureRef.current.lastTapTime = 0;
-          return;
-        }
-        origGestureRef.current.lastTapTime = now;
-
-        origGestureRef.current.isDragging = true;
-        origGestureRef.current.isPinching = false;
-        origGestureRef.current.dragStart = {
-          x: touch.clientX - origPanRef.current.x,
-          y: touch.clientY - origPanRef.current.y,
-        };
-      } else if (e.touches.length === 2) {
-        // Two fingers -> Start Pinch-to-zoom
-        e.preventDefault();
-        const t1 = e.touches[0];
-        const t2 = e.touches[1];
-        const dist = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
-        const midX = (t1.clientX + t2.clientX) / 2;
-        const midY = (t1.clientY + t2.clientY) / 2;
-
-        origGestureRef.current.isPinching = true;
-        origGestureRef.current.isDragging = false;
-        origGestureRef.current.initialDistance = dist;
-        origGestureRef.current.initialZoom = origZoomRef.current;
-        origGestureRef.current.initialPan = { ...origPanRef.current };
-        origGestureRef.current.initialMidpoint = { x: midX, y: midY };
-      }
-    };
-
-    const onTouchMove = (e: TouchEvent) => {
-      if (e.touches.length === 2 && origGestureRef.current.isPinching) {
-        e.preventDefault();
-        const t1 = e.touches[0];
-        const t2 = e.touches[1];
-        const dist = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
-        const midX = (t1.clientX + t2.clientX) / 2;
-        const midY = (t1.clientY + t2.clientY) / 2;
-
-        if (origGestureRef.current.initialDistance > 0) {
-          const factor = dist / origGestureRef.current.initialDistance;
-          const newZoom = Math.min(
-            Math.max(origGestureRef.current.initialZoom * factor, 0.6),
-            5.0
-          );
-          const deltaX = midX - origGestureRef.current.initialMidpoint.x;
-          const deltaY = midY - origGestureRef.current.initialMidpoint.y;
-
-          setOrigZoom(newZoom);
-          setOrigPan({
-            x: origGestureRef.current.initialPan.x + deltaX,
-            y: origGestureRef.current.initialPan.y + deltaY,
-          });
-        }
-      } else if (e.touches.length === 1 && origGestureRef.current.isDragging) {
-        const touch = e.touches[0];
-        setOrigPan({
-          x: touch.clientX - origGestureRef.current.dragStart.x,
-          y: touch.clientY - origGestureRef.current.dragStart.y,
-        });
-      }
-    };
-
-    const onTouchEnd = (e: TouchEvent) => {
-      if (e.touches.length === 1) {
-        const touch = e.touches[0];
-        origGestureRef.current.isPinching = false;
-        origGestureRef.current.isDragging = true;
-        origGestureRef.current.dragStart = {
-          x: touch.clientX - origPanRef.current.x,
-          y: touch.clientY - origPanRef.current.y,
-        };
-      } else if (e.touches.length === 0) {
-        origGestureRef.current.isDragging = false;
-        origGestureRef.current.isPinching = false;
-      }
-    };
-
-    const onWheel = (e: WheelEvent) => {
-      e.preventDefault();
-      const zoomFactor = e.deltaY < 0 ? 1.15 : 0.88;
-      setOrigZoom((prev) => Math.min(Math.max(prev * zoomFactor, 0.6), 5.0));
-    };
-
-    container.addEventListener('touchstart', onTouchStart, { passive: false });
-    container.addEventListener('touchmove', onTouchMove, { passive: false });
-    container.addEventListener('touchend', onTouchEnd, { passive: false });
-    container.addEventListener('touchcancel', onTouchEnd, { passive: false });
-    container.addEventListener('wheel', onWheel, { passive: false });
-
-    return () => {
-      container.removeEventListener('touchstart', onTouchStart);
-      container.removeEventListener('touchmove', onTouchMove);
-      container.removeEventListener('touchend', onTouchEnd);
-      container.removeEventListener('touchcancel', onTouchEnd);
-      container.removeEventListener('wheel', onWheel);
-    };
-  }, [activeView]);
+  }, []);
 
   // Center on a specific booth
   const handleSelectBooth = (booth: FloorBooth) => {
@@ -427,110 +261,54 @@ export const DelegateMap: React.FC = () => {
   return (
     <div className="flex-1 bg-[#F8F7F4] flex flex-col h-full overflow-hidden select-none">
       {/* Top Header */}
-      <div className="shrink-0 bg-[#F8F7F4] border-b border-[#E5E7EB] px-3.5 pt-3 pb-2.5 z-20">
-        <div className="flex items-center justify-between gap-2 mb-2">
-          <div className="flex items-center gap-2 min-w-0">
+      <div className="pt-4 pb-3 px-4 bg-[#F8F7F4] flex-shrink-0 z-20">
+        <div className="flex items-center justify-between gap-3 mb-3.5">
+          <div className="flex items-center gap-3 min-w-0">
             <button
               onClick={() => router.push('/delegate/home')}
-              className="w-8 h-8 rounded-full bg-white border border-[#DEDCD7] flex items-center justify-center text-[#181818] shadow-xs active:scale-95 transition-all shrink-0 cursor-pointer"
-              aria-label="Back to home"
+              className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-[#181818] transition-active active:scale-95 shadow-xs border border-gray-100 cursor-pointer shrink-0"
+              aria-label="Back to Home"
             >
-              <ChevronLeft className="w-4 h-4 stroke-[2.5]" />
+              <ChevronLeft className="w-5 h-5 stroke-[2.5]" />
             </button>
-            <div className="min-w-0">
-              <span className="text-[9.5px] uppercase tracking-[0.14em] text-[#6B6B6B] font-bold block">
-                MPSS26 · EXHIBITION HALL
-              </span>
-              <h1 className="text-[19px] font-bold text-[#181818] tracking-tight leading-tight truncate">
-                Floor Plan Map
-              </h1>
-            </div>
+            <h1 className="text-[22px] font-bold text-[#181818] tracking-tight truncate">
+              Floor Plan Map
+            </h1>
           </div>
 
-          {/* View Switcher Pills */}
-          <div className="flex items-center bg-[#EFECE6] p-0.5 rounded-xl border border-[#DCD7CD] shrink-0">
-            <button
-              onClick={() => setActiveView('blueprint')}
-              className={`px-3 py-1 rounded-lg text-[11px] font-bold flex items-center gap-1 transition-all ${
-                activeView === 'blueprint'
-                  ? 'bg-white text-[#181818] shadow-xs'
-                  : 'text-[#6B6B6B] hover:text-[#181818]'
-              }`}
-              title="Interactive Vector Floor Plan"
-            >
-              <Layers className="w-3.5 h-3.5" />
-              <span>Map</span>
-            </button>
-            <button
-              onClick={() => setActiveView('original')}
-              className={`px-3 py-1 rounded-lg text-[11px] font-bold flex items-center gap-1 transition-all ${
-                activeView === 'original'
-                  ? 'bg-white text-[#181818] shadow-xs'
-                  : 'text-[#6B6B6B] hover:text-[#181818]'
-              }`}
-              title="View Official Blueprint Image"
-            >
-              <FileImage className="w-3.5 h-3.5" />
-              <span>Original</span>
-            </button>
-          </div>
+          {/* Download Map Button */}
+          <button
+            onClick={handleDownloadMap}
+            className="h-10 px-3.5 rounded-xl bg-white border border-[#E5E7EB] hover:bg-[#FAF9F5] active:scale-95 text-[#181818] text-xs font-semibold flex items-center gap-1.5 shadow-xs transition-all cursor-pointer shrink-0"
+            title="Download Floor Plan Map"
+          >
+            <Download className="w-4 h-4 text-[#B51F32]" />
+            <span>Download</span>
+          </button>
         </div>
 
-        {/* Search & Category Filter Toolbar */}
-        <div className="space-y-2">
-          {/* Search bar */}
-          <div className="relative">
-            <Search className="w-3.5 h-3.5 text-[#9CA3AF] absolute left-3 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by booth number or exhibitor name..."
-              className="w-full pl-8 pr-8 py-1.5 rounded-xl bg-white border border-[#DEDCD7] text-[12px] text-[#181818] placeholder-[#9CA3AF] focus:outline-none focus:ring-1 focus:ring-[#181818] shadow-2xs"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded-full hover:bg-gray-100 text-[#9CA3AF]"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            )}
-          </div>
-
-          {/* Category Filter Pills */}
-          <div className="flex gap-1.5 overflow-x-auto no-scrollbar pb-0.5 text-[10.5px]">
-            {(
-              [
-                'All',
-                'Semiconductor & Design',
-                'Government & Nodal',
-                'Academia & Research',
-                'Instrumentation & Test',
-                'IoT, Cloud & Robotics',
-              ] as CategoryFilter[]
-            ).map((cat) => {
-              const isActive = selectedCategory === cat;
-              return (
-                <button
-                  key={cat}
-                  onClick={() => setSelectedCategory(cat)}
-                  className={`px-2.5 py-1 rounded-full whitespace-nowrap font-semibold border transition-all cursor-pointer ${
-                    isActive
-                      ? 'bg-[#181818] text-white border-[#181818] shadow-xs'
-                      : 'bg-white text-[#4B5563] border-[#E5E7EB] hover:border-gray-400'
-                  }`}
-                >
-                  {cat}
-                </button>
-              );
-            })}
-          </div>
+        {/* Search */}
+        <div className="relative">
+          <Search className="w-4 h-4 text-[#6B6B6B] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search by booth number or exhibitor name..."
+            className="w-full h-11 bg-white border border-[#E5E7EB] rounded-xl pl-10 pr-10 text-[13px] focus:ring-2 focus:ring-[#B51F32]/20 focus:border-[#B51F32] outline-none text-[#181818] placeholder-[#9CA3AF] shadow-xs transition-all"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[11px] font-bold text-[#6B6B6B] hover:text-[#181818] cursor-pointer"
+            >
+              Clear
+            </button>
+          )}
         </div>
       </div>
 
-      {/* Main Content Area based on Active View */}
-      {activeView === 'blueprint' && (
+      {/* Main Content Area - Interactive Floor Plan Map */}
         <div
           ref={containerRef}
           onMouseDown={handleMouseDown}
@@ -741,7 +519,7 @@ export const DelegateMap: React.FC = () => {
                 {FLOOR_PLAN_BOOTHS.map((b) => {
                   const isSelected = selectedBooth?.id === b.id;
                   const isMatch = matchingIds.has(b.id);
-                  const isDimmed = (searchQuery.trim() || selectedCategory !== 'All') && !isMatch;
+                  const isDimmed = Boolean(searchQuery.trim()) && !isMatch;
 
                   // Dynamic fill and stroke based on state & category
                   let fill = '#FFFFFF';
@@ -773,6 +551,30 @@ export const DelegateMap: React.FC = () => {
                     }
                   });
                   if (current) lines.push(current.trim());
+
+                  // Split subtitle into two lines if it contains parentheses or is too long to fit
+                  const subtitleLines: string[] = [];
+                  if (b.subtitle) {
+                    if (b.subtitle.includes('(')) {
+                      const parts = b.subtitle.split('(');
+                      subtitleLines.push(parts[0].trim());
+                      subtitleLines.push(`(${parts.slice(1).join('(').trim()}`);
+                    } else if (b.subtitle.length > 12) {
+                      const subWords = b.subtitle.split(' ');
+                      let curSub = '';
+                      subWords.forEach((w) => {
+                        if ((curSub + ' ' + w).trim().length > 12) {
+                          if (curSub) subtitleLines.push(curSub.trim());
+                          curSub = w;
+                        } else {
+                          curSub = (curSub + ' ' + w).trim();
+                        }
+                      });
+                      if (curSub) subtitleLines.push(curSub.trim());
+                    } else {
+                      subtitleLines.push(b.subtitle);
+                    }
+                  }
 
                   return (
                     <g
@@ -815,7 +617,11 @@ export const DelegateMap: React.FC = () => {
                         <g textAnchor="middle">
                           <text
                             x={b.x + b.w / 2}
-                            y={b.y + b.h / 2 - (b.subtitle ? 8 : 0)}
+                            y={
+                              b.y +
+                              b.h / 2 -
+                              (subtitleLines.length > 1 ? 12 : subtitleLines.length === 1 ? 8 : 0)
+                            }
                             fill={isSelected ? '#B45309' : '#181818'}
                             fontWeight="900"
                             fontSize={b.id === 'pavilion-mpsedc' ? 15 : 10.5}
@@ -824,18 +630,33 @@ export const DelegateMap: React.FC = () => {
                           >
                             {b.name}
                           </text>
-                          {b.subtitle && (
+                          {subtitleLines.map((subLine, sIdx) => (
                             <text
+                              key={sIdx}
                               x={b.x + b.w / 2}
-                              y={b.y + b.h / 2 + (b.id === 'pavilion-mpsedc' ? 14 : 9)}
+                              y={
+                                b.y +
+                                b.h / 2 +
+                                (b.id === 'pavilion-mpsedc'
+                                  ? 14
+                                  : subtitleLines.length > 1
+                                  ? 4 + sIdx * 9.5
+                                  : 9)
+                              }
                               fill="#4B5563"
                               fontWeight="700"
-                              fontSize={b.id === 'pavilion-mpsedc' ? '9.5' : '7.5'}
+                              fontSize={
+                                b.id === 'pavilion-mpsedc'
+                                  ? '9.5'
+                                  : subtitleLines.length > 1
+                                  ? '6.5'
+                                  : '7.5'
+                              }
                               fontFamily="sans-serif"
                             >
-                              {b.subtitle}
+                              {subLine}
                             </text>
-                          )}
+                          ))}
                         </g>
                       ) : (
                         /* Standard Booth: Number on top, Name below */
@@ -946,82 +767,6 @@ export const DelegateMap: React.FC = () => {
             </div>
           )}
         </div>
-      )}
-
-      {/* View 2: High-Resolution Official Blueprint Image with Interactive Multi-Touch Zoom & Pan */}
-      {activeView === 'original' && (
-        <div
-          ref={origContainerRef}
-          onMouseDown={handleOrigMouseDown}
-          onMouseMove={handleOrigMouseMove}
-          onMouseUp={handleOrigMouseUp}
-          onMouseLeave={handleOrigMouseUp}
-          className="flex-1 relative overflow-hidden bg-[#18181B] flex flex-col items-center justify-center select-none cursor-grab active:cursor-grabbing"
-          style={{ touchAction: 'none' }}
-        >
-          {/* Top Bar with Floating Controls & Hint */}
-          <div className="absolute top-3 left-3 right-3 z-20 flex items-center justify-between pointer-events-none">
-            <div className="bg-black/85 backdrop-blur-md px-3 py-1.5 rounded-xl text-white text-xs font-semibold flex items-center gap-1.5 shadow-lg pointer-events-auto border border-white/10">
-              <FileImage className="w-4 h-4 text-[#38BDF8]" />
-              <span>Official Blueprint (HD)</span>
-            </div>
-
-            <div className="flex items-center gap-1 bg-black/85 backdrop-blur-md p-1 rounded-xl shadow-lg border border-white/10 pointer-events-auto">
-              <button
-                onClick={() => setOrigZoom((prev) => Math.min(prev + 0.35, 5.0))}
-                className="p-1.5 rounded-lg text-white hover:bg-white/15 active:scale-90 transition-all cursor-pointer"
-                title="Zoom In (+)"
-              >
-                <ZoomIn className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() => setOrigZoom((prev) => Math.max(prev - 0.35, 0.6))}
-                className="p-1.5 rounded-lg text-white hover:bg-white/15 active:scale-90 transition-all cursor-pointer"
-                title="Zoom Out (-)"
-              >
-                <ZoomOut className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() => {
-                  setOrigZoom(1);
-                  setOrigPan({ x: 0, y: 0 });
-                }}
-                className="p-1.5 rounded-lg text-white hover:bg-white/15 active:scale-90 transition-all cursor-pointer"
-                title="Reset Zoom"
-              >
-                <RotateCcw className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-
-          {/* Interactive Zoomable Blueprint Image */}
-          <div
-            className="w-full h-full flex items-center justify-center pointer-events-none p-4"
-            style={{
-              transform: `translate(${origPan.x}px, ${origPan.y}px) scale(${origZoom})`,
-              transformOrigin: 'center center',
-              transition: isOrigDragging ? 'none' : 'transform 0.08s ease-out',
-            }}
-          >
-            <div className="max-w-md w-full bg-white p-2 rounded-xl shadow-2xl border border-gray-700">
-              <img
-                src="/images/floorplan/official-blueprint.png?v=3"
-                alt="Official MPSS26 Floor Plan Blueprint HD"
-                className="w-full h-auto object-contain rounded-lg pointer-events-none"
-                draggable={false}
-              />
-            </div>
-          </div>
-
-          {/* Subtle Mobile Gesture Hint Footer */}
-          <div className="absolute bottom-3 z-10 pointer-events-none">
-            <span className="bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-[10.5px] font-medium text-gray-300 border border-white/10 shadow-sm">
-              Pinch to zoom · Drag to pan · Double-tap to reset
-            </span>
-          </div>
-        </div>
-      )}
-
     </div>
   );
 };

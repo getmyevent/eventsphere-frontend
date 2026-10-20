@@ -22,6 +22,8 @@ export const DelegateBottomNavRouted: React.FC = () => {
     if (
       pathname === '/delegate/home' ||
       pathname === '/delegate/speakers' ||
+      pathname === '/delegate/organizers' ||
+      pathname === '/delegate/partners' ||
       pathname === '/delegate/polls' ||
       pathname === '/delegate/map' ||
       pathname === '/delegate/sponsors' ||

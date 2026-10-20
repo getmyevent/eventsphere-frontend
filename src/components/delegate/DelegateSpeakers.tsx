@@ -214,12 +214,12 @@ export const DelegateSpeakers: React.FC = () => {
                             if (fallback) (fallback as HTMLElement).style.display = 'flex';
                           }}
                         />
-                        <div className="avatar-fallback w-full h-full hidden items-center justify-center bg-gradient-to-br from-[#E2E8F0] to-[#CBD5E1] text-[#1E293B] font-bold text-lg select-none">
+                        <div className="avatar-fallback w-full h-full hidden items-center justify-center bg-[#181818] text-white font-bold text-2xl select-none">
                           {getInitials(speaker.name)}
                         </div>
                       </>
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#E2E8F0] to-[#CBD5E1] text-[#1E293B] font-bold text-lg select-none">
+                      <div className="w-full h-full flex items-center justify-center bg-[#181818] text-white font-bold text-2xl select-none">
                         {getInitials(speaker.name)}
                       </div>
                     )}

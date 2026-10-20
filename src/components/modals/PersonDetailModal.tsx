@@ -5,7 +5,15 @@ import { useStore } from '../../lib/store';
 import { INITIAL_ATTENDEES, INITIAL_SESSIONS } from '../../lib/mockData';
 import { Person } from '../../types';
 import { X, Mail, Phone, Linkedin, Twitter, Star, Pencil, Save } from 'lucide-react';
-import { getProfileAvatar, getCloudinaryProfileUrl } from '../../lib/profileImages';
+import { getProfileAvatar, getCloudinaryProfileUrl, hasRealProfilePhoto } from '../../lib/profileImages';
+
+const getInitials = (name: string) => {
+  const clean = name.replace(/^(dr\.|prof\.|maj\.\s*gen\.?|mr\.|mrs\.|ms\.)\s+/i, '').trim();
+  const parts = clean.split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return name.slice(0, 2).toUpperCase();
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+};
 
 export const PersonDetailModal: React.FC = () => {
   const {
@@ -242,16 +250,6 @@ export const PersonDetailModal: React.FC = () => {
               </div>
             </div>
 
-            <div className="space-y-1">
-              <label className="font-semibold text-[#4B5563]">Bio / Description</label>
-              <textarea
-                rows={3}
-                value={editForm.bio}
-                onChange={(e) => setEditForm((prev) => ({ ...prev, bio: e.target.value }))}
-                className="w-full px-2.5 py-1.5 rounded-lg border border-[#DEDCD7] text-xs focus:outline-none focus:ring-1 focus:ring-[#181818] resize-none"
-              />
-            </div>
-
             <div className="grid grid-cols-2 gap-2">
               <div className="space-y-1">
                 <label className="font-semibold text-[#4B5563]">Email</label>
@@ -316,19 +314,34 @@ export const PersonDetailModal: React.FC = () => {
                 <Star className={`w-5 h-5 ${isSaved ? 'fill-yellow-400 text-yellow-400' : 'text-[#9CA3AF]'}`} />
               </button>
 
-              <img
-                src={getProfileAvatar(person)}
-                alt={person.name}
-                className="w-14 h-14 rounded-full object-cover shadow-sm border border-[#E5E7EB] flex-shrink-0"
-                onError={(e) => {
-                  e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(person.name)}&background=181818&color=ffffff&bold=true`;
-                }}
-              />
+              {hasRealProfilePhoto(person) ? (
+                <div className="relative w-14 h-14 rounded-full overflow-hidden shrink-0 shadow-sm border border-[#E5E7EB]">
+                  <img
+                    src={getProfileAvatar(person)}
+                    alt={person.name}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                      const fallback = e.currentTarget.parentElement?.querySelector('.avatar-fallback');
+                      if (fallback) (fallback as HTMLElement).style.display = 'flex';
+                    }}
+                  />
+                  <div className="avatar-fallback w-full h-full hidden items-center justify-center bg-[#181818] text-white font-bold text-lg select-none">
+                    {getInitials(person.name)}
+                  </div>
+                </div>
+              ) : (
+                <div className="w-14 h-14 rounded-full bg-[#181818] text-white flex items-center justify-center font-bold text-lg shadow-sm border border-[#E5E7EB] shrink-0 select-none">
+                  {getInitials(person.name)}
+                </div>
+              )}
               <div className="pt-0.5 pr-8 min-w-0 flex-1">
                 <h2 className="text-[16px] font-bold text-[#181818] leading-tight truncate">{person.name}</h2>
-                <p className="text-[13.5px] text-[#4B5563] mt-0.5 leading-snug">
-                  {[person.designation, person.company].filter(Boolean).join(' · ') || 'Attendee'}
-                </p>
+                {[person.designation, person.company].filter(Boolean).length > 0 && (
+                  <p className="text-[13.5px] text-[#4B5563] mt-0.5 leading-snug">
+                    {[person.designation, person.company].filter(Boolean).join(' · ')}
+                  </p>
+                )}
                 {(() => {
                   const rawTag = person.ticketType !== undefined ? person.ticketType : (person.role === 'speaker' ? 'Speaker' : 'Delegate');
                   const tag = (rawTag || '').trim();

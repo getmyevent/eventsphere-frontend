@@ -74,9 +74,11 @@ export const DelegateProfile: React.FC<DelegateProfileProps> = () => {
             <h2 className="text-[15.5px] font-bold text-[#181818] tracking-tight leading-tight truncate">
               {currentUser.name || 'Anonymous Delegate'}
             </h2>
-            <p className="text-[12px] text-[#6B6B6B] leading-tight truncate">
-              {[currentUser.designation, currentUser.company].filter(Boolean).join(' · ') || 'No title or company added'}
-            </p>
+            {[currentUser.designation, currentUser.company].filter(Boolean).length > 0 && (
+              <p className="text-[12px] text-[#6B6B6B] leading-tight truncate">
+                {[currentUser.designation, currentUser.company].filter(Boolean).join(' · ')}
+              </p>
+            )}
             {currentUser.id !== 'att-hari-gupta' && currentUser.id !== 'att-pushpit-upadhyay' && (
               <p className="text-[11.5px] text-[#8BA5CD] font-medium leading-tight">
                 {currentUser.ticketType || 'Delegate'} · 2-day

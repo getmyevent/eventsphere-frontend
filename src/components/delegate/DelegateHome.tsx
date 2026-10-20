@@ -26,45 +26,9 @@ import {
   GraduationCap,
   Linkedin,
   Building2,
+  Handshake,
 } from 'lucide-react';
 
-const EVENT_PARTNERS = [
-  {
-    name: 'Make in India',
-    type: 'National Initiative',
-    logo: '/images/partners/make-in-india.png',
-  },
-  {
-    name: 'MSME Department',
-    type: 'Government Partner',
-    logo: '/images/partners/msme.png',
-  },
-  {
-    name: 'Semi-Conductor Laboratory',
-    type: 'Technology Partner',
-    logo: '/images/partners/scl.png',
-  },
-  {
-    name: 'MP Tourism',
-    type: 'Tourism Partner',
-    logo: '/images/partners/mp-tourism.png',
-  },
-  {
-    name: 'Invest MP',
-    type: 'Investment Partner',
-    logo: '/images/partners/invest-mp.png',
-  },
-  {
-    name: 'VLSI Society of India',
-    type: 'Industry Partner',
-    logo: '/images/partners/vlsi.png',
-  },
-  {
-    name: 'ISIG',
-    type: 'Industry Partner',
-    logo: '/images/partners/isig.png',
-  },
-];
 
 const FOUNDERS = [
   {
@@ -195,43 +159,6 @@ export const DelegateHome: React.FC = () => {
     'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792441695/satya-gupta.png',
   ];
 
-  // Auto-scroll for Event Partners Section (seamless infinite circular loop, scrolls one by one)
-  const partnersScrollRef = useRef<HTMLDivElement>(null);
-  const [isPartnersPaused, setIsPartnersPaused] = useState(false);
-
-  useEffect(() => {
-    const container = partnersScrollRef.current;
-    if (!container) return;
-
-    const interval = setInterval(() => {
-      if (isPartnersPaused) return;
-
-      const firstChild = container.firstElementChild as HTMLElement;
-      const itemWidth = firstChild ? firstChild.offsetWidth + 8 : 84;
-      const oneSetWidth = itemWidth * EVENT_PARTNERS.length;
-
-      // When we reach or pass one full set, normalize silently to start of cycle
-      if (container.scrollLeft >= oneSetWidth) {
-        container.scrollLeft -= oneSetWidth;
-      }
-
-      container.scrollBy({ left: itemWidth, behavior: 'smooth' });
-    }, 2500);
-
-    return () => clearInterval(interval);
-  }, [isPartnersPaused]);
-
-  const handlePartnersScroll = () => {
-    const container = partnersScrollRef.current;
-    if (!container) return;
-    const firstChild = container.firstElementChild as HTMLElement;
-    const itemWidth = firstChild ? firstChild.offsetWidth + 8 : 84;
-    const oneSetWidth = itemWidth * EVENT_PARTNERS.length;
-
-    if (container.scrollLeft >= 2 * oneSetWidth) {
-      container.scrollLeft -= oneSetWidth;
-    }
-  };
 
   return (
     <div className="flex-1 min-h-0 h-full px-3 pt-2 pb-3 space-y-3 bg-[#F8F7F4] overflow-y-auto overflow-x-hidden select-none">
@@ -625,9 +552,9 @@ export const DelegateHome: React.FC = () => {
         <div className="grid grid-cols-4 gap-2">
           {[
             { id: 'speakers', label: 'Speakers', icon: Users, path: '/delegate/speakers' },
-            { id: 'organizers', label: 'Organizers', icon: Building2, path: '/delegate/about' },
+            { id: 'organizers', label: 'Organizers', icon: Building2, path: '/delegate/organizers' },
             { id: 'map', label: 'Map', icon: Map, path: '/delegate/map' },
-            { id: 'sponsors', label: 'Sponsors', icon: Star, path: '/delegate/sponsors' },
+            { id: 'partners', label: 'Partners', icon: Handshake, path: '/delegate/partners' },
           ].map((item) => (
             <button
               key={item.id}
@@ -785,55 +712,7 @@ export const DelegateHome: React.FC = () => {
         </div>
       </div>
 
-      {/* Partners Section (Clean minimal horizontal auto-scroll) */}
-      <div className="space-y-2 pt-1 pb-1">
-        {/* Section Heading Left-Aligned */}
-        <div className="px-0.5">
-          <h3 className="text-[17px] font-bold text-[#111827] tracking-tight">
-            Partners
-          </h3>
-        </div>
 
-        {/* Scrollable Container with Auto-Scroll One by One (Fits 4 Icons in View, No Scrollbar Line) */}
-        <div
-          ref={partnersScrollRef}
-          onScroll={handlePartnersScroll}
-          onMouseEnter={() => setIsPartnersPaused(true)}
-          onMouseLeave={() => setIsPartnersPaused(false)}
-          onTouchStart={() => setIsPartnersPaused(true)}
-          onTouchEnd={() => {
-            setTimeout(() => setIsPartnersPaused(false), 2500);
-          }}
-          className="flex items-start gap-2 overflow-x-auto pb-1 pt-0.5 scroll-smooth select-none no-scrollbar"
-        >
-          {[...EVENT_PARTNERS, ...EVENT_PARTNERS, ...EVENT_PARTNERS].map((partner, index) => (
-            <div
-              key={index}
-              onClick={() => showToast(`${partner.name} · Official ${partner.type}`, 'info')}
-              className="w-[76px] sm:w-[82px] shrink-0 flex flex-col items-center text-center group cursor-pointer"
-            >
-              {/* Decreased icon size in clean rounded white box */}
-              <div className="w-11 h-11 rounded-xl bg-white border border-[#E5E7EB] shadow-2xs p-1 flex items-center justify-center overflow-hidden group-hover:border-gray-400 group-hover:shadow-xs transition-all">
-                <img
-                  src={partner.logo}
-                  alt={partner.name}
-                  className="w-full h-full object-contain select-none"
-                />
-              </div>
-
-              {/* Name below */}
-              <h4 className="text-[10px] sm:text-[10.5px] font-bold text-[#181818] leading-[1.15] text-center mt-1.5 line-clamp-2 px-0.5">
-                {partner.name}
-              </h4>
-
-              {/* Partner type below */}
-              <p className="text-[8px] sm:text-[8.5px] font-semibold text-[#6B7280] leading-tight text-center mt-0.5 line-clamp-1">
-                {partner.type}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
 
       {/* Meet the Founders Section */}
       <div className="space-y-2.5 pt-1 pb-3 select-none">
