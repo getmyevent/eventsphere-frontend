@@ -629,42 +629,42 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
     <div className="flex-1 flex flex-col bg-[#FAF9F6] min-h-[600px] select-none h-full relative overflow-y-auto">
       {/* Hero Image Section */}
       <div
-        className="h-[40%] min-h-[270px] relative bg-cover bg-center shrink-0"
+        className="h-[48%] min-h-[320px] sm:min-h-[360px] relative bg-cover bg-center shrink-0"
         style={{
           backgroundImage:
             'url("https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop")',
         }}
       >
         {/* Gradient Overlay for text readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/85" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/10 to-black/80" />
 
         {/* Top Bar */}
-        <div className="absolute top-0 left-0 w-full p-4 flex items-center justify-between z-10">
+        <div className="absolute top-0 left-0 w-full p-5 flex items-center justify-between z-10">
           <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 bg-white flex items-center justify-center font-extrabold text-[#181818] text-[13px] rounded-md shadow-sm">
+            <div className="w-[30px] h-[30px] bg-white rounded-lg flex items-center justify-center font-bold text-[#181818] text-[15px] shadow-sm">
               G
             </div>
-            <span className="font-bold text-[13px] tracking-[0.16em] text-white">GETMYEVENT</span>
+            <span className="font-bold text-[13px] tracking-[0.18em] text-white">GETMYEVENT</span>
           </div>
-          <span className="text-[11px] font-semibold tracking-wider text-white border border-white/40 px-3 py-1 rounded-full backdrop-blur-sm bg-black/25">
+          <span className="text-[11px] font-semibold tracking-wide text-white border border-white/20 px-3.5 py-1 rounded-lg backdrop-blur-md bg-[#334155]/70 shadow-xs">
             MPSS26
           </span>
         </div>
 
         {/* Bottom Hero Text */}
-        <div className="absolute bottom-9 left-6 right-6 z-10 text-white">
-          <p className="text-[12.5px] font-medium text-white/90 mb-0.5">Welcome to</p>
-          <h1 className="text-[26px] sm:text-[28px] font-serif font-medium leading-tight tracking-tight mb-1 text-white">
-            MP Semiconductor Summit 2026
+        <div className="absolute bottom-10 left-6 right-6 z-10 text-white">
+          <p className="text-[13px] font-normal text-white/90 mb-1">Welcome to</p>
+          <h1 className="text-[30px] sm:text-[34px] font-serif font-normal leading-[1.15] tracking-tight text-white">
+            MP Semiconductor<br />Summit 2026
           </h1>
-          <p className="text-[12px] font-medium text-white/80">
-            23–24 Oct 2026 · Indore · 2,400 attending
+          <p className="text-[13px] font-normal text-white/85 mt-2">
+            23 – 24 Oct 2026 · Indore
           </p>
         </div>
       </div>
 
       {/* Form / Bottom Sheet Section */}
-      <div className="flex-1 bg-[#FAF9F6] rounded-t-[30px] -mt-6 relative z-20 px-5 pt-5 pb-5 flex flex-col shadow-[0_-8px_30px_rgba(0,0,0,0.12)] border-t border-black/5">
+      <div className="flex-1 bg-[#FAF9F6] rounded-t-[32px] -mt-6 relative z-20 px-6 pt-6 pb-8 flex flex-col shadow-[0_-8px_30px_rgba(0,0,0,0.12)] border-t border-black/5">
         {/* Floating OTP Notice banner */}
         {otpNotice && (
           <div className="mb-3 p-2.5 bg-[#181818] text-white text-[12px] rounded-xl shadow-lg flex items-center gap-2 animate-in fade-in slide-in-from-top-2 duration-200">
@@ -677,11 +677,13 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
         {step === 'details' && (
           <div className="flex-1 flex flex-col">
             {/* Header with Red Accent Bar */}
-            <div className="flex items-start gap-3 mb-3.5">
-              <div className="w-1 self-stretch min-h-[34px] bg-[#B51F32] rounded-full shrink-0 mt-0.5" />
+            <div className="flex items-start gap-3 mb-4">
+              <div className="w-[4px] self-stretch min-h-[36px] bg-[#D32F2F] rounded-full shrink-0 mt-0.5" />
               <div>
-                <h2 className="text-[16.5px] font-bold text-[#181818] tracking-tight">Enter your event</h2>
-                <p className="text-[11.5px] text-[#6B7280] mt-0.5 leading-snug">
+                <h2 className="text-[19px] font-bold text-[#111827] tracking-tight leading-tight">
+                  Enter your event
+                </h2>
+                <p className="text-[13px] text-[#6B7280] mt-1 leading-snug">
                   Sign in with your Google account to access MPSS 2026.
                 </p>
               </div>
@@ -690,7 +692,9 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
             <div className="space-y-3">
               {/* Event ID Field */}
               <div>
-                <label className="block text-[11.5px] font-semibold text-[#181818] mb-1">Event ID</label>
+                <label className="block text-[12.5px] font-semibold text-[#181818] mb-1.5">
+                  Event ID
+                </label>
                 <div className="relative flex items-center">
                   <input
                     type="text"
@@ -698,10 +702,10 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
                     onChange={(e) => setEventId(e.target.value.toUpperCase())}
                     placeholder="MPSS26"
                     disabled={isGoogleLoading}
-                    className="w-full h-[38px] px-3 rounded-xl bg-white border border-[#E5E7EB] text-[13px] font-bold tracking-wider text-[#181818] shadow-xs focus:ring-2 focus:ring-[#B51F32]/20 focus:border-[#B51F32] outline-none transition-all uppercase"
+                    className="w-full h-[52px] pl-4 pr-12 rounded-2xl bg-white border border-[#E5E7EB] text-[15px] font-bold tracking-normal text-[#181818] shadow-xs focus:ring-2 focus:ring-[#D32F2F]/20 focus:border-[#D32F2F] outline-none transition-all uppercase"
                   />
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
-                    <CheckCircle2 className="w-4 h-4 text-[#B51F32]" />
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
+                    <CheckCircle2 className="w-5 h-5 text-[#D32F2F] stroke-[1.8]" />
                   </div>
                 </div>
               </div>
@@ -714,45 +718,52 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
                 </div>
               )}
 
-              {/* Google Sign-In Action - Placed directly below Event ID, perfectly center aligned */}
-              <div className="pt-1 flex flex-col items-center justify-center w-full">
-                <div className="w-full flex justify-center items-center">
+              {/* Google Sign-In Action */}
+              <div className="pt-3.5 flex flex-col items-center justify-center w-full">
+                <div className="relative w-full h-[52px]">
+                  {/* Visual custom button matching reference mockup */}
+                  <div className="w-full h-full bg-white hover:bg-[#FAFAFA] active:scale-[0.99] border border-[#E5E7EB] text-[#111827] font-semibold text-[15px] rounded-2xl shadow-xs transition-all flex items-center justify-center gap-3 cursor-pointer">
+                    {isGoogleLoading ? (
+                      <>
+                        <Loader2 className="w-5 h-5 animate-spin text-[#D32F2F]" />
+                        <span>Connecting with Google...</span>
+                      </>
+                    ) : (
+                      <>
+                        <GoogleIcon size={22} className="w-[22px] h-[22px] shrink-0" />
+                        <span>Continue with Google</span>
+                      </>
+                    )}
+                  </div>
+
+                  {/* Google GIS rendered button as transparent overlay */}
                   <div
                     ref={googleButtonContainerRef}
                     id="google-signin-btn"
-                    className="w-full flex justify-center items-center [&>div]:!flex [&>div]:!justify-center [&>div]:!w-full [&_iframe]:!mx-auto"
+                    className="absolute inset-0 w-full h-full opacity-0 overflow-hidden cursor-pointer z-10 [&>div]:!w-full [&>div]:!h-full [&_iframe]:!w-full [&_iframe]:!h-full"
                   />
+
+                  {/* Click fallback when GIS is loading/offline */}
                   {!isGisReady && (
                     <button
                       type="button"
                       onClick={handleGoogleSignIn}
                       disabled={status === 'sending' || isGoogleLoading}
-                      className="w-full h-[42px] bg-white hover:bg-[#F9FAFB] active:scale-[0.98] border border-[#E5E7EB] text-[#1F2937] font-semibold text-[13px] rounded-xl shadow-2xs transition-all flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed mx-auto text-center"
-                    >
-                      {isGoogleLoading ? (
-                        <>
-                          <Loader2 className="w-4 h-4 animate-spin text-[#B51F32]" />
-                          <span>Connecting with Google...</span>
-                        </>
-                      ) : (
-                        <>
-                          <GoogleIcon size={18} className="w-[18px] h-[18px] shrink-0" />
-                          <span>Continue with Google</span>
-                        </>
-                      )}
-                    </button>
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
+                      aria-label="Continue with Google"
+                    />
                   )}
                 </div>
 
                 {/* Footer Trust Badges */}
-                <div className="mt-3.5 pb-1 flex items-center justify-center gap-3 text-[11px] font-medium text-[#6B7280]">
+                <div className="mt-6 pb-1 flex items-center justify-center gap-3 text-[12px] font-normal text-[#6B7280]">
                   <div className="flex items-center gap-1.5">
-                    <Lock className="w-3 h-3 text-[#6B7280]" />
+                    <Lock className="w-3.5 h-3.5 text-[#6B7280] stroke-[1.8]" />
                     <span>Secure sign-in</span>
                   </div>
                   <span className="text-[#D1D5DB]">|</span>
                   <div className="flex items-center gap-1.5">
-                    <ShieldCheck className="w-3 h-3 text-[#6B7280]" />
+                    <ShieldCheck className="w-4 h-4 text-[#6B7280] stroke-[1.8]" />
                     <span>Registration verified</span>
                   </div>
                 </div>
