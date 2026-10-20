@@ -27,6 +27,7 @@ export const DelegatePeople: React.FC = () => {
     toggleSavePerson,
   } = useStore();
 
+  
   const [searchQuery, setSearchQuery] = useState('');
 
   // Strictly the 10 curated speakers for People You Should Meet
