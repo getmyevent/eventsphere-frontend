@@ -295,13 +295,15 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
     setCurrentUser({
       id: backendUser.id || `att-${Date.now().toString().slice(-6)}`,
       name: name,
-      designation: backendUser.designation || 'Delegate',
-      company: backendUser.company || 'EventSphere Attendee',
+      designation: backendUser.designation || '',
+      company: backendUser.company || '',
       role: personRole,
       email: backendUser.email || '',
-      mobile: backendUser.mobile || '+91 98765 43210',
+      mobile: backendUser.mobile || '',
       avatar: backendUser.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=181818&color=ffffff&bold=true`,
-      bio: backendUser.bio || 'Registered attendee at Madhya Pradesh Semiconductor Summit 2026.',
+      bio: backendUser.bio || '',
+      linkedin: backendUser.linkedin || '',
+      twitter: backendUser.twitter || '',
       interests: ['Semiconductors', 'VLSI Design', 'AI Infrastructure'],
       skills: ['Technology'],
       checkedIn: true,
@@ -318,104 +320,23 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
     });
   };
 
-  // Establish delegate authenticated session
-  const establishSessionForEmail = (userEmail: string, userName?: string) => {
-    const cleanEmail = userEmail.trim().toLowerCase();
-    const cleanName = userName?.trim();
-
-    // 1. Founder specific shortcuts
-    if (
-      cleanEmail === 'harigupta@getmyevent.in' ||
-      cleanEmail === 'hari.gupta@mpss2026.in' ||
-      cleanEmail === 'hari@getmyevent.in'
-    ) {
-      resetUserState();
-      setRole('delegate');
-      const hariAttendee = INITIAL_ATTENDEES.find((a) => a.id === 'att-hari-gupta');
-      setCurrentUser({
-        ...(hariAttendee || CURRENT_USER),
-        id: 'att-hari-gupta',
-        name: cleanName || 'Hari Gupta',
-        company: 'GetMyEvent',
-        designation: 'Co-Founder',
-        email: 'harigupta@getmyevent.in',
-        mobile: '+91 7089157046',
-        linkedin: 'https://www.linkedin.com/in/hari-gupta-159948330',
-        twitter: '',
-        avatar: 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792450462/hari.png',
-        bio: 'Co-Founder at GetMyEvent building next-gen event engagement platforms.',
-        role: 'delegate',
-        ticketType: 'VIP Delegate',
-        checkedIn: true,
-      });
-      return;
-    }
-
-    if (
-      cleanEmail === 'pushpitupadhya@getmyevent.in' ||
-      cleanEmail === 'pushpit@getmyevent.in' ||
-      cleanEmail === 'pushpit.upadhyay@mpss2026.in'
-    ) {
-      resetUserState();
-      setRole('delegate');
-      const pushpitAttendee = INITIAL_ATTENDEES.find((a) => a.id === 'att-pushpit-upadhyay');
-      setCurrentUser({
-        ...(pushpitAttendee || CURRENT_USER),
-        id: 'att-pushpit-upadhyay',
-        name: cleanName || 'Pushpit Upadhyay',
-        company: 'GetMyEvent',
-        designation: 'Co-Founder',
-        email: 'pushpitupadhya@getmyevent.in',
-        mobile: '+91 8463865310',
-        linkedin: '',
-        twitter: '',
-        avatar: '/images/founders/pushpit-upadhyay.jpg',
-        bio: 'Co-Founder at GetMyEvent building next-gen event engagement platforms.',
-        role: 'delegate',
-        ticketType: 'VIP Delegate',
-        checkedIn: true,
-      });
-      return;
-    }
-
-    // 2. Search match by email in INITIAL_ATTENDEES
-    const matchedAttendee = INITIAL_ATTENDEES.find(
-      (a) => (a.email || '').trim().toLowerCase() === cleanEmail
-    );
-
-    if (matchedAttendee) {
-      resetUserState();
-      const detectedRole =
-        (matchedAttendee.role as any) === 'organizer_staff'
-          ? 'organizer'
-          : (matchedAttendee.role as any) === 'exhibitor_staff'
-          ? 'exhibitor'
-          : 'delegate';
-
-      setRole(detectedRole);
-      setCurrentUser({
-        ...matchedAttendee,
-        name: cleanName || matchedAttendee.name,
-        email: userEmail.trim(),
-        checkedIn: true,
-      });
-      return;
-    }
-
-    // 3. New registered delegate session
+  // Establish delegate authenticated session (only name and email fetched via Google auth, others blank)
+  const establishSessionForEmail = (userEmail: string, userName?: string, userAvatar?: string) => {
     resetUserState();
     setRole('delegate');
-    const derivedName = cleanName || deriveNameFromEmail(userEmail);
+    const derivedName = userName?.trim() || deriveNameFromEmail(userEmail);
     const newAttendee: Person = {
       id: `att-${Date.now().toString().slice(-6)}`,
       name: derivedName,
-      designation: 'Delegate',
-      company: 'Registered Attendee',
+      designation: '',
+      company: '',
       role: 'delegate',
       email: userEmail.trim(),
-      mobile: '+91 98765 43210',
-      avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(derivedName)}&background=181818&color=ffffff&bold=true`,
-      bio: 'Registered attendee at Madhya Pradesh Semiconductor Summit 2026.',
+      mobile: '',
+      linkedin: '',
+      twitter: '',
+      avatar: userAvatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(derivedName)}&background=181818&color=ffffff&bold=true`,
+      bio: '',
       interests: ['Semiconductors', 'VLSI Design', 'AI Infrastructure'],
       skills: ['Technology'],
       checkedIn: true,
@@ -510,11 +431,13 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
     // Extract payload from Google JWT for smooth profile pre-population
     let googleEmail = '';
     let googleName = '';
+    let googlePicture = '';
     try {
       const payloadBase64 = response.credential.split('.')[1];
       const decoded = JSON.parse(atob(payloadBase64.replace(/-/g, '+').replace(/_/g, '/')));
       googleEmail = decoded.email || '';
       googleName = decoded.name || '';
+      googlePicture = decoded.picture || '';
     } catch (e) {
       // ignore
     }
@@ -551,6 +474,15 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
           setStep('create_profile');
           return;
         }
+      }
+      if (googleEmail) {
+        establishSessionForEmail(googleEmail, googleName, googlePicture);
+        setStatus('confirmed');
+        setTimeout(() => {
+          setHasAccessConfirmed(true);
+          onSuccess();
+        }, 350);
+        return;
       }
       setStatus('error');
       setErrorMessage(errMsg || 'This Google account is not registered as an event delegate.');
@@ -626,6 +558,7 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
 
           if (googleButtonContainerRef.current) {
             googleButtonContainerRef.current.innerHTML = '';
+            const containerWidth = googleButtonContainerRef.current.clientWidth || 320;
             (window as any).google.accounts.id.renderButton(googleButtonContainerRef.current, {
               theme: 'outline',
               size: 'large',
@@ -633,7 +566,7 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
               text: 'continue_with',
               shape: 'rectangular',
               logo_alignment: 'center',
-              width: 320,
+              width: containerWidth > 0 ? Math.min(containerWidth, 360) : 320,
             });
             setIsGisReady(true);
           }
@@ -740,21 +673,21 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
           </div>
         )}
 
-        {/* STEP 1: Details Entry (Matches user screenshot) */}
+        {/* STEP 1: Details Entry - Google Sign-In Only */}
         {step === 'details' && (
-          <form onSubmit={handleSendOtp} className="flex-1 flex flex-col">
+          <div className="flex-1 flex flex-col">
             {/* Header with Red Accent Bar */}
-            <div className="flex items-start gap-3 mb-3">
+            <div className="flex items-start gap-3 mb-3.5">
               <div className="w-1 self-stretch min-h-[34px] bg-[#B51F32] rounded-full shrink-0 mt-0.5" />
               <div>
                 <h2 className="text-[16.5px] font-bold text-[#181818] tracking-tight">Enter your event</h2>
-                <p className="text-[11px] text-[#6B7280] mt-0.5 leading-snug">
-                  Enter your Event ID and email address to continue.
+                <p className="text-[11.5px] text-[#6B7280] mt-0.5 leading-snug">
+                  Sign in with your Google account to access MPSS 2026.
                 </p>
               </div>
             </div>
 
-            <div className="space-y-2.5 flex-1">
+            <div className="space-y-3">
               {/* Event ID Field */}
               <div>
                 <label className="block text-[11.5px] font-semibold text-[#181818] mb-1">Event ID</label>
@@ -764,42 +697,12 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
                     value={eventId}
                     onChange={(e) => setEventId(e.target.value.toUpperCase())}
                     placeholder="MPSS26"
-                    disabled={status === 'sending'}
+                    disabled={isGoogleLoading}
                     className="w-full h-[38px] px-3 rounded-xl bg-white border border-[#E5E7EB] text-[13px] font-bold tracking-wider text-[#181818] shadow-xs focus:ring-2 focus:ring-[#B51F32]/20 focus:border-[#B51F32] outline-none transition-all uppercase"
                   />
                   <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
                     <CheckCircle2 className="w-4 h-4 text-[#B51F32]" />
                   </div>
-                </div>
-              </div>
-
-
-
-              {/* Email Address Field */}
-              <div>
-                <label className="block text-[11.5px] font-semibold text-[#181818] mb-1">
-                  Email Address
-                </label>
-                <div className="flex h-[38px] rounded-xl bg-white border border-[#E5E7EB] shadow-xs focus-within:ring-2 focus-within:ring-[#B51F32]/20 focus-within:border-[#B51F32] transition-all overflow-hidden">
-                  {/* Mail Icon Prefix Box */}
-                  <div className="w-[38px] h-full flex items-center justify-center border-r border-[#E5E7EB] bg-[#FAFAFA] shrink-0 text-[#9CA3AF]">
-                    <Mail className="w-3.5 h-3.5 stroke-[1.8]" />
-                  </div>
-
-                  {/* Email Input */}
-                  <input
-                    ref={emailInputRef}
-                    type="email"
-                    value={email}
-                    onChange={(e) => {
-                      setEmail(e.target.value);
-                      if (status === 'error') setStatus('idle');
-                    }}
-                    placeholder="Enter your email address"
-                    disabled={status === 'sending'}
-                    className="flex-1 min-w-0 h-full px-3 text-[13px] font-medium text-[#181818] bg-transparent focus:outline-none placeholder-[#9CA3AF]"
-                    autoComplete="email"
-                  />
                 </div>
               </div>
 
@@ -810,83 +713,52 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
                   <p className="font-semibold">{errorMessage}</p>
                 </div>
               )}
-            </div>
 
-            {/* Submit Action: Send OTP */}
-            <div className="mt-3.5 pt-0.5">
-              <button
-                type="submit"
-                disabled={status === 'sending' || isGoogleLoading}
-                className="w-full h-[42px] bg-[#B51F32] hover:bg-[#9C1A2B] active:scale-[0.98] text-white font-semibold text-[13.5px] rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed"
-              >
-                {status === 'sending' ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Sending OTP...</span>
-                  </>
-                ) : (
-                  <>
-                    <span>Send OTP</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </>
-                )}
-              </button>
-
-              {/* Centered OR Divider */}
-              <div className="relative my-3 flex items-center justify-center">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-[#E5E7EB]" />
+              {/* Google Sign-In Action - Placed directly below Event ID, perfectly center aligned */}
+              <div className="pt-1 flex flex-col items-center justify-center w-full">
+                <div className="w-full flex justify-center items-center">
+                  <div
+                    ref={googleButtonContainerRef}
+                    id="google-signin-btn"
+                    className="w-full flex justify-center items-center [&>div]:!flex [&>div]:!justify-center [&>div]:!w-full [&_iframe]:!mx-auto"
+                  />
+                  {!isGisReady && (
+                    <button
+                      type="button"
+                      onClick={handleGoogleSignIn}
+                      disabled={status === 'sending' || isGoogleLoading}
+                      className="w-full h-[42px] bg-white hover:bg-[#F9FAFB] active:scale-[0.98] border border-[#E5E7EB] text-[#1F2937] font-semibold text-[13px] rounded-xl shadow-2xs transition-all flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed mx-auto text-center"
+                    >
+                      {isGoogleLoading ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin text-[#B51F32]" />
+                          <span>Connecting with Google...</span>
+                        </>
+                      ) : (
+                        <>
+                          <GoogleIcon size={18} className="w-[18px] h-[18px] shrink-0" />
+                          <span>Continue with Google</span>
+                        </>
+                      )}
+                    </button>
+                  )}
                 </div>
-                <div className="relative bg-[#FAF9F6] px-3">
-                  <span className="text-[10.5px] font-semibold uppercase tracking-wider text-[#9CA3AF]">
-                    OR
-                  </span>
-                </div>
-              </div>
 
-{/* Google Sign In Container */}
-              <div className="w-full flex flex-col items-center justify-center min-h-[44px]">
-                <div
-                  ref={googleButtonContainerRef}
-                  id="google-signin-btn"
-                  className="w-full flex justify-center [&>div]:w-full"
-                />
-                {!isGisReady && (
-                  <button
-                    type="button"
-                    onClick={handleGoogleSignIn}
-                    disabled={status === 'sending' || isGoogleLoading}
-                    className="w-full h-11 bg-white hover:bg-[#F9FAFB] active:scale-[0.98] border border-[#E5E7EB] text-[#1F2937] font-semibold text-[13.5px] rounded-xl shadow-2xs transition-all flex items-center justify-center gap-3 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
-                  >
-                    {isGoogleLoading ? (
-                      <>
-                        <Loader2 className="w-4 h-4 animate-spin text-[#B51F32]" />
-                        <span>Connecting with Google...</span>
-                      </>
-                    ) : (
-                      <>
-                        <GoogleIcon size={18} className="w-[18px] h-[18px] shrink-0" />
-                        <span>Continue with Google</span>
-                      </>
-                    )}
-                  </button>
-                )}
-              </div>
-
-              {/* Footer Trust Badges */}
-              <div className="mt-3.5 pb-0.5 flex items-center justify-center gap-3 text-[11px] font-medium text-[#6B7280]">
-                <div className="flex items-center gap-1.5">
-                  <Lock className="w-3 h-3 text-[#6B7280]" />
-                  <span>Secure sign-in</span>
-                </div>
-                <span className="text-[#D1D5DB]">|</span>
-                <div className="flex items-center gap-1.5">
-                  <ShieldCheck className="w-3 h-3 text-[#6B7280]" />
-                  <span>Registration verified</span>
+                {/* Footer Trust Badges */}
+                <div className="mt-3.5 pb-1 flex items-center justify-center gap-3 text-[11px] font-medium text-[#6B7280]">
+                  <div className="flex items-center gap-1.5">
+                    <Lock className="w-3 h-3 text-[#6B7280]" />
+                    <span>Secure sign-in</span>
+                  </div>
+                  <span className="text-[#D1D5DB]">|</span>
+                  <div className="flex items-center gap-1.5">
+                    <ShieldCheck className="w-3 h-3 text-[#6B7280]" />
+                    <span>Registration verified</span>
+                  </div>
                 </div>
               </div>
             </div>
-          </form>
+          </div>
         )}
 
         {/* STEP 2: OTP Verification */}

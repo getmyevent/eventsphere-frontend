@@ -204,29 +204,17 @@ export const DelegateEditProfile: React.FC = () => {
           </div>
           
           <div className="space-y-1">
-            <label className="text-[11.5px] font-semibold text-[#181818]">Email Address</label>
-            <input
-              type="email"
-              name="email"
-              placeholder="e.g. skvishvakarma@iiti.ac.in"
-              value={formData.email}
-              onChange={handleChange}
-              className="w-full px-3 py-2 rounded-lg border border-[#DEDCD7] text-[12.5px] focus:outline-none focus:ring-1 focus:ring-[#181818]"
-            />
-          </div>
-
-          <div className="space-y-1">
             <div className="flex items-center justify-between">
-              <label className="text-[11.5px] font-semibold text-[#181818]">Mobile Number</label>
+              <label className="text-[11.5px] font-semibold text-[#181818]">Email Address</label>
               <span className="text-[10px] font-medium text-[#71717A] flex items-center gap-1 bg-[#F4F4F5] px-1.5 py-0.5 rounded border border-[#E4E4E7]">
                 <Lock className="w-2.5 h-2.5 text-[#71717A]" />
                 Registered
               </span>
             </div>
             <input
-              type="tel"
-              name="mobile"
-              value={formData.mobile}
+              type="email"
+              name="email"
+              value={formData.email}
               readOnly
               disabled
               className="w-full px-3 py-2 rounded-lg border border-[#E5E7EB] bg-[#F9FAFB] text-[12.5px] text-[#6B7280] font-medium cursor-not-allowed select-none"
@@ -234,7 +222,23 @@ export const DelegateEditProfile: React.FC = () => {
           </div>
 
           <div className="space-y-1">
-            <label className="text-[11.5px] font-semibold text-[#181818]">LinkedIn Profile</label>
+            <label className="text-[11.5px] font-semibold text-[#181818]">
+              Mobile Number <span className="text-[10px] font-normal text-[#9CA3AF]">(Optional)</span>
+            </label>
+            <input
+              type="tel"
+              name="mobile"
+              placeholder="Enter mobile number"
+              value={formData.mobile}
+              onChange={handleChange}
+              className="w-full px-3 py-2 rounded-lg border border-[#DEDCD7] text-[12.5px] focus:outline-none focus:ring-1 focus:ring-[#181818]"
+            />
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-[11.5px] font-semibold text-[#181818]">
+              LinkedIn Profile <span className="text-[10px] font-normal text-[#9CA3AF]">(Optional)</span>
+            </label>
             <input
               type="text"
               name="linkedin"
