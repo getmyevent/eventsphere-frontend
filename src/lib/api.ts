@@ -314,10 +314,10 @@ class ApiClient {
             id: 'att-hari-gupta',
             name: 'Hari Gupta',
             mobile: '+91 7089157046',
-            email: '',
+            email: 'harigupta@getmyevent.in',
             role: 'ROLE_DELEGATE',
-            company: '',
-            designation: '',
+            company: 'GetMyEvent',
+            designation: 'Co-Founder',
             avatar: 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792450462/hari.png',
             ticketType: '',
             checkedIn: true,
@@ -343,10 +343,10 @@ class ApiClient {
             id: 'att-pushpit-upadhyay',
             name: 'Pushpit Upadhyay',
             mobile: '+91 8463865310',
-            email: '',
+            email: 'pushpitupadhya@getmyevent.in',
             role: 'ROLE_DELEGATE',
-            company: '',
-            designation: '',
+            company: 'GetMyEvent',
+            designation: 'Co-Founder',
             avatar: '/images/founders/pushpit-upadhyay.jpg',
             ticketType: '',
             checkedIn: true,
@@ -367,6 +367,62 @@ class ApiClient {
           }
           return fallbackRes;
         }
+        throw err;
+      }
+    },
+    sendEmailOtp: async (eventId: string, email: string): Promise<{ success: boolean; message: string; demoOtp?: string }> => {
+      try {
+        return await this.request<{ success: boolean; message: string; demoOtp?: string }>('/api/v1/auth/email/send-otp', {
+          method: 'POST',
+          body: JSON.stringify({ eventId, email }),
+        });
+      } catch {
+        return {
+          success: true,
+          message: 'OTP sent to registered email address.',
+          demoOtp: '1234',
+        };
+      }
+    },
+    verifyEmailOtp: async (eventId: string, email: string, otp: string): Promise<AuthResponse> => {
+      try {
+        const res = await this.request<AuthResponse>('/api/v1/auth/email/verify-otp', {
+          method: 'POST',
+          body: JSON.stringify({ eventId, email, otp }),
+        });
+        if (res && res.token) {
+          this.setToken(res.token);
+          if (typeof window !== 'undefined') {
+            try {
+              localStorage.setItem(USER_KEY, JSON.stringify(res.user));
+            } catch {
+              // ignore
+            }
+          }
+        }
+        return res;
+      } catch (err) {
+        throw err;
+      }
+    },
+    googleLogin: async (eventId: string, email: string, credential?: string): Promise<AuthResponse> => {
+      try {
+        const res = await this.request<AuthResponse>('/api/v1/auth/google', {
+          method: 'POST',
+          body: JSON.stringify({ eventId, email, credential }),
+        });
+        if (res && res.token) {
+          this.setToken(res.token);
+          if (typeof window !== 'undefined') {
+            try {
+              localStorage.setItem(USER_KEY, JSON.stringify(res.user));
+            } catch {
+              // ignore
+            }
+          }
+        }
+        return res;
+      } catch (err) {
         throw err;
       }
     },
