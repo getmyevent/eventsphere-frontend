@@ -95,12 +95,7 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
   const [status, setStatus] = useState<'idle' | 'sending' | 'verifying' | 'confirmed' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
 
-  // Google Sign-In state & interactive selector
-  const [isGoogleModalOpen, setIsGoogleModalOpen] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
-  const [googleCustomEmail, setGoogleCustomEmail] = useState('');
-  const [googleModalError, setGoogleModalError] = useState('');
-  const [showCustomGoogleInput, setShowCustomGoogleInput] = useState(false);
 
   const fullNameInputRef = useRef<HTMLInputElement>(null);
   const emailInputRef = useRef<HTMLInputElement>(null);
@@ -530,12 +525,13 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
     }
   };
 
-  // Initialize Google Identity Services (GIS) on mount
+  // Initialize Google Identity Services (GIS) and render official Google button
   useEffect(() => {
-    const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
-    if (!googleClientId) return;
+    const googleClientId =
+      process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ||
+      '1031947527724-gqcj9phog0kfubj1l1e0vg83uish36g2.apps.googleusercontent.com';
 
-    const setupGoogle = () => {
+    const renderGoogle = () => {
       if (typeof window !== 'undefined' && (window as any).google?.accounts?.id) {
         try {
           (window as any).google.accounts.id.initialize({
@@ -550,86 +546,67 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
             (window as any).google.accounts.id.renderButton(googleButtonContainerRef.current, {
               theme: 'outline',
               size: 'large',
-              width: 340,
+              type: 'standard',
               text: 'continue_with',
               shape: 'rectangular',
-              logo_alignment: 'left',
+              logo_alignment: 'center',
+              width: 320,
             });
             setIsGisReady(true);
           }
-        } catch {
-          // Keep fallback active
+        } catch (e) {
+          console.error('Failed to render Google Sign-In button:', e);
         }
       }
     };
 
     if ((window as any).google?.accounts?.id) {
-      setupGoogle();
+      renderGoogle();
     } else {
       const interval = setInterval(() => {
         if ((window as any).google?.accounts?.id) {
-          setupGoogle();
+          renderGoogle();
           clearInterval(interval);
         }
-      }, 300);
+      }, 150);
       return () => clearInterval(interval);
     }
   }, []);
 
-  // Google Sign-In Initiation
+  // Fallback Google Sign-In trigger (One-Tap prompt)
   const handleGoogleSignIn = async () => {
     setErrorMessage('');
     setIsGoogleLoading(true);
 
-    const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
-    if (googleClientId && typeof window !== 'undefined' && (window as any).google?.accounts?.id) {
+    const googleClientId =
+      process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ||
+      '1031947527724-gqcj9phog0kfubj1l1e0vg83uish36g2.apps.googleusercontent.com';
+
+    if (typeof window !== 'undefined' && (window as any).google?.accounts?.id) {
       try {
+        (window as any).google.accounts.id.initialize({
+          client_id: googleClientId,
+          callback: handleGoogleCredentialResponse,
+          auto_select: false,
+          cancel_on_tap_outside: true,
+        });
+
         (window as any).google.accounts.id.prompt((notification: any) => {
-          if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-            setIsGoogleModalOpen(true);
-            setIsGoogleLoading(false);
+          setIsGoogleLoading(false);
+          if (notification.isNotDisplayed()) {
+            console.warn('GIS One-Tap not displayed:', notification.getNotDisplayedReason?.());
           }
         });
         return;
-      } catch {
-        // Fallback to interactive account chooser modal
+      } catch (err: any) {
+        setIsGoogleLoading(false);
+        setErrorMessage('Unable to initialize Google Sign-In. Please check your browser settings.');
+        return;
       }
     }
 
-    setTimeout(() => {
-      setIsGoogleLoading(false);
-      setGoogleModalError('');
-      setIsGoogleModalOpen(true);
-    }, 200);
-  };
-
-  // Complete Google Sign-In with selected or custom email
-  const handleSelectGoogleAccount = (selectedEmail: string, accountName: string) => {
-    setGoogleModalError('');
-
-    // Verification check for unauthorized accounts
-    const clean = selectedEmail.trim().toLowerCase();
-    if (clean.includes('unauthorized') || clean.includes('notregistered') || clean.includes('blocked')) {
-      setGoogleModalError(
-        `This Google account (${selectedEmail}) is not registered for MP Semiconductor Summit 2026. Please use your registered email address or contact support.`
-      );
-      return;
-    }
-
-    setIsGoogleLoading(true);
-    setIsGoogleModalOpen(false);
-
-    try {
-      establishSessionForEmail(selectedEmail);
-      setStatus('confirmed');
-      setTimeout(() => {
-        setHasAccessConfirmed(true);
-        onSuccess();
-      }, 350);
-    } catch {
-      setIsGoogleLoading(false);
-      setErrorMessage('Google authentication could not be completed. Please try again.');
-    }
+    setIsGoogleLoading(false);
+    setErrorMessage('Google Sign-In is still loading. Please try again in a moment.');
   };
 
   return (
@@ -807,37 +784,19 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
                 </div>
               </div>
 
-<<<<<<< HEAD
-              {/* Continue with Google Button */}
-              <button
-                type="button"
-                onClick={handleGoogleSignIn}
-                disabled={status === 'sending' || isGoogleLoading}
-                className="w-full h-[42px] bg-white hover:bg-[#F9FAFB] active:scale-[0.98] border border-[#E5E7EB] text-[#1F2937] font-semibold text-[13px] rounded-xl shadow-2xs transition-all flex items-center justify-center gap-3 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
-              >
-                {isGoogleLoading ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin text-[#B51F32]" />
-                    <span>Connecting with Google...</span>
-                  </>
-                ) : (
-                  <>
-                    <GoogleIcon size={18} className="w-[18px] h-[18px] shrink-0" />
-                    <span>Continue with Google</span>
-                  </>
-=======
-              {/* Official Google Sign In Container & Fallback */}
-              <div className="w-full flex flex-col items-center">
+              {/* Google Sign In Container */}
+              <div className="w-full flex flex-col items-center justify-center min-h-[44px]">
                 <div
                   ref={googleButtonContainerRef}
-                  className={`w-full flex justify-center ${isGisReady ? 'min-h-[44px]' : 'hidden'}`}
+                  id="google-signin-btn"
+                  className="w-full flex justify-center [&>div]:w-full"
                 />
-                {(!isGisReady || isGoogleLoading) && (
+                {!isGisReady && (
                   <button
                     type="button"
                     onClick={handleGoogleSignIn}
                     disabled={status === 'sending' || isGoogleLoading}
-                    className="w-full h-12 bg-white hover:bg-[#F9FAFB] active:scale-[0.98] border border-[#E5E7EB] text-[#1F2937] font-semibold text-[13.5px] rounded-xl shadow-2xs transition-all flex items-center justify-center gap-3 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
+                    className="w-full h-11 bg-white hover:bg-[#F9FAFB] active:scale-[0.98] border border-[#E5E7EB] text-[#1F2937] font-semibold text-[13.5px] rounded-xl shadow-2xs transition-all flex items-center justify-center gap-3 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
                   >
                     {isGoogleLoading ? (
                       <>
@@ -846,12 +805,11 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
                       </>
                     ) : (
                       <>
-                        <GoogleIcon className="w-5 h-5 shrink-0" />
+                        <GoogleIcon size={18} className="w-[18px] h-[18px] shrink-0" />
                         <span>Continue with Google</span>
                       </>
                     )}
                   </button>
->>>>>>> 7d626f7193bc9a7d9cbb52f99c4b6df0ef14c1c8
                 )}
               </div>
 
@@ -1024,150 +982,6 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
         )}
       </div>
 
-      {/* Google Account Selector Modal (Native-feeling Google Dialog) */}
-      {isGoogleModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl border border-gray-200 relative animate-in zoom-in-95 duration-150">
-            {/* Close Button */}
-            <button
-              type="button"
-              onClick={() => {
-                setIsGoogleModalOpen(false);
-                setGoogleModalError('');
-                setShowCustomGoogleInput(false);
-              }}
-              className="absolute top-4 right-4 p-1.5 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
-            >
-              <X className="w-4 h-4" />
-            </button>
-
-            {/* Header */}
-            <div className="flex flex-col items-center text-center pt-1 mb-4">
-              <GoogleIcon size={28} className="w-7 h-7 mb-2" />
-              <h3 className="text-[16px] font-bold text-gray-900">Sign in with Google</h3>
-              <p className="text-[12px] text-gray-500 mt-0.5">
-                Choose an account to continue to <span className="font-semibold text-gray-800">GetMyEvent MPSS26</span>
-              </p>
-            </div>
-
-            {/* Error in modal if unauthorized */}
-            {googleModalError && (
-              <div className="mb-3 p-3 bg-red-50 border border-red-200 rounded-xl text-[11.5px] text-red-800 flex items-start gap-2">
-                <AlertCircle className="w-4 h-4 text-red-600 mt-0.5 shrink-0" />
-                <p className="font-medium leading-relaxed">{googleModalError}</p>
-              </div>
-            )}
-
-            {/* Account List */}
-            <div className="space-y-2 border-y border-gray-100 py-3">
-              {/* Account 1: Hari Gupta */}
-              <button
-                type="button"
-                onClick={() => handleSelectGoogleAccount('harigupta@getmyevent.in', 'Hari Gupta')}
-                className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-gray-50 active:bg-gray-100 text-left transition-colors border border-transparent hover:border-gray-200"
-              >
-                <div className="w-9 h-9 rounded-full bg-emerald-600 text-white font-bold text-sm flex items-center justify-center shrink-0">
-                  H
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[13px] font-semibold text-gray-900 truncate">Hari Gupta</p>
-                  <p className="text-[11px] text-gray-500 truncate">harigupta@getmyevent.in</p>
-                </div>
-                <span className="text-[10px] font-medium px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full">
-                  Registered
-                </span>
-              </button>
-
-              {/* Account 2: Pushpit Upadhyay */}
-              <button
-                type="button"
-                onClick={() => handleSelectGoogleAccount('pushpitupadhya@getmyevent.in', 'Pushpit Upadhyay')}
-                className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-gray-50 active:bg-gray-100 text-left transition-colors border border-transparent hover:border-gray-200"
-              >
-                <div className="w-9 h-9 rounded-full bg-blue-600 text-white font-bold text-sm flex items-center justify-center shrink-0">
-                  P
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[13px] font-semibold text-gray-900 truncate">Pushpit Upadhyay</p>
-                  <p className="text-[11px] text-gray-500 truncate">pushpitupadhya@getmyevent.in</p>
-                </div>
-                <span className="text-[10px] font-medium px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full">
-                  Registered
-                </span>
-              </button>
-
-              {/* Account 3: Santosh Kumar */}
-              <button
-                type="button"
-                onClick={() => handleSelectGoogleAccount('skvishvakarma@iiti.ac.in', 'Santosh Kumar')}
-                className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-gray-50 active:bg-gray-100 text-left transition-colors border border-transparent hover:border-gray-200"
-              >
-                <div className="w-9 h-9 rounded-full bg-indigo-600 text-white font-bold text-sm flex items-center justify-center shrink-0">
-                  S
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[13px] font-semibold text-gray-900 truncate">Santosh Kumar</p>
-                  <p className="text-[11px] text-gray-500 truncate">skvishvakarma@iiti.ac.in</p>
-                </div>
-                <span className="text-[10px] font-medium px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full">
-                  Registered
-                </span>
-              </button>
-
-              {/* Option: Use another account */}
-              {!showCustomGoogleInput ? (
-                <button
-                  type="button"
-                  onClick={() => setShowCustomGoogleInput(true)}
-                  className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-gray-50 text-left transition-colors text-gray-700 font-medium text-[12.5px]"
-                >
-                  <div className="w-9 h-9 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center shrink-0">
-                    <User className="w-4 h-4" />
-                  </div>
-                  <span>Use another Google account</span>
-                </button>
-              ) : (
-                <div className="p-2.5 bg-gray-50 rounded-xl space-y-2">
-                  <label className="block text-[11px] font-semibold text-gray-700">
-                    Enter Google email address
-                  </label>
-                  <input
-                    type="email"
-                    value={googleCustomEmail}
-                    onChange={(e) => setGoogleCustomEmail(e.target.value)}
-                    placeholder="e.g. name@company.com"
-                    className="w-full h-9 px-3 text-[12.5px] rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  />
-                  <div className="flex justify-end gap-2 pt-1">
-                    <button
-                      type="button"
-                      onClick={() => setShowCustomGoogleInput(false)}
-                      className="px-2.5 py-1 text-[11.5px] text-gray-600 hover:text-gray-900"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="button"
-                      disabled={!googleCustomEmail.trim()}
-                      onClick={() => handleSelectGoogleAccount(googleCustomEmail, '')}
-                      className="px-3 py-1 bg-[#1A73E8] text-white text-[11.5px] font-semibold rounded-md hover:bg-blue-600 disabled:opacity-50"
-                    >
-                      Sign In
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Google Notice Footer */}
-            <div className="pt-3 text-center">
-              <p className="text-[11px] text-gray-400">
-                To continue, Google will share your name and email address with GetMyEvent.
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
