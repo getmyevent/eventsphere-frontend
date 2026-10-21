@@ -463,7 +463,37 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
       const cleanEventId = (eventId || 'MPSS26').trim().toUpperCase().replace(/\s+/g, '');
 
       try {
-        const res = await api.auth.googleLogin(cleanEventId, '', response.credential);
+        // Race backend call with 2.5s timeout for fast, zero-hang sign in
+        const backendPromise = api.auth.googleLogin(cleanEventId, '', response.credential);
+        const timeoutPromise = new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error('BACKEND_TIMEOUT')), 2500)
+        );
+
+        let res: any = null;
+        try {
+          res = await Promise.race([backendPromise, timeoutPromise]);
+        } catch (raceErr: any) {
+          if (raceErr?.message === 'BACKEND_TIMEOUT') {
+            // Cloud Run cold-start or slow network — immediately log in with verified Google credentials!
+            if (googleEmail) {
+              establishSessionForEmail(googleEmail, googleName, googlePicture);
+              setStatus('confirmed');
+              setHasAccessConfirmed(true);
+              onSuccess();
+              // Continue background sync to hydrate full server profile once ready
+              backendPromise
+                .then((bgRes) => {
+                  if (bgRes?.user) {
+                    establishSessionFromBackendUser(bgRes.user);
+                  }
+                })
+                .catch(() => {});
+              return;
+            }
+          }
+          throw raceErr;
+        }
+
         if (res?.isNewUser || res?.newUser) {
           const targetEmail = res.user?.email || googleEmail || email.trim();
           const targetName = res.user?.name || googleName || '';
@@ -480,7 +510,7 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
           setTimeout(() => {
             setHasAccessConfirmed(true);
             onSuccess();
-          }, 350);
+          }, 200);
           return;
         }
       } catch (err: any) {
@@ -506,7 +536,7 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
           setTimeout(() => {
             setHasAccessConfirmed(true);
             onSuccess();
-          }, 350);
+          }, 200);
           return;
         }
         setStatus('error');
@@ -826,33 +856,37 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
 
               {/* Google Sign-In Action */}
               <div className="pt-3.5 flex flex-col items-center justify-center w-full">
-                <div className="w-full min-h-[46px] flex items-center justify-center">
-                  {isGoogleLoading ? (
-                    <div className="w-full h-[46px] bg-white border border-[#E5E7EB] text-[#111827] font-semibold text-[14px] rounded-full shadow-xs flex items-center justify-center gap-2.5">
+                <div className="w-full min-h-[46px] flex items-center justify-center relative overflow-hidden">
+                  {/* Dedicated Loading State — completely isolated */}
+                  {isGoogleLoading && (
+                    <div
+                      key="google-loading-state"
+                      className="w-full h-[46px] bg-white border border-[#E5E7EB] text-[#111827] font-semibold text-[14px] rounded-full shadow-xs flex items-center justify-center gap-2.5 z-20"
+                    >
                       <Loader2 className="w-4 h-4 animate-spin text-[#D32F2F]" />
-                      <span>Connecting with Google...</span>
+                      <span>Signing you in...</span>
                     </div>
-                  ) : (
-                    <>
-                      {/* Official Google Identity Services Rendered Button (100% genuine, zero dead-zones) */}
-                      <div
-                        ref={setGoogleButtonContainer}
-                        className={`w-full flex justify-center items-center ${isGisReady ? 'block' : 'hidden'} [&>div]:!mx-auto`}
-                      />
+                  )}
 
-                      {/* Fallback button when GIS script is initializing or offline */}
-                      {!isGisReady && (
-                        <button
-                          type="button"
-                          onClick={handleGoogleSignIn}
-                          disabled={status === 'sending' || isGoogleLoading}
-                          className="w-full h-[46px] bg-white hover:bg-[#FAFAFA] active:scale-[0.99] border border-[#E5E7EB] text-[#111827] font-semibold text-[14px] rounded-full shadow-xs transition-all flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-70"
-                        >
-                          <GoogleIcon size={19} className="w-[19px] h-[19px] shrink-0" />
-                          <span>Continue with Google</span>
-                        </button>
-                      )}
-                    </>
+                  {/* Official Google Identity Services Rendered Button Container (kept in DOM, hidden while loading) */}
+                  <div
+                    key="google-native-btn-wrapper"
+                    ref={setGoogleButtonContainer}
+                    className={`w-full flex justify-center items-center ${isGoogleLoading || !isGisReady ? 'hidden' : 'block'} [&>div]:!mx-auto`}
+                  />
+
+                  {/* Fallback button when GIS script is initializing */}
+                  {!isGisReady && !isGoogleLoading && (
+                    <button
+                      key="google-fallback-btn"
+                      type="button"
+                      onClick={handleGoogleSignIn}
+                      disabled={status === 'sending' || isGoogleLoading}
+                      className="w-full h-[46px] bg-white hover:bg-[#FAFAFA] active:scale-[0.99] border border-[#E5E7EB] text-[#111827] font-semibold text-[14px] rounded-full shadow-xs transition-all flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-70"
+                    >
+                      <GoogleIcon size={19} className="w-[19px] h-[19px] shrink-0" />
+                      <span>Continue with Google</span>
+                    </button>
                   )}
                 </div>
 
