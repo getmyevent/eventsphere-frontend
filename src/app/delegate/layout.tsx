@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useStore } from '../../lib/store';
 import { PhoneFrame } from '../../components/shell/PhoneFrame';
 import { DelegateBottomNavRouted } from '../../components/delegate/DelegateBottomNavRouted';
+import { cleanupLingeringOverlays } from '../../lib/overlayCleanup';
 import { CheckCircle2, Info, AlertCircle } from 'lucide-react';
 
 const PersonDetailModal = dynamic(
@@ -26,16 +27,41 @@ const AccessScreen = dynamic(
 );
 
 export default function DelegateLayout({ children }: { children: React.ReactNode }) {
-  const { role, hasAccessConfirmed, isSessionLoading, setHasAccessConfirmed, selectedPersonId, toast } = useStore();
+  const pathname = usePathname();
+  const router = useRouter();
+  const {
+    role,
+    hasAccessConfirmed,
+    isSessionLoading,
+    setHasAccessConfirmed,
+    selectedPersonId,
+    setSelectedPersonId,
+    toast,
+  } = useStore();
+
   const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
   const [isQRModalOpen, setIsQRModalOpen] = useState(false);
-  const router = useRouter();
 
   useEffect(() => {
     if (!isSessionLoading && role !== 'delegate') {
       router.push('/');
     }
   }, [role, router, isSessionLoading]);
+
+  // Clean up modals and eradicate lingering Google Identity Services (GIS) One-Tap / FedCM overlays on route change
+  useEffect(() => {
+    setSelectedPersonId(null);
+    setIsPrivacyModalOpen(false);
+    setIsQRModalOpen(false);
+    cleanupLingeringOverlays();
+
+    // Safety timeout to catch any delayed GIS DOM injections
+    const timer = setTimeout(() => {
+      cleanupLingeringOverlays();
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [pathname, setSelectedPersonId]);
 
   if (isSessionLoading) {
     return (
@@ -56,7 +82,12 @@ export default function DelegateLayout({ children }: { children: React.ReactNode
     return (
       <div className="bg-[#F6F4F0] min-h-[100dvh] flex flex-col font-sans">
         <PhoneFrame>
-          <AccessScreen onSuccess={() => setHasAccessConfirmed(true)} />
+          <AccessScreen
+            onSuccess={() => {
+              cleanupLingeringOverlays();
+              setHasAccessConfirmed(true);
+            }}
+          />
         </PhoneFrame>
       </div>
     );

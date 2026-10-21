@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useStore } from '../../lib/store';
 import { INITIAL_ATTENDEES, INITIAL_SESSIONS } from '../../lib/mockData';
 import { Person } from '../../types';
@@ -49,12 +49,15 @@ export const PersonDetailModal: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [setSelectedPersonId]);
 
-  if (!selectedPersonId) return null;
+
 
   const normalizedSearch = (selectedPersonId || '').toLowerCase().trim();
 
   // Multi-tier resolution:
-  const person: Person | null =
+  const person: Person | null = useMemo(() => {
+    if (!selectedPersonId) return null;
+
+    return (
     attendees.find((a) => a.id === selectedPersonId) ||
     INITIAL_ATTENDEES.find((a) => a.id === selectedPersonId) ||
     attendees.find((a) => a.name.toLowerCase() === normalizedSearch) ||
@@ -142,9 +145,19 @@ export const PersonDetailModal: React.FC = () => {
         }
       }
       return null;
-    })();
+    })()
 
-  if (!person) return null;
+    );
+  }, [selectedPersonId, attendees, sessions, normalizedSearch]);
+
+  // Defensive fallback: if selectedPersonId is invalid or not found, automatically clear it to avoid stuck backdrops
+  useEffect(() => {
+    if (selectedPersonId && !person) {
+      setSelectedPersonId(null);
+    }
+  }, [selectedPersonId, person, setSelectedPersonId]);
+
+  if (!selectedPersonId || !person) return null;
 
   const isSaved = savedPeopleIds.includes(person.id);
 

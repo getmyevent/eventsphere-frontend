@@ -19,6 +19,7 @@ import {
   X,
   User,
 } from 'lucide-react';
+import { cleanupLingeringOverlays } from '../../lib/overlayCleanup';
 
 interface AccessScreenProps {
   onSuccess: () => void;
@@ -152,6 +153,13 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
       return () => clearTimeout(timer);
     }
   }, [step]);
+
+  // Aggressively clean up Google GIS One-Tap DOM containers and prompts when AccessScreen unmounts
+  useEffect(() => {
+    return () => {
+      cleanupLingeringOverlays();
+    };
+  }, []);
 
   // Countdown timer for OTP resend
   useEffect(() => {
@@ -516,6 +524,7 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
           if (raceErr?.message === 'BACKEND_TIMEOUT') {
             // Cloud Run cold-start or slow network — immediately log in with verified Google credentials!
             if (googleEmail) {
+              cleanupLingeringOverlays();
               establishSessionForEmail(googleEmail, googleName, googlePicture);
               setStatus('confirmed');
               setHasAccessConfirmed(true);
@@ -538,6 +547,7 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
           const targetEmail = res.user?.email || googleEmail || email.trim();
           const targetName = res.user?.name || googleName || '';
           if (targetEmail && targetName) {
+            cleanupLingeringOverlays();
             establishSessionForEmail(targetEmail, targetName, googlePicture);
             setStatus('confirmed');
             setTimeout(() => {
@@ -546,6 +556,7 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
             }, 200);
             return;
           }
+          cleanupLingeringOverlays();
           setPendingEmail(targetEmail);
           setProfileName(targetName);
           setStatus('idle');
@@ -554,6 +565,7 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
         }
 
         if (res?.user) {
+          cleanupLingeringOverlays();
           establishSessionFromBackendUser(res.user, res.token);
           setStatus('confirmed');
           setTimeout(() => {
@@ -571,6 +583,7 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
         ) {
           const targetEmail = googleEmail || email.trim();
           if (targetEmail) {
+            cleanupLingeringOverlays();
             setPendingEmail(targetEmail);
             setProfileName(googleName || deriveNameFromEmail(targetEmail));
             setStatus('idle');
@@ -580,6 +593,7 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
         }
         if (googleEmail) {
           // Fallback: establish delegate authenticated session using verified Google identity
+          cleanupLingeringOverlays();
           establishSessionForEmail(googleEmail, googleName, googlePicture);
           setStatus('confirmed');
           setTimeout(() => {
@@ -624,6 +638,7 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
       const targetEmail = pendingEmail.trim() || email.trim();
       const authRes = await api.auth.register(eventId || 'MPSS26', targetEmail, trimmedName);
       if (authRes?.user) {
+        cleanupLingeringOverlays();
         establishSessionFromBackendUser(authRes.user, authRes.token);
         setStatus('confirmed');
         setTimeout(() => {
@@ -634,6 +649,7 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
       }
 
       // Offline fallback session
+      cleanupLingeringOverlays();
       establishSessionForEmail(targetEmail, trimmedName);
       setStatus('confirmed');
       setTimeout(() => {
@@ -775,16 +791,21 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
           if (notification?.isNotDisplayed?.()) {
             const reason = notification.getNotDisplayedReason?.() || 'unknown';
             console.warn('GIS One-Tap not displayed:', reason);
+            cleanupLingeringOverlays();
             if (reason === 'opt_out_or_no_session') {
               setErrorMessage('No active Google session found. Please sign in to your Google account in this browser and try again.');
             } else if (reason === 'suppressed_by_user') {
               setErrorMessage('Google Sign-In prompt was previously dismissed. Please use the button directly or reset browser cookies.');
             }
           }
+          if (notification?.isDismissedMoment?.()) {
+            cleanupLingeringOverlays();
+          }
         });
         return;
       } catch (err: any) {
         setIsGoogleLoading(false);
+        cleanupLingeringOverlays();
         setErrorMessage('Unable to initialize Google Sign-In. Please check your browser settings.');
         return;
       }

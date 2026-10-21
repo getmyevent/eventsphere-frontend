@@ -1,14 +1,22 @@
 'use client';
 
 import React from 'react';
-import { usePathname, useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Home, Calendar, Building2, User } from 'lucide-react';
 import { useStore } from '../../lib/store';
+import { cleanupLingeringOverlays } from '../../lib/overlayCleanup';
 
 export const DelegateBottomNavRouted: React.FC = () => {
   const pathname = usePathname();
-  const router = useRouter();
-  const { setSelectedSessionId, setScheduleSubTab, setSessionBackTab, setViewSavedCompaniesOnly } = useStore();
+  const {
+    setSelectedPersonId,
+    setSelectedSessionId,
+    setScheduleSubTab,
+    setSessionBackTab,
+    setViewSavedCompaniesOnly,
+    setViewSavedPeopleOnly,
+  } = useStore();
 
   const navItems = [
     { id: 'home', label: 'Home', icon: Home, href: '/delegate/home' },
@@ -27,26 +35,19 @@ export const DelegateBottomNavRouted: React.FC = () => {
       pathname === '/delegate/polls' ||
       pathname === '/delegate/map' ||
       pathname === '/delegate/sponsors' ||
-      pathname === '/delegate/people'
+      pathname === '/delegate/people' ||
+      pathname === '/delegate/about' ||
+      pathname === '/delegate/founders'
     ) {
       return 'home';
     }
-    if (
-      pathname.startsWith('/delegate/agenda') ||
-      pathname.startsWith('/delegate/agenda/')
-    ) {
+    if (pathname.startsWith('/delegate/agenda')) {
       return 'agenda';
     }
-    if (
-      pathname === '/delegate/exhibitors' ||
-      pathname.startsWith('/delegate/exhibitors/')
-    ) {
+    if (pathname.startsWith('/delegate/exhibitors')) {
       return 'exhibitors';
     }
-    if (
-      pathname === '/delegate/profile' ||
-      pathname.startsWith('/delegate/profile/')
-    ) {
+    if (pathname.startsWith('/delegate/profile')) {
       return 'profile';
     }
     return 'home';
@@ -54,42 +55,58 @@ export const DelegateBottomNavRouted: React.FC = () => {
 
   const activeId = getActiveId();
 
+  const handleNavClick = (item: (typeof navItems)[0]) => {
+    // 1. Immediately dismiss any open modal dialogs
+    setSelectedPersonId(null);
+    setSelectedSessionId(null);
+
+    // 2. Clear sub-views and filter states
+    if (item.id === 'agenda') {
+      setScheduleSubTab('all');
+      setSessionBackTab('schedule');
+    }
+    if (item.id === 'exhibitors') {
+      setViewSavedCompaniesOnly(false);
+    }
+    if (item.id === 'home') {
+      setViewSavedPeopleOnly(false);
+    }
+
+    // 3. Remove any lingering Google Identity Services (GIS) / One-Tap backdrops or iframes
+    cleanupLingeringOverlays();
+  };
+
   return (
-    <nav className="flex-shrink-0 w-full z-40 bg-[#FFFFFF] border-t border-[#DEDCD7] pb-safe px-2 pt-1 shadow-md select-none">
+    <nav
+      className="flex-shrink-0 w-full z-[60] bg-[#FFFFFF] border-t border-[#DEDCD7] pb-safe px-2 pt-1 shadow-md select-none touch-manipulation pointer-events-auto"
+      role="navigation"
+      aria-label="Main Navigation"
+    >
       <div className="flex items-center justify-around max-w-md mx-auto relative">
         {navItems.map((item) => {
           const isActive = activeId === item.id;
           const Icon = item.icon;
 
           return (
-            <button
+            <Link
               key={item.id}
-              onClick={() => {
-                if (item.id === 'agenda') {
-                  setSelectedSessionId(null);
-                  setScheduleSubTab('all');
-                  setSessionBackTab('schedule');
-                }
-                if (item.id === 'home') {
-                  setSelectedSessionId(null);
-                }
-                if (item.id === 'exhibitors') {
-                  setViewSavedCompaniesOnly(false);
-                }
-                router.push(item.href);
-              }}
-              className={`flex-1 flex flex-col items-center justify-center min-h-[42px] py-1 transition-colors relative ${
+              href={item.href}
+              prefetch={true}
+              onClick={() => handleNavClick(item)}
+              className={`flex-1 flex flex-col items-center justify-center min-h-[48px] py-1 transition-colors relative cursor-pointer touch-manipulation select-none active:opacity-75 ${
                 isActive ? 'text-[#D11E39]' : 'text-[#6B6B6B] hover:text-[#181818]'
               }`}
+              aria-label={item.label}
+              aria-current={isActive ? 'page' : undefined}
             >
-              <div className="relative">
+              <div className="relative pointer-events-none">
                 <Icon
                   className={`w-[22px] h-[22px] ${
                     isActive ? 'stroke-[2.2]' : 'stroke-[1.8]'
                   }`}
                 />
               </div>
-              <div className="flex flex-col items-center mt-1">
+              <div className="flex flex-col items-center mt-1 pointer-events-none">
                 <span
                   className={`text-[9.5px] font-medium tracking-tight ${
                     isActive ? 'font-bold' : ''
@@ -101,7 +118,7 @@ export const DelegateBottomNavRouted: React.FC = () => {
                   <div className="w-4 h-0.5 bg-[#D11E39] rounded-full mt-0.5" />
                 )}
               </div>
-            </button>
+            </Link>
           );
         })}
       </div>
