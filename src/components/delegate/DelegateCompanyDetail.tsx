@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { ChevronLeft, MapPin, Star, Download } from 'lucide-react';
+import { ChevronLeft, MapPin, Star } from 'lucide-react';
 import { useStore } from '@/lib/store';
 import { api } from '@/lib/api';
 
@@ -14,8 +14,7 @@ export const DelegateCompanyDetail: React.FC = () => {
     exhibitors, 
     products, 
     savedCompanyIds, 
-    toggleSaveCompany,
-    showToast 
+    toggleSaveCompany
   } = useStore();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [liveProducts, setLiveProducts] = useState<any[]>([]);
@@ -56,70 +55,23 @@ export const DelegateCompanyDetail: React.FC = () => {
 
   if (!company) return null;
 
-  const handleDownloadBrochure = () => {
-    const content = `================================================
-${company.company.toUpperCase()} - OFFICIAL EXHIBITOR BROCHURE
-MP Semiconductor Summit 2026 (MPSS26)
-================================================
-
-Booth: ${company.booth || 'TBA'}
-Location: Brilliant Convention Centre, Indore, Madhya Pradesh
-Category: ${company.category || 'Technology'}
-
-ABOUT ${company.company.toUpperCase()}:
-${company.company} is showcasing cutting-edge semiconductor innovations and solutions at MPSS26.
-Visit Booth ${company.booth || 'TBA'} to explore live demonstrations and speak with company representatives.
-
-FEATURED PRODUCTS & SOLUTIONS:
-${companyProducts.length > 0 
-  ? companyProducts.map((p, idx) => `${idx + 1}. ${p.name} (${p.category})\n   ${p.overview || p.tagline || ''}`).join('\n\n')
-  : 'Detailed catalog available at the booth.'}
-
-------------------------------------------------
-Generated via GetMyEvent Official App (MPSS26)
-`;
-
-    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `${company.company.replace(/[^a-zA-Z0-9]/g, '_')}_Brochure_MPSS26.txt`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-
-    showToast(`Downloaded ${company.company} brochure ✓`, 'success');
-  };
-
   return (
     <div ref={scrollRef} className="flex-1 bg-[#F6F4F0] flex flex-col h-full overflow-y-auto no-scrollbar">
       {/* Header */}
-      <div className="pt-4 pb-4 px-4 bg-[#F6F4F0] sticky top-0 z-10 flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2.5 min-w-0 pr-1">
-          <button 
-            onClick={() => {
-              if (typeof window !== 'undefined' && window.history.length > 1) {
-                router.back();
-              } else {
-                router.push('/delegate/exhibitors');
-              }
-            }}
-            className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-[#181818] transition-active active:scale-95 shadow-sm shrink-0"
-          >
-            <ChevronLeft className="w-5 h-5 stroke-[2.5]" />
-          </button>
-          <h1 className="text-[19px] font-bold text-[#181818] tracking-tight truncate">{company.company}</h1>
-        </div>
-
-        <button
-          onClick={handleDownloadBrochure}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-full bg-white hover:bg-gray-50 text-[#181818] border border-[#DEDCD7] text-[12px] font-semibold transition-all active:scale-95 shadow-sm shrink-0 hover:border-[#181818]"
-          title="Download Brochure"
+      <div className="pt-4 pb-4 px-4 bg-[#F6F4F0] sticky top-0 z-10 flex items-center gap-2.5">
+        <button 
+          onClick={() => {
+            if (typeof window !== 'undefined' && window.history.length > 1) {
+              router.back();
+            } else {
+              router.push('/delegate/exhibitors');
+            }
+          }}
+          className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-[#181818] transition-active active:scale-95 shadow-sm shrink-0"
         >
-          <Download className="w-3.5 h-3.5 text-[#B51F32]" />
-          <span>Brochure</span>
+          <ChevronLeft className="w-5 h-5 stroke-[2.5]" />
         </button>
+        <h1 className="text-[19px] font-bold text-[#181818] tracking-tight truncate">{company.company}</h1>
       </div>
 
       <div className="px-4 pb-4 space-y-3">

@@ -9,7 +9,6 @@ import {
   RotateCcw,
   Search,
   X,
-  MapPin,
   ExternalLink,
   Sparkles,
   Info,
@@ -745,23 +744,13 @@ export const DelegateMap: React.FC = () => {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex items-center gap-2 mt-3 pt-2.5 border-t border-gray-100">
+              <div className="mt-3 pt-2.5 border-t border-gray-100">
                 <button
                   onClick={() => handleNavigateToExhibitor(selectedBooth)}
-                  className="flex-1 py-1.5 px-3 bg-[#B51F32] hover:bg-[#9C1A2B] text-white text-xs font-bold rounded-xl shadow-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer active:scale-95"
+                  className="w-full py-2 px-3 bg-[#B51F32] hover:bg-[#9C1A2B] text-white text-xs font-bold rounded-xl shadow-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer active:scale-95"
                 >
                   <span>View Profile & Products</span>
                   <ExternalLink className="w-3.5 h-3.5" />
-                </button>
-                <button
-                  onClick={() => {
-                    // Zoom into booth
-                    handleSelectBooth(selectedBooth);
-                  }}
-                  className="py-1.5 px-3 bg-white border border-[#DEDCD7] text-[#181818] text-xs font-semibold rounded-xl hover:bg-gray-50 flex items-center gap-1 cursor-pointer"
-                >
-                  <MapPin className="w-3.5 h-3.5 text-[#B51F32]" />
-                  <span>Pin</span>
                 </button>
               </div>
             </div>
