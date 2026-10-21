@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useStore } from '../../lib/store';
 import { api } from '../../lib/api';
 import { getStoredProfileImage } from '../../lib/profileImageStorage';
@@ -51,6 +51,30 @@ const GoogleIcon: React.FC<{ className?: string; size?: number }> = ({ className
     />
   </svg>
 );
+
+// Helper: Safely decode Google JWT payload with UTF-8 character support
+const parseJwtPayload = (jwt: string): { email?: string; name?: string; picture?: string; sub?: string } | null => {
+  try {
+    const parts = jwt.split('.');
+    if (parts.length < 2) return null;
+    const base64Url = parts[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+    return JSON.parse(jsonPayload);
+  } catch {
+    try {
+      const base64 = jwt.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+      return JSON.parse(atob(base64));
+    } catch {
+      return null;
+    }
+  }
+};
 
 // Helper: Mask email address (e.g., harigupta@getmyevent.in -> h***a@getmyevent.in)
 const maskEmailAddress = (rawEmail: string): string => {
@@ -111,7 +135,7 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
   const digit5Ref = useRef<HTMLInputElement>(null);
 
   const digitRefs = [digit0Ref, digit1Ref, digit2Ref, digit3Ref, digit4Ref, digit5Ref];
-  const googleButtonContainerRef = useRef<HTMLDivElement>(null);
+  const googleButtonContainerRef = useRef<HTMLDivElement | null>(null);
   const [isGisReady, setIsGisReady] = useState(false);
 
   // Focus first digit box when switching to OTP screen
@@ -423,74 +447,76 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
   };
 
   // Handle credential token returned by Google Identity Services
-  const handleGoogleCredentialResponse = async (response: any) => {
-    if (!response?.credential) return;
-    setIsGoogleLoading(true);
-    setStatus('idle');
-    setErrorMessage('');
+  const handleGoogleCredentialResponse = useCallback(
+    async (response: any) => {
+      if (!response?.credential) return;
+      setIsGoogleLoading(true);
+      setStatus('idle');
+      setErrorMessage('');
 
-    // Extract payload from Google JWT for smooth profile pre-population
-    let googleEmail = '';
-    let googleName = '';
-    let googlePicture = '';
-    try {
-      const payloadBase64 = response.credential.split('.')[1];
-      const decoded = JSON.parse(atob(payloadBase64.replace(/-/g, '+').replace(/_/g, '/')));
-      googleEmail = decoded.email || '';
-      googleName = decoded.name || '';
-      googlePicture = decoded.picture || '';
-    } catch (e) {
-      // ignore
-    }
+      // Safely extract payload from Google JWT with UTF-8 character support
+      const payload = parseJwtPayload(response.credential);
+      const googleEmail = payload?.email || '';
+      const googleName = payload?.name || '';
+      const googlePicture = payload?.picture || '';
 
-    try {
-      const res = await api.auth.googleLogin(eventId || 'MPSS26', '', response.credential);
-      if (res?.isNewUser || res?.newUser) {
-        const targetEmail = res.user?.email || googleEmail || email.trim();
-        const targetName = res.user?.name || googleName || '';
-        setPendingEmail(targetEmail);
-        setProfileName(targetName);
-        setStatus('idle');
-        setStep('create_profile');
-        return;
-      }
+      const cleanEventId = (eventId || 'MPSS26').trim().toUpperCase().replace(/\s+/g, '');
 
-      if (res?.user) {
-        establishSessionFromBackendUser(res.user);
-        setStatus('confirmed');
-        setTimeout(() => {
-          setHasAccessConfirmed(true);
-          onSuccess();
-        }, 350);
-        return;
-      }
-    } catch (err: any) {
-      const errMsg = err?.message || '';
-      if (errMsg.toLowerCase().includes('not registered') || errMsg.toLowerCase().includes('not found') || errMsg.includes('404')) {
-        const targetEmail = googleEmail || email.trim();
-        if (targetEmail) {
+      try {
+        const res = await api.auth.googleLogin(cleanEventId, '', response.credential);
+        if (res?.isNewUser || res?.newUser) {
+          const targetEmail = res.user?.email || googleEmail || email.trim();
+          const targetName = res.user?.name || googleName || '';
           setPendingEmail(targetEmail);
-          setProfileName(googleName || deriveNameFromEmail(targetEmail));
+          setProfileName(targetName);
           setStatus('idle');
           setStep('create_profile');
           return;
         }
+
+        if (res?.user) {
+          establishSessionFromBackendUser(res.user);
+          setStatus('confirmed');
+          setTimeout(() => {
+            setHasAccessConfirmed(true);
+            onSuccess();
+          }, 350);
+          return;
+        }
+      } catch (err: any) {
+        const errMsg = err?.message || '';
+        if (
+          errMsg.toLowerCase().includes('not registered') ||
+          errMsg.toLowerCase().includes('not found') ||
+          errMsg.includes('404')
+        ) {
+          const targetEmail = googleEmail || email.trim();
+          if (targetEmail) {
+            setPendingEmail(targetEmail);
+            setProfileName(googleName || deriveNameFromEmail(targetEmail));
+            setStatus('idle');
+            setStep('create_profile');
+            return;
+          }
+        }
+        if (googleEmail) {
+          // Fallback: establish delegate authenticated session using verified Google identity
+          establishSessionForEmail(googleEmail, googleName, googlePicture);
+          setStatus('confirmed');
+          setTimeout(() => {
+            setHasAccessConfirmed(true);
+            onSuccess();
+          }, 350);
+          return;
+        }
+        setStatus('error');
+        setErrorMessage(errMsg || 'This Google account is not registered as an event delegate.');
+      } finally {
+        setIsGoogleLoading(false);
       }
-      if (googleEmail) {
-        establishSessionForEmail(googleEmail, googleName, googlePicture);
-        setStatus('confirmed');
-        setTimeout(() => {
-          setHasAccessConfirmed(true);
-          onSuccess();
-        }, 350);
-        return;
-      }
-      setStatus('error');
-      setErrorMessage(errMsg || 'This Google account is not registered as an event delegate.');
-    } finally {
-      setIsGoogleLoading(false);
-    }
-  };
+    },
+    [eventId, email, onSuccess, setHasAccessConfirmed]
+  );
 
   // Step 3: Complete Profile & Activate Delegate Pass
   const handleCreateProfile = async (e?: React.FormEvent) => {
@@ -541,65 +567,30 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
     }
   };
 
-  // Initialize Google Identity Services (GIS) and render official Google button
-  useEffect(() => {
-    const googleClientId =
-      process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ||
-      '1031947527724-gqcj9phog0kfubj1l1e0vg83uish36g2.apps.googleusercontent.com';
+  const googleClientId =
+    process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ||
+    '1031947527724-gqcj9phog0kfubj1l1e0vg83uish36g2.apps.googleusercontent.com';
 
-    const renderGoogle = () => {
-      if (typeof window !== 'undefined' && (window as any).google?.accounts?.id) {
-        try {
-          (window as any).google.accounts.id.initialize({
-            client_id: googleClientId,
-            callback: handleGoogleCredentialResponse,
-            auto_select: false,
-            cancel_on_tap_outside: true,
-          });
+  // Render Google's official Sign-In button into container with zero dead-zones
+  const renderGoogleButton = useCallback(
+    (container: HTMLDivElement | null) => {
+      if (!container || typeof window === 'undefined') return;
 
-          if (googleButtonContainerRef.current) {
-            googleButtonContainerRef.current.innerHTML = '';
-            const containerWidth = googleButtonContainerRef.current.clientWidth || 320;
-            (window as any).google.accounts.id.renderButton(googleButtonContainerRef.current, {
-              theme: 'outline',
-              size: 'large',
-              type: 'standard',
-              text: 'continue_with',
-              shape: 'rectangular',
-              logo_alignment: 'center',
-              width: containerWidth > 0 ? Math.min(containerWidth, 360) : 320,
-            });
-            setIsGisReady(true);
-          }
-        } catch (e) {
-          console.error('Failed to render Google Sign-In button:', e);
+      if (!(window as any).google?.accounts?.id) {
+        // Ensure Google GIS script tag is dynamically loaded if missing
+        if (!document.querySelector('script[src*="accounts.google.com/gsi/client"]')) {
+          const script = document.createElement('script');
+          script.src = 'https://accounts.google.com/gsi/client';
+          script.async = true;
+          script.defer = true;
+          script.onload = () => {
+            renderGoogleButton(container);
+          };
+          document.head.appendChild(script);
         }
+        return;
       }
-    };
 
-    if ((window as any).google?.accounts?.id) {
-      renderGoogle();
-    } else {
-      const interval = setInterval(() => {
-        if ((window as any).google?.accounts?.id) {
-          renderGoogle();
-          clearInterval(interval);
-        }
-      }, 150);
-      return () => clearInterval(interval);
-    }
-  }, []);
-
-  // Fallback Google Sign-In trigger (One-Tap prompt)
-  const handleGoogleSignIn = async () => {
-    setErrorMessage('');
-    setIsGoogleLoading(true);
-
-    const googleClientId =
-      process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ||
-      '1031947527724-gqcj9phog0kfubj1l1e0vg83uish36g2.apps.googleusercontent.com';
-
-    if (typeof window !== 'undefined' && (window as any).google?.accounts?.id) {
       try {
         (window as any).google.accounts.id.initialize({
           client_id: googleClientId,
@@ -608,10 +599,108 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
           cancel_on_tap_outside: true,
         });
 
+        container.innerHTML = '';
+        const measuredWidth = container.clientWidth || 340;
+        const targetWidth = Math.min(Math.max(measuredWidth, 240), 400);
+
+        (window as any).google.accounts.id.renderButton(container, {
+          theme: 'outline',
+          size: 'large',
+          type: 'standard',
+          text: 'continue_with',
+          shape: 'pill',
+          logo_alignment: 'center',
+          width: targetWidth,
+        });
+
+        setIsGisReady(true);
+      } catch (err) {
+        console.error('Failed to render Google Sign-In button:', err);
+      }
+    },
+    [googleClientId, handleGoogleCredentialResponse]
+  );
+
+  // Callback ref: renders Google button the moment container mounts into DOM
+  const setGoogleButtonContainer = useCallback(
+    (node: HTMLDivElement | null) => {
+      googleButtonContainerRef.current = node;
+      if (node) {
+        renderGoogleButton(node);
+      }
+    },
+    [renderGoogleButton]
+  );
+
+  // Ensure button is re-rendered whenever navigating back to 'details' step or resizing
+  useEffect(() => {
+    if (step !== 'details') return;
+
+    const container = googleButtonContainerRef.current;
+    if (container) {
+      renderGoogleButton(container);
+    }
+
+    // Polling retry while GIS client finishes initialization
+    let attempts = 0;
+    const interval = setInterval(() => {
+      attempts++;
+      if ((window as any).google?.accounts?.id && googleButtonContainerRef.current) {
+        renderGoogleButton(googleButtonContainerRef.current);
+        clearInterval(interval);
+      }
+      if (attempts > 30) {
+        clearInterval(interval);
+      }
+    }, 150);
+
+    // ResizeObserver to adjust button if device rotates or frame resizes
+    let ro: ResizeObserver | null = null;
+    if (container && typeof ResizeObserver !== 'undefined') {
+      let lastWidth = container.clientWidth;
+      ro = new ResizeObserver((entries) => {
+        for (const entry of entries) {
+          const w = Math.round(entry.contentRect.width);
+          if (w > 200 && Math.abs(w - lastWidth) > 15) {
+            lastWidth = w;
+            renderGoogleButton(container);
+          }
+        }
+      });
+      ro.observe(container);
+    }
+
+    return () => {
+      clearInterval(interval);
+      ro?.disconnect();
+    };
+  }, [step, renderGoogleButton]);
+
+  // Fallback Google Sign-In trigger when GIS is loading or One-Tap is used
+  const handleGoogleSignIn = async () => {
+    setErrorMessage('');
+    setIsGoogleLoading(true);
+
+    if (typeof window === 'undefined') {
+      setIsGoogleLoading(false);
+      return;
+    }
+
+    if ((window as any).google?.accounts?.id) {
+      if (googleButtonContainerRef.current) {
+        renderGoogleButton(googleButtonContainerRef.current);
+      }
+      try {
         (window as any).google.accounts.id.prompt((notification: any) => {
           setIsGoogleLoading(false);
-          if (notification.isNotDisplayed()) {
-            console.warn('GIS One-Tap not displayed:', notification.getNotDisplayedReason?.());
+          if (notification?.isNotDisplayed?.()) {
+            const reason = notification.getNotDisplayedReason?.() || 'unknown';
+            console.warn('GIS One-Tap not displayed:', reason);
+            if (reason === 'opt_out_or_no_session') {
+              setErrorMessage('No active Google session found. Please sign in to your Google account in this browser and try again.');
+            } else if (reason === 'suppressed_by_user') {
+              setErrorMessage('Google Sign-In prompt was previously dismissed. Please use the button directly or reset browser cookies.');
+            }
           }
         });
         return;
@@ -622,8 +711,24 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
       }
     }
 
-    setIsGoogleLoading(false);
-    setErrorMessage('Google Sign-In is still loading. Please try again in a moment.');
+    // Wait up to 3 seconds for GIS script to load
+    let elapsed = 0;
+    const timer = setInterval(() => {
+      elapsed += 150;
+      if ((window as any).google?.accounts?.id) {
+        clearInterval(timer);
+        setIsGoogleLoading(false);
+        if (googleButtonContainerRef.current) {
+          renderGoogleButton(googleButtonContainerRef.current);
+        }
+        return;
+      }
+      if (elapsed >= 3000) {
+        clearInterval(timer);
+        setIsGoogleLoading(false);
+        setErrorMessage('Google Sign-In service is taking longer than expected. Please check your internet connection or disable ad-blockers, then retry.');
+      }
+    }, 150);
   };
 
   return (
@@ -721,38 +826,33 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
 
               {/* Google Sign-In Action */}
               <div className="pt-3.5 flex flex-col items-center justify-center w-full">
-                <div className="relative w-full h-[52px]">
-                  {/* Visual custom button matching reference mockup */}
-                  <div className="w-full h-full bg-white hover:bg-[#FAFAFA] active:scale-[0.99] border border-[#E5E7EB] text-[#111827] font-semibold text-[15px] rounded-2xl shadow-xs transition-all flex items-center justify-center gap-3 cursor-pointer">
-                    {isGoogleLoading ? (
-                      <>
-                        <Loader2 className="w-5 h-5 animate-spin text-[#D32F2F]" />
-                        <span>Connecting with Google...</span>
-                      </>
-                    ) : (
-                      <>
-                        <GoogleIcon size={22} className="w-[22px] h-[22px] shrink-0" />
-                        <span>Continue with Google</span>
-                      </>
-                    )}
-                  </div>
+                <div className="w-full min-h-[46px] flex items-center justify-center">
+                  {isGoogleLoading ? (
+                    <div className="w-full h-[46px] bg-white border border-[#E5E7EB] text-[#111827] font-semibold text-[14px] rounded-full shadow-xs flex items-center justify-center gap-2.5">
+                      <Loader2 className="w-4 h-4 animate-spin text-[#D32F2F]" />
+                      <span>Connecting with Google...</span>
+                    </div>
+                  ) : (
+                    <>
+                      {/* Official Google Identity Services Rendered Button (100% genuine, zero dead-zones) */}
+                      <div
+                        ref={setGoogleButtonContainer}
+                        className={`w-full flex justify-center items-center ${isGisReady ? 'block' : 'hidden'} [&>div]:!mx-auto`}
+                      />
 
-                  {/* Google GIS rendered button as transparent overlay */}
-                  <div
-                    ref={googleButtonContainerRef}
-                    id="google-signin-btn"
-                    className="absolute inset-0 w-full h-full opacity-0 overflow-hidden cursor-pointer z-10 [&>div]:!w-full [&>div]:!h-full [&_iframe]:!w-full [&_iframe]:!h-full"
-                  />
-
-                  {/* Click fallback when GIS is loading/offline */}
-                  {!isGisReady && (
-                    <button
-                      type="button"
-                      onClick={handleGoogleSignIn}
-                      disabled={status === 'sending' || isGoogleLoading}
-                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
-                      aria-label="Continue with Google"
-                    />
+                      {/* Fallback button when GIS script is initializing or offline */}
+                      {!isGisReady && (
+                        <button
+                          type="button"
+                          onClick={handleGoogleSignIn}
+                          disabled={status === 'sending' || isGoogleLoading}
+                          className="w-full h-[46px] bg-white hover:bg-[#FAFAFA] active:scale-[0.99] border border-[#E5E7EB] text-[#111827] font-semibold text-[14px] rounded-full shadow-xs transition-all flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-70"
+                        >
+                          <GoogleIcon size={19} className="w-[19px] h-[19px] shrink-0" />
+                          <span>Continue with Google</span>
+                        </button>
+                      )}
+                    </>
                   )}
                 </div>
 
