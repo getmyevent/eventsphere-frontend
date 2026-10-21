@@ -328,14 +328,26 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
     const userId = backendUser.id || `att-${Date.now().toString().slice(-6)}`;
     const avatarUrl = getStoredProfileImage(backendUser.email) || backendUser.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=181818&color=ffffff&bold=true`;
 
+    const isPlaceholderDesignation = (d?: string) => {
+      if (!d) return true;
+      const lower = d.trim().toLowerCase();
+      return lower === 'delegate' || lower === 'summit attendee' || lower === 'attendee' || lower === 'participant';
+    };
+
+    const isPlaceholderCompany = (c?: string) => {
+      if (!c) return true;
+      const lower = c.trim().toLowerCase();
+      return lower === 'summit attendee' || lower === 'mpss 2026' || lower === 'mpss26' || lower === 'delegate' || lower === 'attendee';
+    };
+
     setCurrentUser({
       id: userId,
       name: name,
-      designation: backendUser.designation || '',
-      company: backendUser.company || '',
+      designation: isPlaceholderDesignation(backendUser.designation) ? '' : (backendUser.designation || ''),
+      company: isPlaceholderCompany(backendUser.company) ? '' : (backendUser.company || ''),
       role: personRole,
       email: backendUser.email || '',
-      mobile: backendUser.mobile || '',
+      mobile: backendUser.mobile && backendUser.mobile !== 'Not listed' ? backendUser.mobile : '',
       avatar: avatarUrl,
       bio: backendUser.bio || '',
       linkedin: backendUser.linkedin || '',

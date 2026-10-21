@@ -34,6 +34,18 @@ import { api } from './api';
 import { getStoredProfileImage } from './profileImageStorage';
 
 
+export const isPlaceholderDesignation = (d?: string): boolean => {
+  if (!d) return true;
+  const lower = d.trim().toLowerCase();
+  return lower === 'delegate' || lower === 'summit attendee' || lower === 'attendee' || lower === 'participant';
+};
+
+export const isPlaceholderCompany = (c?: string): boolean => {
+  if (!c) return true;
+  const lower = c.trim().toLowerCase();
+  return lower === 'summit attendee' || lower === 'mpss 2026' || lower === 'mpss26' || lower === 'delegate' || lower === 'attendee';
+};
+
 export const EMPTY_USER: Person = {
   id: '',
   name: '',
@@ -381,6 +393,15 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         const parsed = JSON.parse(saved);
         if (parsed.currentUser && parsed.currentUser.id === authUser.id) {
           const u = { ...EMPTY_USER, ...parsed.currentUser };
+          if (isPlaceholderDesignation(u.designation)) {
+            u.designation = '';
+          }
+          if (isPlaceholderCompany(u.company)) {
+            u.company = '';
+          }
+          if (u.mobile === 'Not listed') {
+            u.mobile = '';
+          }
           if (u.email) {
             const storedImg = getStoredProfileImage(u.email);
             if (storedImg) {
@@ -398,14 +419,20 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           }
           setCurrentUser(u);
         } else {
-          setCurrentUser((prev) => ({
-            ...EMPTY_USER,
-            ...prev,
-            id: authUser.id,
-            name: authUser.name || prev.name,
-            mobile: authUser.mobile || prev.mobile,
-            email: authUser.email || prev.email,
-          }));
+          setCurrentUser((prev) => {
+            const rawDesig = authUser.designation || prev.designation || '';
+            const rawComp = authUser.company || prev.company || '';
+            return {
+              ...EMPTY_USER,
+              ...prev,
+              id: authUser.id,
+              name: authUser.name || prev.name,
+              mobile: authUser.mobile && authUser.mobile !== 'Not listed' ? authUser.mobile : (prev.mobile && prev.mobile !== 'Not listed' ? prev.mobile : ''),
+              email: authUser.email || prev.email,
+              designation: isPlaceholderDesignation(rawDesig) ? '' : rawDesig,
+              company: isPlaceholderCompany(rawComp) ? '' : rawComp,
+            };
+          });
         }
         if (parsed.role) setRoleState(parsed.role);
         if (typeof parsed.hasAccessConfirmed === 'boolean') {
@@ -424,8 +451,10 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           ...EMPTY_USER,
           id: authUser.id,
           name: authUser.name || '',
-          mobile: authUser.mobile || '',
+          mobile: authUser.mobile && authUser.mobile !== 'Not listed' ? authUser.mobile : '',
           email: authUser.email || '',
+          designation: '',
+          company: '',
         });
         setHasAccessConfirmed(true);
       }
@@ -701,14 +730,19 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       api.attendees.getMyProfile()
         .then((profile) => {
           if (profile && profile.name) {
+            const rawDesig = profile.designation;
+            const cleanDesig = isPlaceholderDesignation(rawDesig) ? '' : rawDesig;
+            const rawComp = profile.company;
+            const cleanComp = isPlaceholderCompany(rawComp) ? '' : rawComp;
+
             setCurrentUser((prev) => ({
               ...prev,
               name: profile.name || prev.name,
-              designation: profile.designation || prev.designation,
-              company: profile.company || prev.company,
+              designation: cleanDesig || (isPlaceholderDesignation(prev.designation) ? '' : prev.designation),
+              company: cleanComp || (isPlaceholderCompany(prev.company) ? '' : prev.company),
               bio: profile.bio || prev.bio,
               email: profile.email || prev.email,
-              mobile: profile.mobile || prev.mobile,
+              mobile: profile.mobile && profile.mobile !== 'Not listed' ? profile.mobile : prev.mobile,
               avatar: profile.avatar || prev.avatar,
               linkedin: profile.linkedin || prev.linkedin,
               twitter: profile.twitter || prev.twitter,
@@ -1238,14 +1272,14 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             ...prev,
             ...data,
             name: res.name || prev.name,
-            designation: res.designation || prev.designation,
-            company: res.company || prev.company,
+            designation: data.designation !== undefined ? data.designation : (isPlaceholderDesignation(res.designation) ? '' : (res.designation || prev.designation)),
+            company: data.company !== undefined ? data.company : (isPlaceholderCompany(res.company) ? '' : (res.company || prev.company)),
             bio: res.bio || prev.bio,
             email: res.email || prev.email,
-            mobile: res.mobile || prev.mobile,
+            mobile: data.mobile !== undefined ? data.mobile : (res.mobile || prev.mobile),
             avatar: res.avatar || prev.avatar,
-            linkedin: res.linkedin || prev.linkedin,
-            twitter: res.twitter || prev.twitter,
+            linkedin: data.linkedin !== undefined ? data.linkedin : (res.linkedin || prev.linkedin),
+            twitter: data.twitter !== undefined ? data.twitter : (res.twitter || prev.twitter),
             interests: (res.interests && res.interests.length > 0) ? res.interests : prev.interests,
             skills: (res.skills && res.skills.length > 0) ? res.skills : prev.skills,
           };

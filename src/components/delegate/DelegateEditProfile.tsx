@@ -16,34 +16,60 @@ export const DelegateEditProfile: React.FC = () => {
   const router = useRouter();
   const { currentUser, setCurrentUser, updateCurrentUser, showToast } = useStore();
   
+  const isPlaceholderDesignation = (d?: string) => {
+    if (!d) return true;
+    const lower = d.trim().toLowerCase();
+    return lower === 'delegate' || lower === 'summit attendee' || lower === 'attendee' || lower === 'participant';
+  };
+
+  const isPlaceholderCompany = (c?: string) => {
+    if (!c) return true;
+    const lower = c.trim().toLowerCase();
+    return lower === 'summit attendee' || lower === 'mpss 2026' || lower === 'mpss26' || lower === 'delegate' || lower === 'attendee';
+  };
+
   const [formData, setFormData] = useState({
     name: currentUser.name || '',
-    designation: currentUser.designation || '',
-    company: currentUser.company || '',
+    designation: isPlaceholderDesignation(currentUser.designation) ? '' : (currentUser.designation || ''),
+    company: isPlaceholderCompany(currentUser.company) ? '' : (currentUser.company || ''),
     bio: currentUser.bio || '',
     linkedin: currentUser.linkedin || '',
     twitter: currentUser.twitter || '',
     email: currentUser.email || '',
-    mobile: currentUser.mobile || '',
+    mobile: currentUser.mobile && currentUser.mobile !== 'Not listed' ? currentUser.mobile : '',
     avatar: currentUser.avatar || '',
   });
 
   const [isProcessingPhoto, setIsProcessingPhoto] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  // Sync profile image from email-scoped localStorage on mount and when user's email changes
+  // Sync profile data and avatar when currentUser updates
   useEffect(() => {
     const userEmail = currentUser?.email;
     if (userEmail) {
       const storedImage = getStoredProfileImage(userEmail);
       if (storedImage) {
-        setFormData((prev) => ({ ...prev, avatar: storedImage }));
+        setFormData((prev) => ({
+          ...prev,
+          avatar: storedImage,
+          name: prev.name || currentUser?.name || '',
+          designation: prev.designation ? prev.designation : (isPlaceholderDesignation(currentUser?.designation) ? '' : (currentUser?.designation || '')),
+          company: prev.company ? prev.company : (isPlaceholderCompany(currentUser?.company) ? '' : (currentUser?.company || '')),
+          email: currentUser?.email || prev.email,
+        }));
         return;
       }
     }
     // If no stored image for this specific email, fallback to default/initial avatar
-    setFormData((prev) => ({ ...prev, avatar: currentUser?.avatar || '' }));
-  }, [currentUser?.email, currentUser?.avatar]);
+    setFormData((prev) => ({
+      ...prev,
+      avatar: currentUser?.avatar || '',
+      name: prev.name || currentUser?.name || '',
+      designation: prev.designation ? prev.designation : (isPlaceholderDesignation(currentUser?.designation) ? '' : (currentUser?.designation || '')),
+      company: prev.company ? prev.company : (isPlaceholderCompany(currentUser?.company) ? '' : (currentUser?.company || '')),
+      email: currentUser?.email || prev.email,
+    }));
+  }, [currentUser?.email, currentUser?.avatar, currentUser?.designation, currentUser?.company, currentUser?.name]);
 
   const completionPercentage = calculateProfileCompletion(formData);
 

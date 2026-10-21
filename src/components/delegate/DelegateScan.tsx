@@ -54,7 +54,7 @@ export const DelegateScan: React.FC = () => {
         </span>
         <h2 className="text-[14px] font-bold text-[#181818] leading-tight shrink-0">{currentUser.name}</h2>
         <p className="text-[11px] text-[#6B6B6B] mt-0.5 shrink-0">
-          {currentUser.designation} · {currentUser.company}
+          {[currentUser.designation, currentUser.company].filter(Boolean).join(' · ') || 'MPSS26 Delegate'}
         </p>
 
         {/* Larger QR Code Container */}

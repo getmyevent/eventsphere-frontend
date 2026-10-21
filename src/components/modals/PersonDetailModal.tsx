@@ -60,6 +60,9 @@ export const PersonDetailModal: React.FC = () => {
     return (
     attendees.find((a) => a.id === selectedPersonId) ||
     INITIAL_ATTENDEES.find((a) => a.id === selectedPersonId) ||
+    (selectedPersonId.includes('rochak')
+      ? attendees.find((a) => a.id.includes('rochak')) || INITIAL_ATTENDEES.find((a) => a.id.includes('rochak'))
+      : null) ||
     attendees.find((a) => a.name.toLowerCase() === normalizedSearch) ||
     INITIAL_ATTENDEES.find((a) => a.name.toLowerCase() === normalizedSearch) ||
     attendees.find((a) => a.id.toLowerCase().includes(normalizedSearch)) ||
@@ -368,6 +371,7 @@ export const PersonDetailModal: React.FC = () => {
                     person.id === 'att-pushpit-upadhyay' ||
                     person.id.startsWith('att-akarshan') ||
                     person.id.startsWith('att-rochak') ||
+                    person.id.startsWith('att-aniket') ||
                     person.id.startsWith('att-sarthak') ||
                     person.id.startsWith('att-sagar') ||
                     person.id.startsWith('att-vipul')
