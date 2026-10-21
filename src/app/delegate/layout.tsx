@@ -26,16 +26,31 @@ const AccessScreen = dynamic(
 );
 
 export default function DelegateLayout({ children }: { children: React.ReactNode }) {
-  const { role, hasAccessConfirmed, setHasAccessConfirmed, selectedPersonId, toast } = useStore();
+  const { role, hasAccessConfirmed, isSessionLoading, setHasAccessConfirmed, selectedPersonId, toast } = useStore();
   const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
   const [isQRModalOpen, setIsQRModalOpen] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    if (role !== 'delegate') {
+    if (!isSessionLoading && role !== 'delegate') {
       router.push('/');
     }
-  }, [role, router]);
+  }, [role, router, isSessionLoading]);
+
+  if (isSessionLoading) {
+    return (
+      <div className="bg-[#F6F4F0] min-h-[100dvh] flex flex-col font-sans items-center justify-center">
+        <PhoneFrame>
+          <div className="flex-1 flex flex-col items-center justify-center p-6 space-y-3">
+            <div className="w-8 h-8 border-2 border-[#181818] border-t-transparent rounded-full animate-spin" />
+            <p className="text-[12px] font-semibold text-[#6B6B6B] tracking-wide uppercase">
+              Verifying Session...
+            </p>
+          </div>
+        </PhoneFrame>
+      </div>
+    );
+  }
 
   if (!hasAccessConfirmed) {
     return (

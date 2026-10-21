@@ -102,6 +102,7 @@ interface StoreContextType {
   // Access Flow state
   hasAccessConfirmed: boolean;
   setHasAccessConfirmed: (confirmed: boolean) => void;
+  isSessionLoading: boolean;
   triggerAccessFlow: (prefillMobile?: string, prefillEventId?: string) => void;
   logout: () => void;
   resetUserState: () => void;
@@ -233,6 +234,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   // Access Flow
   const [hasAccessConfirmed, setHasAccessConfirmed] = useState<boolean>(false);
+  const [isSessionLoading, setIsSessionLoading] = useState<boolean>(true);
 
   // Selected Detail Views
   const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
@@ -355,6 +357,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       if (!token || !authUser?.id) {
         clearUserSessionState();
         setHasAccessConfirmed(false);
+        setIsSessionLoading(false);
         return;
       }
 
@@ -405,7 +408,11 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           }));
         }
         if (parsed.role) setRoleState(parsed.role);
-        if (typeof parsed.hasAccessConfirmed === 'boolean') setHasAccessConfirmed(parsed.hasAccessConfirmed);
+        if (typeof parsed.hasAccessConfirmed === 'boolean') {
+          setHasAccessConfirmed(parsed.hasAccessConfirmed);
+        } else {
+          setHasAccessConfirmed(true);
+        }
         if (parsed.savedPeopleIds && Array.isArray(parsed.savedPeopleIds)) {
           setSavedPeopleIds(parsed.savedPeopleIds);
         }
@@ -424,12 +431,14 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       }
     } catch {
       // ignore
+    } finally {
+      setIsSessionLoading(false);
     }
   }, [clearUserSessionState]);
 
   // Save to localStorage when state changes (strictly user-scoped)
   useEffect(() => {
-    if (!hasAccessConfirmed || !currentUser?.id || !api.getToken()) {
+    if (!hasAccessConfirmed || !currentUser?.id) {
       return;
     }
     const userStorageKey = `${STORAGE_KEY}_${currentUser.id}`;
@@ -1169,6 +1178,11 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   // Listen for unauthorized 401 events from ApiClient
   useEffect(() => {
     const handleUnauthorized = () => {
+      // Do not log out active delegates on transient background auth issues
+      if (role === 'delegate' && hasAccessConfirmed) {
+        console.warn('Ignoring unauthorized event for active delegate session');
+        return;
+      }
       logout();
       showToast('Session expired. Please log in again.', 'error');
     };
@@ -1176,7 +1190,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       window.addEventListener('eventsphere:unauthorized', handleUnauthorized);
       return () => window.removeEventListener('eventsphere:unauthorized', handleUnauthorized);
     }
-  }, [logout, showToast]);
+  }, [logout, showToast, role, hasAccessConfirmed]);
 
   // Connectivity toggle
   const toggleConnectivity = useCallback(() => {
@@ -2236,6 +2250,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     lastSyncedTime,
     hasAccessConfirmed,
     setHasAccessConfirmed,
+    isSessionLoading,
     triggerAccessFlow,
     logout,
     resetUserState,
@@ -2318,6 +2333,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     syncPendingCount,
     lastSyncedTime,
     hasAccessConfirmed,
+    isSessionLoading,
     triggerAccessFlow,
     logout,
     resetUserState,

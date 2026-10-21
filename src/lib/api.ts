@@ -155,17 +155,38 @@ class ApiClient {
     return null;
   }
 
+  public setSession(token: string, user: ApiUser) {
+    this.token = token;
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem(TOKEN_KEY, token);
+        localStorage.setItem(USER_KEY, JSON.stringify(user));
+      } catch {
+        // ignore
+      }
+    }
+  }
+
+  public setUser(user: ApiUser | null) {
+    if (typeof window !== 'undefined') {
+      try {
+        if (user) {
+          localStorage.setItem(USER_KEY, JSON.stringify(user));
+        } else {
+          localStorage.removeItem(USER_KEY);
+        }
+      } catch {
+        // ignore
+      }
+    }
+  }
+
   public clearAuth() {
     this.token = null;
     if (typeof window !== 'undefined') {
       try {
         localStorage.removeItem(TOKEN_KEY);
         localStorage.removeItem(USER_KEY);
-        Object.keys(localStorage).forEach((key) => {
-          if (key.startsWith('eventsphere_')) {
-            localStorage.removeItem(key);
-          }
-        });
       } catch {
         // ignore
       }
@@ -233,14 +254,20 @@ class ApiClient {
           headers,
         });
 
-        if (response.status === 401 && !endpoint.includes('/auth') && !this.token?.startsWith('mpss26-delegate-token-')) {
-          this.clearAuth();
-          if (typeof window !== 'undefined') {
-            try {
-              localStorage.removeItem('eventsphere_mpss26_store_v13');
-              window.dispatchEvent(new CustomEvent('eventsphere:unauthorized'));
-            } catch {
-              // ignore
+        if (response.status === 401) {
+          // Never blow away a session or clear localStorage on background read requests (e.g. attendees, sessions, connections)
+          // or if the user has an active delegate session
+          const isDelegateSession = this.token?.startsWith('mpss26-delegate-token-') || this.getUser()?.role === 'ROLE_DELEGATE';
+          const isExplicitAuthEndpoint = endpoint.includes('/auth/check') || endpoint.includes('/auth/validate');
+
+          if (!isDelegateSession && isExplicitAuthEndpoint) {
+            this.clearAuth();
+            if (typeof window !== 'undefined') {
+              try {
+                window.dispatchEvent(new CustomEvent('eventsphere:unauthorized'));
+              } catch {
+                // ignore
+              }
             }
           }
           throw new Error('Session expired or unauthorized. Please log in.');
@@ -320,14 +347,20 @@ class ApiClient {
       headers,
     });
 
-    if (response.status === 401 && !endpoint.includes('/auth') && !this.token?.startsWith('mpss26-delegate-token-')) {
-      this.clearAuth();
-      if (typeof window !== 'undefined') {
-        try {
-          localStorage.removeItem('eventsphere_mpss26_store_v13');
-          window.dispatchEvent(new CustomEvent('eventsphere:unauthorized'));
-        } catch {
-          // ignore
+    if (response.status === 401) {
+      // Never blow away a session or clear localStorage on background read requests (e.g. attendees, sessions, connections)
+      // or if the user has an active delegate session
+      const isDelegateSession = this.token?.startsWith('mpss26-delegate-token-') || this.getUser()?.role === 'ROLE_DELEGATE';
+      const isExplicitAuthEndpoint = endpoint.includes('/auth/check') || endpoint.includes('/auth/validate');
+
+      if (!isDelegateSession && isExplicitAuthEndpoint) {
+        this.clearAuth();
+        if (typeof window !== 'undefined') {
+          try {
+            window.dispatchEvent(new CustomEvent('eventsphere:unauthorized'));
+          } catch {
+            // ignore
+          }
         }
       }
       throw new Error('Session expired or unauthorized. Please log in.');
@@ -459,15 +492,10 @@ class ApiClient {
           method: 'POST',
           body: JSON.stringify({ eventId, email, otp }),
         });
-        if (res && res.token) {
+        if (res && res.token && res.user) {
+          this.setSession(res.token, res.user);
+        } else if (res && res.token) {
           this.setToken(res.token);
-          if (typeof window !== 'undefined') {
-            try {
-              localStorage.setItem(USER_KEY, JSON.stringify(res.user));
-            } catch {
-              // ignore
-            }
-          }
         }
         return res;
       } catch (err) {
@@ -480,36 +508,26 @@ class ApiClient {
           method: 'POST',
           body: JSON.stringify({ eventId, email, name }),
         });
-        if (res && res.token) {
+        if (res && res.token && res.user) {
+          this.setSession(res.token, res.user);
+        } else if (res && res.token) {
           this.setToken(res.token);
-          if (typeof window !== 'undefined') {
-            try {
-              localStorage.setItem(USER_KEY, JSON.stringify(res.user));
-            } catch {
-              // ignore
-            }
-          }
         }
         return res;
       } catch (err) {
         throw err;
       }
     },
-    googleLogin: async (eventId: string, email: string, credential?: string): Promise<AuthResponse> => {
+    googleLogin: async (eventId: string, email: string, credential?: string, name?: string): Promise<AuthResponse> => {
       try {
         const res = await this.request<AuthResponse>('/api/v1/auth/google', {
           method: 'POST',
-          body: JSON.stringify({ eventId, email, credential }),
+          body: JSON.stringify({ eventId, email, credential, name }),
         });
-        if (res && res.token) {
+        if (res && res.token && res.user) {
+          this.setSession(res.token, res.user);
+        } else if (res && res.token) {
           this.setToken(res.token);
-          if (typeof window !== 'undefined') {
-            try {
-              localStorage.setItem(USER_KEY, JSON.stringify(res.user));
-            } catch {
-              // ignore
-            }
-          }
         }
         return res;
       } catch (err) {

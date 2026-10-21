@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useStore } from '../../lib/store';
-import { api } from '../../lib/api';
+import { api, ApiUser } from '../../lib/api';
 import { getStoredProfileImage } from '../../lib/profileImageStorage';
 import { CURRENT_USER, INITIAL_ATTENDEES } from '../../lib/mockData';
 import { Person, DemoRole, RoleType } from '../../types';
@@ -300,7 +300,7 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
   };
 
   // Establish session directly from backend user profile
-  const establishSessionFromBackendUser = (backendUser: any) => {
+  const establishSessionFromBackendUser = (backendUser: any, token?: string) => {
     resetUserState();
     const rawRole = (backendUser.role || '').toLowerCase();
     const detectedDemoRole: DemoRole = rawRole.includes('organizer')
@@ -317,15 +317,18 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
       : (rawRole === 'speaker' ? 'speaker' : rawRole === 'vip' ? 'vip' : 'delegate');
 
     const name = backendUser.name || deriveNameFromEmail(backendUser.email || '');
+    const userId = backendUser.id || `att-${Date.now().toString().slice(-6)}`;
+    const avatarUrl = getStoredProfileImage(backendUser.email) || backendUser.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=181818&color=ffffff&bold=true`;
+
     setCurrentUser({
-      id: backendUser.id || `att-${Date.now().toString().slice(-6)}`,
+      id: userId,
       name: name,
       designation: backendUser.designation || '',
       company: backendUser.company || '',
       role: personRole,
       email: backendUser.email || '',
       mobile: backendUser.mobile || '',
-      avatar: getStoredProfileImage(backendUser.email) || backendUser.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=181818&color=ffffff&bold=true`,
+      avatar: avatarUrl,
       bio: backendUser.bio || '',
       linkedin: backendUser.linkedin || '',
       twitter: backendUser.twitter || '',
@@ -343,6 +346,26 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
         preset: 'Connections Only',
       },
     });
+
+    const activeToken = token || api.getToken() || `mpss26-delegate-token-${encodeURIComponent((backendUser.email || '').trim())}`;
+    const apiRole = detectedDemoRole === 'organizer'
+      ? 'ROLE_ORGANIZER'
+      : detectedDemoRole === 'exhibitor'
+      ? 'ROLE_EXHIBITOR'
+      : 'ROLE_DELEGATE';
+
+    const apiUser: ApiUser = {
+      id: userId,
+      name: name,
+      email: backendUser.email || '',
+      mobile: backendUser.mobile || '',
+      role: apiRole as any,
+      eventId: backendUser.eventId || 'MPSS26',
+      avatar: avatarUrl,
+      ticketType: backendUser.ticketType || 'Delegate',
+      checkedIn: true,
+    };
+    api.setSession(activeToken, apiUser);
   };
 
   // Establish delegate authenticated session (only name and email fetched via Google auth, others blank)
@@ -350,8 +373,10 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
     resetUserState();
     setRole('delegate');
     const derivedName = userName?.trim() || deriveNameFromEmail(userEmail);
+    const userId = `att-${Date.now().toString().slice(-6)}`;
+    const avatarUrl = getStoredProfileImage(userEmail) || userAvatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(derivedName)}&background=181818&color=ffffff&bold=true`;
     const newAttendee: Person = {
-      id: `att-${Date.now().toString().slice(-6)}`,
+      id: userId,
       name: derivedName,
       designation: '',
       company: '',
@@ -360,7 +385,7 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
       mobile: '',
       linkedin: '',
       twitter: '',
-      avatar: getStoredProfileImage(userEmail) || userAvatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(derivedName)}&background=181818&color=ffffff&bold=true`,
+      avatar: avatarUrl,
       bio: '',
       interests: ['Semiconductors', 'VLSI Design', 'AI Infrastructure'],
       skills: ['Technology'],
@@ -377,6 +402,21 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
       },
     };
     setCurrentUser(newAttendee);
+
+    // Save persistent session token and user into api client and localStorage
+    const persistentToken = `mpss26-delegate-token-${encodeURIComponent(userEmail.trim())}`;
+    const apiUser: ApiUser = {
+      id: userId,
+      name: derivedName,
+      email: userEmail.trim(),
+      mobile: '',
+      role: 'ROLE_DELEGATE',
+      eventId: 'MPSS26',
+      avatar: avatarUrl,
+      ticketType: 'Delegate',
+      checkedIn: true,
+    };
+    api.setSession(persistentToken, apiUser);
   };
 
   // Step 2: Verify OTP & Enter Event
@@ -410,7 +450,7 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
           return;
         }
         if (authRes?.user) {
-          establishSessionFromBackendUser(authRes.user);
+          establishSessionFromBackendUser(authRes.user, authRes.token);
           setStatus('confirmed');
           setTimeout(() => {
             setHasAccessConfirmed(true);
@@ -463,10 +503,10 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
       const cleanEventId = (eventId || 'MPSS26').trim().toUpperCase().replace(/\s+/g, '');
 
       try {
-        // Race backend call with 2.5s timeout for fast, zero-hang sign in
-        const backendPromise = api.auth.googleLogin(cleanEventId, '', response.credential);
+        // Race backend call with 4s timeout for fast, reliable sign in
+        const backendPromise = api.auth.googleLogin(cleanEventId, googleEmail, response.credential, googleName);
         const timeoutPromise = new Promise<never>((_, reject) =>
-          setTimeout(() => reject(new Error('BACKEND_TIMEOUT')), 2500)
+          setTimeout(() => reject(new Error('BACKEND_TIMEOUT')), 4000)
         );
 
         let res: any = null;
@@ -484,7 +524,7 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
               backendPromise
                 .then((bgRes) => {
                   if (bgRes?.user) {
-                    establishSessionFromBackendUser(bgRes.user);
+                    establishSessionFromBackendUser(bgRes.user, bgRes.token);
                   }
                 })
                 .catch(() => {});
@@ -497,6 +537,15 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
         if (res?.isNewUser || res?.newUser) {
           const targetEmail = res.user?.email || googleEmail || email.trim();
           const targetName = res.user?.name || googleName || '';
+          if (targetEmail && targetName) {
+            establishSessionForEmail(targetEmail, targetName, googlePicture);
+            setStatus('confirmed');
+            setTimeout(() => {
+              setHasAccessConfirmed(true);
+              onSuccess();
+            }, 200);
+            return;
+          }
           setPendingEmail(targetEmail);
           setProfileName(targetName);
           setStatus('idle');
@@ -505,7 +554,7 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
         }
 
         if (res?.user) {
-          establishSessionFromBackendUser(res.user);
+          establishSessionFromBackendUser(res.user, res.token);
           setStatus('confirmed');
           setTimeout(() => {
             setHasAccessConfirmed(true);
@@ -575,7 +624,7 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
       const targetEmail = pendingEmail.trim() || email.trim();
       const authRes = await api.auth.register(eventId || 'MPSS26', targetEmail, trimmedName);
       if (authRes?.user) {
-        establishSessionFromBackendUser(authRes.user);
+        establishSessionFromBackendUser(authRes.user, authRes.token);
         setStatus('confirmed');
         setTimeout(() => {
           setHasAccessConfirmed(true);
