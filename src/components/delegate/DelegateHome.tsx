@@ -746,12 +746,6 @@ export const DelegateHome: React.FC = () => {
                   </span>
                 )}
               </div>
-              {currentSession.speakerName && currentSession.speakerName !== 'Organizing Committee' && (
-                <p className="text-[11.5px] text-[#4B5563] font-medium mt-1 truncate">
-                  {currentSession.speakerName}
-                  {currentSession.speakerCompany ? ` · ${currentSession.speakerCompany}` : ''}
-                </p>
-              )}
             </div>
 
             {/* Compact View Details Button */}
