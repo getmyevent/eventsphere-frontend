@@ -9,7 +9,7 @@ import {
   Star,
 } from 'lucide-react';
 import { useStore } from '../../lib/store';
-import { RECOMMENDED_PEOPLE_IDS } from '../../lib/mockData';
+import { RECOMMENDED_PEOPLE_IDS, INITIAL_ATTENDEES } from '../../lib/mockData';
 import { Person } from '../../types';
 import { getOptimizedAvatarUrl } from '../../lib/cloudinary';
 
@@ -35,7 +35,15 @@ export const DelegatePeople: React.FC = () => {
   // Strictly the 10 curated speakers for People You Should Meet
   const baseList = useMemo(() => {
     if (viewSavedPeopleOnly) {
-      return attendees.filter((p) => savedPeopleIds.includes(p.id));
+      const allPool = [...attendees, ...INITIAL_ATTENDEES];
+      const seen = new Set<string>();
+      return savedPeopleIds
+        .map((id) => allPool.find((p) => p.id === id))
+        .filter((p): p is Person => {
+          if (!p || seen.has(p.id)) return false;
+          seen.add(p.id);
+          return true;
+        });
     }
     return RECOMMENDED_PEOPLE_IDS.map((id) =>
       attendees.find((a) => a.id === id)
