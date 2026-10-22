@@ -1,10 +1,9 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { ChevronLeft, MapPin, Star } from 'lucide-react';
 import { useStore } from '@/lib/store';
-import { api } from '@/lib/api';
 import { getOfficialBoothNumber, formatBoothBadge } from '@/lib/officialBooths';
 
 export const DelegateCompanyDetail: React.FC = () => {
@@ -13,12 +12,10 @@ export const DelegateCompanyDetail: React.FC = () => {
     setActiveDelegateTab, 
     selectedCompanyId, 
     exhibitors, 
-    products, 
     savedCompanyIds, 
     toggleSaveCompany
   } = useStore();
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [liveProducts, setLiveProducts] = useState<any[]>([]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -27,32 +24,6 @@ export const DelegateCompanyDetail: React.FC = () => {
   }, [selectedCompanyId]);
 
   const company = exhibitors.find(e => e.id === selectedCompanyId) || exhibitors[0];
-
-  useEffect(() => {
-    if (company?.id) {
-      api.exhibitors.getProducts(company.id)
-        .then((data) => {
-          if (data && Array.isArray(data) && data.length > 0) {
-            setLiveProducts(data);
-          }
-        })
-        .catch((err) => {
-          console.warn('Failed to load exhibitor products from backend:', err);
-        });
-    }
-  }, [company?.id]);
-
-  const companyProducts = liveProducts.length > 0
-    ? liveProducts.map((p) => ({
-        id: p.id,
-        name: p.name,
-        tagline: p.tagline,
-        category: p.category,
-        overview: p.overview,
-        image: p.imageUrl || p.image || '',
-        company: company.company,
-      }))
-    : products.filter(p => p.company === company.company);
 
   if (!company) return null;
 
@@ -121,46 +92,6 @@ export const DelegateCompanyDetail: React.FC = () => {
             {savedCompanyIds.includes(company.id) ? 'Company Saved' : 'Save Company'}
           </button>
         </div>
-
-        {/* Products Section */}
-        {companyProducts.length > 0 && (
-          <div>
-            <h3 className="text-[11px] font-bold text-[#6B6B6B] uppercase tracking-wider mb-2">
-              SHOWCASING AT THE BOOTH
-            </h3>
-            
-            <div className="space-y-2">
-              {companyProducts.map(product => (
-                <div key={product.id} className="bg-white rounded-[14px] border border-[#DEDCD7] p-3 shadow-sm cursor-pointer hover:border-[#181818]/30 transition-colors">
-                  <div className="flex gap-2 items-start mb-2">
-                    {product.image ? (
-                      <img 
-                        src={product.image} 
-                        alt={product.name} 
-                        className="w-8 h-8 rounded-lg object-contain bg-gray-50 border border-gray-100 p-1 flex-shrink-0"
-                        onError={(e) => {
-                          e.currentTarget.onerror = null;
-                          e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(product.name)}&background=F3F4F6&color=181818&bold=true`;
-                        }}
-                      />
-                    ) : (
-                      <div className="w-8 h-8 rounded-lg bg-[#EFEEEA] flex items-center justify-center font-bold text-[12px] text-[#181818] flex-shrink-0">
-                        {product.name.charAt(0)}
-                      </div>
-                    )}
-                    <div>
-                      <h4 className="text-[12px] font-bold text-[#181818]">{product.name}</h4>
-                      <p className="text-[12px] text-[#6B6B6B]">{product.category || product.tagline}</p>
-                    </div>
-                  </div>
-                  <p className="text-[11px] text-[#6B6B6B] leading-relaxed">
-                    {product.overview || product.tagline}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
