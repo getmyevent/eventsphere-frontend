@@ -67,8 +67,8 @@ export const DelegateFounders: React.FC = () => {
       name: 'Aniket Agrawal',
       role: 'Data Engineer',
       company: 'ZS',
-      avatar: 'https://ui-avatars.com/api/?name=Aniket+Agrawal&background=181818&color=ffffff&bold=true',
-      linkedin: 'https://www.linkedin.com/in/aniket-agrawal/',
+      avatar: 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792644603/aniket_agrawal.png',
+      linkedin: 'https://www.linkedin.com/in/aniket4168/',
     },
     {
       id: 'att-vipul-jaiswal',
