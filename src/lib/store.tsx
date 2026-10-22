@@ -476,16 +476,13 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         .then((exhList) => {
           if (exhList && Array.isArray(exhList) && exhList.length > 0) {
             setExhibitors((prev) => {
-              const bMap = new Map(exhList.map((e) => [e.id, e]));
               const bNameMap = new Map(exhList.map((e) => [(e.company || '').toLowerCase().trim(), e]));
               return prev.map((e) => {
-                const b = bMap.get(e.id) || bNameMap.get(e.company.toLowerCase().trim());
+                const b = bNameMap.get(e.company.toLowerCase().trim());
                 if (b) {
                   return {
                     ...e,
                     leads: typeof b.leadCount === 'number' ? b.leadCount : (typeof b.leads === 'number' ? b.leads : e.leads),
-                    category: b.category || e.category,
-                    logo: b.logoUrl || e.logo,
                   };
                 }
                 return e;
@@ -512,15 +509,11 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
               avatar: stats.logoUrl || prev.avatar,
             }));
             setExhibitors((prev) => {
-              const idx = prev.findIndex((e) => e.id === stats.id || e.company.toLowerCase() === stats.company?.toLowerCase());
+              const idx = prev.findIndex((e) => e.company.toLowerCase() === stats.company?.toLowerCase());
               if (idx >= 0) {
                 const copy = [...prev];
                 copy[idx] = {
                   ...copy[idx],
-                  company: stats.company || copy[idx].company,
-                  booth: stats.booth || copy[idx].booth,
-                  category: stats.category || copy[idx].category,
-                  logo: stats.logoUrl || copy[idx].logo,
                   teamSize: stats.teamSize || copy[idx].teamSize,
                   leads: typeof stats.totalLeads === 'number' ? stats.totalLeads : copy[idx].leads,
                   enquiries: typeof stats.totalEnquiries === 'number' ? stats.totalEnquiries : copy[idx].enquiries,
@@ -545,16 +538,13 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         .then((backendExhibitors) => {
           if (backendExhibitors && Array.isArray(backendExhibitors) && backendExhibitors.length > 0) {
             setExhibitors((prev) => {
-              const bMap = new Map(backendExhibitors.map((b: any) => [b.id, b]));
               const bNameMap = new Map(backendExhibitors.map((b: any) => [(b.company || '').toLowerCase().trim(), b]));
               return prev.map((e) => {
-                const b = bMap.get(e.id) || bNameMap.get(e.company.toLowerCase().trim());
+                const b = bNameMap.get(e.company.toLowerCase().trim());
                 if (b) {
                   return {
                     ...e,
                     leads: typeof b.leadCount === 'number' ? b.leadCount : (typeof b.leads === 'number' ? b.leads : e.leads),
-                    category: b.category || e.category,
-                    logo: b.logoUrl || e.logo,
                   };
                 }
                 return e;

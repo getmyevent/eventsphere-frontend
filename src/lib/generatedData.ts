@@ -71,10 +71,11 @@ export function generateAttendees(count: number): Person[] {
 }
 
 export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
+
   {
     "id": "exh-1",
     "company": "DigiComm Semi",
-    "logo": "/images/exhibitors/digicomm.png",
+    "logo": "",
     "booth": "1, 2",
     "category": "Semiconductor Design",
     "visits": 620,
@@ -86,7 +87,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-2",
     "company": "New Age Instruments",
-    "logo": "/images/exhibitors/newage.png",
+    "logo": "",
     "booth": "3, 4, 5",
     "category": "Instrumentation & Test",
     "visits": 540,
@@ -98,7 +99,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-3",
     "company": "RRCAT",
-    "logo": "/images/exhibitors/rrcat.png",
+    "logo": "",
     "booth": "6, 7",
     "category": "R&D & Computing",
     "visits": 710,
@@ -110,7 +111,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-4",
     "company": "Bio Line India",
-    "logo": "/images/exhibitors/bioline.png",
+    "logo": "",
     "booth": "8",
     "category": "Instrumentation & Test",
     "visits": 420,
@@ -122,7 +123,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-5",
     "company": "AndGate Informatics",
-    "logo": "/images/exhibitors/andgate.png",
+    "logo": "",
     "booth": "9",
     "category": "Embedded Systems",
     "visits": 430,
@@ -134,7 +135,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-6",
     "company": "VLSI Experts",
-    "logo": "/images/exhibitors/vlsiexperts.png",
+    "logo": "",
     "booth": "10",
     "category": "Skill Development",
     "visits": 680,
@@ -146,7 +147,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-7",
     "company": "RackBank",
-    "logo": "/images/exhibitors/rackbank.png",
+    "logo": "",
     "booth": "11, 12",
     "category": "AI Data Centers",
     "visits": 810,
@@ -158,7 +159,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-8",
     "company": "Impute Inc. Japan",
-    "logo": "/images/exhibitors/impute.png",
+    "logo": "",
     "booth": "13, 14",
     "category": "AI & Edge Systems",
     "visits": 690,
@@ -170,7 +171,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-9",
     "company": "Analog Devices",
-    "logo": "/images/exhibitors/analogdevices.png",
+    "logo": "",
     "booth": "15, 16",
     "category": "Semiconductor Design",
     "visits": 950,
@@ -182,7 +183,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-10",
     "company": "Nanodroits Technology",
-    "logo": "/images/exhibitors/nanodroits.png",
+    "logo": "",
     "booth": "17",
     "category": "Nanotechnology",
     "visits": 460,
@@ -194,7 +195,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-11",
     "company": "MANIT Bhopal",
-    "logo": "/images/exhibitors/manit.png",
+    "logo": "",
     "booth": "18",
     "category": "Academia & Research",
     "visits": 590,
@@ -206,7 +207,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-12",
     "company": "HLBS Technologies",
-    "logo": "/images/exhibitors/hlbs.png",
+    "logo": "",
     "booth": "19",
     "category": "Electronics Manufacturing",
     "visits": 480,
@@ -218,7 +219,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-13",
     "company": "Jetwave",
-    "logo": "/images/exhibitors/jetwave.png",
+    "logo": "",
     "booth": "20",
     "category": "RF & Wireless Systems",
     "visits": 410,
@@ -230,7 +231,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-14",
     "company": "ABV-IIITM Gwalior",
-    "logo": "/images/exhibitors/iiitmgwalior.png",
+    "logo": "",
     "booth": "21",
     "category": "Academia & Research",
     "visits": 530,
@@ -242,7 +243,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-15",
     "company": "AgriHub IIT Indore",
-    "logo": "/images/exhibitors/drishticps.png",
+    "logo": "",
     "booth": "22",
     "category": "IoT & Sensors",
     "visits": 470,
@@ -254,7 +255,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-16",
     "company": "Daksh Instruments",
-    "logo": "/images/exhibitors/daksh.png",
+    "logo": "",
     "booth": "23",
     "category": "Instrumentation & Test",
     "visits": 390,
@@ -266,7 +267,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-17",
     "company": "DAVV Incubation Center",
-    "logo": "/images/exhibitors/davv.png",
+    "logo": "",
     "booth": "24",
     "category": "Incubation & Startups",
     "visits": 510,
@@ -278,7 +279,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-18",
     "company": "IET-DAVV Indore",
-    "logo": "/images/exhibitors/ietdavv.png",
+    "logo": "",
     "booth": "25",
     "category": "Academia & Research",
     "visits": 620,
@@ -290,7 +291,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-19",
     "company": "Setu Manufacturing",
-    "logo": "/images/exhibitors/setu.png",
+    "logo": "",
     "booth": "26",
     "category": "Electronics Manufacturing",
     "visits": 490,
@@ -302,7 +303,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-20",
     "company": "Nirji Semicon",
-    "logo": "/images/exhibitors/nirji.png",
+    "logo": "",
     "booth": "27",
     "category": "Semiconductor Design",
     "visits": 540,
@@ -314,7 +315,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-21",
     "company": "Stemrobo",
-    "logo": "/images/exhibitors/stemrobo.png",
+    "logo": "",
     "booth": "28",
     "category": "EdTech & Robotics",
     "visits": 620,
@@ -326,7 +327,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-22",
     "company": "IISER Bhopal / Anuranan",
-    "logo": "/images/exhibitors/iiser.png",
+    "logo": "",
     "booth": "29",
     "category": "Academia & Research",
     "visits": 560,
@@ -338,7 +339,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-23",
     "company": "Techno Support Core Inn",
-    "logo": "/images/exhibitors/technosup.png",
+    "logo": "",
     "booth": "30",
     "category": "Prototyping & Lab Support",
     "visits": 420,
@@ -350,7 +351,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-24",
     "company": "VIT Bhopal",
-    "logo": "/images/exhibitors/vitbhopal.png",
+    "logo": "",
     "booth": "31",
     "category": "Academia & Research",
     "visits": 640,
@@ -362,7 +363,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-25",
     "company": "SGSTS Indore",
-    "logo": "/images/exhibitors/sgsits.png",
+    "logo": "",
     "booth": "32",
     "category": "Academia & Research",
     "visits": 670,
@@ -374,7 +375,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-26",
     "company": "Samvit Logix",
-    "logo": "/images/exhibitors/samvit.png",
+    "logo": "",
     "booth": "33",
     "category": "ASIC & Verification",
     "visits": 450,
@@ -386,7 +387,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-27",
     "company": "Medicaps",
-    "logo": "/images/exhibitors/medicaps.png",
+    "logo": "",
     "booth": "34",
     "category": "Academia & Research",
     "visits": 580,
@@ -398,7 +399,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-28",
     "company": "Lakshmishri PCB",
-    "logo": "/images/exhibitors/laxmishri.png",
+    "logo": "",
     "booth": "35",
     "category": "PCB Design & Fabrication",
     "visits": 530,
@@ -410,7 +411,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-29",
     "company": "Mehtab Intl Agro Trade",
-    "logo": "/images/exhibitors/mehtab.png",
+    "logo": "",
     "booth": "36",
     "category": "AgriTech & Automation",
     "visits": 380,
@@ -422,7 +423,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-30",
     "company": "Prestige PIEMR / Soaring",
-    "logo": "/images/exhibitors/piemr.png",
+    "logo": "",
     "booth": "37",
     "category": "Academia & Research",
     "visits": 610,
@@ -434,7 +435,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-31",
     "company": "Acropolis Institute",
-    "logo": "/images/exhibitors/acropolis.png",
+    "logo": "",
     "booth": "38",
     "category": "Academia & Research",
     "visits": 630,
@@ -446,7 +447,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-32",
     "company": "SAGUNE University",
-    "logo": "/images/exhibitors/sage.png",
+    "logo": "",
     "booth": "39",
     "category": "Academia & Research",
     "visits": 590,
@@ -458,7 +459,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-33",
     "company": "IES University",
-    "logo": "/images/exhibitors/ietbhopal.png",
+    "logo": "",
     "booth": "40",
     "category": "Academia & Research",
     "visits": 510,
@@ -470,7 +471,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-34",
     "company": "Technisium Web Solutions",
-    "logo": "/images/exhibitors/technisum.png",
+    "logo": "",
     "booth": "41",
     "category": "Cloud & Web Integration",
     "visits": 440,
@@ -482,7 +483,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-35",
     "company": "Oriental University",
-    "logo": "/images/exhibitors/oriental.png",
+    "logo": "",
     "booth": "42",
     "category": "Academia & Research",
     "visits": 520,
@@ -494,7 +495,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-36",
     "company": "HTL Co India",
-    "logo": "/images/exhibitors/htl.png",
+    "logo": "",
     "booth": "43, 44",
     "category": "Instrumentation & Fab Support",
     "visits": 570,
@@ -506,7 +507,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-37",
     "company": "Scientech",
-    "logo": "/images/exhibitors/scientech.png",
+    "logo": "",
     "booth": "45, 46",
     "category": "Instrumentation & Test",
     "visits": 720,
@@ -518,7 +519,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-38",
     "company": "SVVV Indore",
-    "logo": "/images/exhibitors/svvv.png",
+    "logo": "",
     "booth": "47",
     "category": "Academia & Research",
     "visits": 580,
@@ -530,7 +531,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-39",
     "company": "Futurewiz",
-    "logo": "/images/exhibitors/futurewiz.png",
+    "logo": "",
     "booth": "48",
     "category": "Skill Development & EDA",
     "visits": 560,
@@ -542,7 +543,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-40",
     "company": "Truechip Solutions",
-    "logo": "/images/exhibitors/truechip.png",
+    "logo": "",
     "booth": "49",
     "category": "Verification IP & EDA",
     "visits": 760,
@@ -554,7 +555,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-41",
     "company": "MSME",
-    "logo": "/images/exhibitors/msme.png",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792507137/MSME-logo.png",
     "booth": "50, 51",
     "category": "Government & Nodal",
     "visits": 680,
@@ -566,7 +567,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-42",
     "company": "MPCST",
-    "logo": "/images/exhibitors/mpcst.png",
+    "logo": "",
     "booth": "52, 53",
     "category": "Government & Nodal",
     "visits": 650,
@@ -578,7 +579,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-43",
     "company": "Technical Education",
-    "logo": "/images/exhibitors/techedu.png",
+    "logo": "",
     "booth": "54",
     "category": "Government & Nodal",
     "visits": 610,
@@ -590,7 +591,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-44",
     "company": "Higher Education",
-    "logo": "/images/exhibitors/higheredu.png",
+    "logo": "",
     "booth": "55",
     "category": "Government & Nodal",
     "visits": 590,
@@ -602,7 +603,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-45",
     "company": "Teradyne",
-    "logo": "/images/exhibitors/teradyne.png",
+    "logo": "",
     "booth": "56",
     "category": "Automated Test Equipment",
     "visits": 840,
@@ -614,7 +615,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-46",
     "company": "Pisarv Innovations",
-    "logo": "/images/exhibitors/pisarv.png",
+    "logo": "",
     "booth": "57",
     "category": "IoT, Cloud & Robotics",
     "visits": 580,
@@ -626,7 +627,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-47",
     "company": "Tourism",
-    "logo": "/images/exhibitors/tourism.png",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792507116/mp-tourism-logo.jpg",
     "booth": "58, 70",
     "category": "Government & Nodal",
     "visits": 670,
@@ -638,7 +639,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-48",
     "company": "Indiesemic",
-    "logo": "/images/exhibitors/indiesemic.png",
+    "logo": "",
     "booth": "59",
     "category": "Semiconductor Design",
     "visits": 560,
@@ -650,7 +651,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-49",
     "company": "Shubham IOT Homes",
-    "logo": "/images/exhibitors/smarthome.png",
+    "logo": "",
     "booth": "60, 61",
     "category": "IoT & Smart Devices",
     "visits": 520,
@@ -662,7 +663,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-50",
     "company": "CraftAI",
-    "logo": "/images/exhibitors/craftifai.png",
+    "logo": "",
     "booth": "62",
     "category": "AI & Silicon Acceleration",
     "visits": 610,
@@ -674,7 +675,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-51",
     "company": "CSIR CEERI Pilani",
-    "logo": "/images/exhibitors/ceeri.png",
+    "logo": "",
     "booth": "63",
     "category": "Academia & Research",
     "visits": 690,
@@ -686,7 +687,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-52",
     "company": "MCTE Mhow",
-    "logo": "/images/exhibitors/mcte.png",
+    "logo": "",
     "booth": "64, 65",
     "category": "Defense & Strategic Comms",
     "visits": 730,
@@ -698,7 +699,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-53",
     "company": "Paras Semi",
-    "logo": "/images/exhibitors/paras.png",
+    "logo": "",
     "booth": "66, 67",
     "category": "OSAT & Packaging",
     "visits": 780,
@@ -710,7 +711,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-54",
     "company": "NSDCS Lab, IIT Indore",
-    "logo": "/images/exhibitors/nsdcs.png",
+    "logo": "",
     "booth": "68, 69",
     "category": "Academia & Research",
     "visits": 650,
@@ -722,7 +723,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-55",
     "company": "MPIDC",
-    "logo": "/images/exhibitors/mpidc.png",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792507118/mpinvestmetnlogo.jpg",
     "booth": "MPIDC Pavilion",
     "category": "Industrial Infrastructure",
     "visits": 890,
@@ -734,7 +735,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-56",
     "company": "SCL Mohali",
-    "logo": "/images/exhibitors/scl.png",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792507139/SCL-logo.png",
     "booth": "SCL Mohali Pavilion",
     "category": "Wafer Fabrication",
     "visits": 920,
@@ -746,7 +747,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-57",
     "company": "MPSEDC",
-    "logo": "/images/exhibitors/mpsedc.png",
+    "logo": "",
     "booth": "MPSEDC Pavilion",
     "category": "State Nodal Agency",
     "visits": 980,
@@ -755,6 +756,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
     "teamSize": 16,
     "status": "Active"
   }
+
 ];
 
 export const GENERATED_PRODUCTS: Product[] = [
