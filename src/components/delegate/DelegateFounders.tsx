@@ -423,14 +423,9 @@ export const DelegateFounders: React.FC = () => {
             Powered by IET DAVV
           </p>
           <div className="pt-0.5">
-            <a
-              href="https://getmyevent.in"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[11.5px] font-bold text-[#B51F32] hover:underline inline-block cursor-pointer"
-            >
+            <span className="text-[11.5px] font-bold text-[#B51F32] inline-block select-none cursor-default">
               getmyevent.in
-            </a>
+            </span>
           </div>
         </div>
       </div>
