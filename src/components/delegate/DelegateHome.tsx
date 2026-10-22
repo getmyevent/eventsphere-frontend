@@ -34,23 +34,6 @@ import {
   getOptimizedCardImageUrl,
 } from '../../lib/cloudinary';
 
-const FOUNDERS = [
-  {
-    id: 'att-hari-gupta',
-    name: 'Hari Gupta',
-    role: 'Co-Founder',
-    avatar: getOptimizedAvatarUrl('https://res.cloudinary.com/vc0wtqtw/image/upload/v1792450462/hari.png', 300),
-    linkedin: 'https://www.linkedin.com/in/hari-gupta-159948330',
-  },
-  {
-    id: 'att-pushpit-upadhyay',
-    name: 'Pushpit Upadhyay',
-    role: 'Co-Founder',
-    avatar: '/images/founders/pushpit-upadhyay.jpg',
-    linkedin: 'https://www.linkedin.com/in/pushpit-upadhyay/',
-  },
-];
-
 export const DelegateHome: React.FC = () => {
   const router = useRouter();
   const {
@@ -722,77 +705,26 @@ export const DelegateHome: React.FC = () => {
 
 
 
-      {/* Meet the Founders Section */}
-      <div className="space-y-2.5 pt-1 pb-3 select-none">
-        {/* Section Header */}
-        <div className="flex items-center justify-between px-0.5">
-          <div>
-            <h3 className="text-[19px] font-bold text-[#111827] tracking-tight leading-tight">
-              Meet the Founders
-            </h3>
-            <p className="text-[12px] text-[#6B7280] font-normal mt-0.5">
-              Behind GetMyEvent
-            </p>
-          </div>
-          <button
-            onClick={() => router.push('/delegate/about')}
-            className="text-[12.5px] font-bold text-[#B51F32] hover:text-[#9C1A2B] transition-colors flex items-center gap-1 cursor-pointer group"
-          >
-            <span>About</span>
-            <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
-          </button>
-        </div>
-
-        {/* 2-Column Founder Cards Grid */}
-        <div className="grid grid-cols-2 gap-3">
-          {FOUNDERS.map((founder) => (
-            <div
-              key={founder.id}
-              onClick={() => setSelectedPersonId(founder.id)}
-              className="bg-white rounded-[20px] p-2.5 border border-[#E5E7EB] hover:border-gray-400 transition-all shadow-xs cursor-pointer flex flex-col group select-none"
-            >
-              {/* Photo Container */}
-              <div className="relative w-full aspect-[4/3] rounded-[14px] overflow-hidden bg-slate-100 shrink-0 border border-slate-200/70">
-                <img
-                  src={getOptimizedCardImageUrl(founder.avatar, 300)}
-                  alt={founder.name}
-                  loading="lazy"
-                  decoding="async"
-                  className="w-full h-full object-cover object-top transition-transform duration-300 group-hover:scale-105"
-                  onError={(e) => {
-                    e.currentTarget.onerror = null;
-                    e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(founder.name)}&background=181818&color=ffffff&bold=true`;
-                  }}
-                />
-
-                {/* LinkedIn Badge */}
-                {founder.linkedin && (
-                  <a
-                    href={founder.linkedin.startsWith('http') ? founder.linkedin : `https://${founder.linkedin}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={(e) => e.stopPropagation()}
-                    className="absolute top-1.5 right-1.5 w-[22px] h-[22px] rounded-[5px] bg-white shadow-xs border border-white/80 flex items-center justify-center transition-transform active:scale-90 hover:scale-105 z-10"
-                    title={`View ${founder.name} on LinkedIn`}
-                  >
-                    <div className="w-[14px] h-[14px] rounded-[2.5px] bg-[#0A66C2] flex items-center justify-center text-white text-[9px] font-bold leading-none font-sans">
-                      in
-                    </div>
-                  </a>
-                )}
-              </div>
-
-              {/* Founder Info */}
-              <div className="mt-2 text-center px-0.5">
-                <h4 className="text-[13.5px] font-bold text-[#111827] leading-tight truncate">
-                  {founder.name}
-                </h4>
-                <p className="text-[11.5px] text-[#6B7280] font-medium mt-0.5">
-                  {founder.role}
-                </p>
-              </div>
+      {/* About GetMyEvent Card */}
+      <div className="pt-2 pb-4 select-none">
+        <div
+          onClick={() => router.push('/delegate/about')}
+          className="bg-white rounded-[20px] p-3.5 sm:p-4 border border-[#E5E7EB] shadow-xs hover:border-gray-300 transition-all cursor-pointer flex items-center justify-between group active:scale-[0.99]"
+        >
+          <div className="flex items-center gap-3.5 min-w-0">
+            <div className="w-12 h-12 rounded-[16px] bg-[#FDF2F2] border border-red-100/70 flex items-center justify-center text-[#B51F32] shrink-0">
+              <Users className="w-6 h-6 stroke-[2]" />
             </div>
-          ))}
+            <div className="min-w-0">
+              <h3 className="text-[15.5px] font-bold text-[#111827] tracking-tight group-hover:text-[#B51F32] transition-colors leading-snug">
+                About GetMyEvent
+              </h3>
+              <p className="text-[12px] text-[#6B7280] font-normal mt-0.5 leading-snug">
+                Meet our mentors, founders &amp; the team
+              </p>
+            </div>
+          </div>
+          <ArrowRight className="w-5 h-5 text-[#B51F32] group-hover:translate-x-1 transition-transform shrink-0 ml-2" />
         </div>
       </div>
     </div>
