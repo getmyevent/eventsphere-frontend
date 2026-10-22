@@ -607,30 +607,9 @@ class ApiClient {
     },
     getExhibitors: async (): Promise<OrganizerExhibitor[]> => {
       return this.request<OrganizerExhibitor[]>('/api/v1/organizer/exhibitors');
-    },
-    getPolls: async (): Promise<any[]> => {
-      return this.request<any[]>('/api/v1/organizer/polls');
-    },
-    createPoll: async (data: { sessionId: string; question: string; options: string[] }): Promise<any> => {
-      return this.request<any>('/api/v1/organizer/polls', {
-        method: 'POST',
-        body: JSON.stringify(data),
-      });
-    },
-    updatePollStatus: async (pollId: string, status: 'open' | 'closed'): Promise<any> => {
-      return this.request<any>(`/api/v1/organizer/polls/${encodeURIComponent(pollId)}/status`, {
-        method: 'PATCH',
-        body: JSON.stringify({ status }),
-      });
-    },
-    activatePoll: async (pollId: string): Promise<any> => {
-      return this.request<any>(`/api/v1/organizer/polls/${encodeURIComponent(pollId)}/activate`, {
-        method: 'POST',
-      });
-    },
-  };
+    },  };
 
-  // Phase 7: Sessions, Q&A & Live Polls
+  // Phase 7: Sessions & Q&A
   public sessions = {
     getAll: async (day?: number, track?: string): Promise<any[]> => {
       const params = new URLSearchParams();
@@ -665,41 +644,7 @@ class ApiClient {
       return this.request<{ questionId: string; upvotes: number; hasUpvoted: boolean; message: string }>(`/api/v1/sessions/questions/${encodeURIComponent(questionId)}/upvote`, {
         method: 'POST',
       });
-    },
-    getPolls: async (sessionId: string): Promise<any[]> => {
-      return this.request<any[]>(`/api/v1/sessions/${encodeURIComponent(sessionId)}/polls`);
-    },
-    votePoll: async (pollId: string, optionId: string): Promise<any> => {
-      return this.request<any>(`/api/v1/polls/${encodeURIComponent(pollId)}/vote`, {
-        method: 'POST',
-        body: JSON.stringify({ optionId }),
-      });
-    },
-    resetPollVote: async (pollId: string): Promise<any> => {
-      return this.request<any>(`/api/v1/polls/${encodeURIComponent(pollId)}/vote`, {
-        method: 'DELETE',
-      });
-    },
-    getPollById: async (pollId: string): Promise<any> => {
-      return this.request<any>(`/api/v1/polls/${encodeURIComponent(pollId)}`);
-    },
-    getActivePoll: async (): Promise<any> => {
-      return this.request<any>('/api/v1/polls/active');
-    },
-    activatePoll: async (pollId: string): Promise<any> => {
-      return this.request<any>(`/api/v1/polls/${encodeURIComponent(pollId)}/activate`, {
-        method: 'POST',
-      });
-    },
-    getPollStreamUrl: (pollId: string): string => {
-      const token = this.getToken();
-      return `${API_BASE_URL}/api/v1/polls/${encodeURIComponent(pollId)}/stream${token ? `?token=${encodeURIComponent(token)}` : ''}`;
-    },
-    getActivePollStreamUrl: (): string => {
-      const token = this.getToken();
-      return `${API_BASE_URL}/api/v1/polls/stream${token ? `?token=${encodeURIComponent(token)}` : ''}`;
-    },
-  };
+    },  };
 
   // Phase 6: Attendees & Networking
   public attendees = {

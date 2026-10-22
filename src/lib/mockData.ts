@@ -6,8 +6,7 @@ import {
   Product,
   Session,
   Question,
-  Poll,
-  ExhibitorStats,
+    ExhibitorStats,
   Lead,
   Connection,
   InterestedVisitor,
@@ -30,7 +29,7 @@ import {
  *   from the official BTS 2026 website.
  * - Public schedule titles/times are taken from the official programme.
  * - The public site does NOT expose individual attendee registration IDs,
- *   check-in times, booth scans, leads, connection history, poll votes, or
+ *   check-in times, booth scans, leads, connection history, or
  *   per-product app analytics. Those fields are intentionally empty/zero
  *   instead of inventing values.
  * - Speaker photographs are hotlinked from the official BTS image directory.
@@ -4788,21 +4787,6 @@ export const INITIAL_SESSIONS: Session[] = [
 ];
 
 export const INITIAL_QUESTIONS: Question[] = [];
-
-export const INITIAL_POLL: Poll = {
-  id: 'poll-mpss26-01',
-  sessionId: 'mpss26-d1-02',
-  question: 'Which sector presents the largest semiconductor growth opportunity for India by 2030?',
-  status: 'open',
-  totalVotes: 480,
-  voterIds: [],
-  options: [
-    { id: 'opt-1', text: 'Automotive & EV Power Semiconductor Modules', votes: 210 },
-    { id: 'opt-2', text: 'AI & Data Center High-Performance Accelerators', votes: 165 },
-    { id: 'opt-3', text: '5G / Telecom & IoT Edge Silicon', votes: 65 },
-    { id: 'opt-4', text: 'Industrial Automation & Fab Instrumentation', votes: 40 },
-  ],
-};
 
 export const INITIAL_EXHIBITORS: ExhibitorStats[] = sortExhibitors([
   ...GENERATED_EXHIBITORS,

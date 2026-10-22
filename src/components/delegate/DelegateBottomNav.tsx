@@ -63,7 +63,6 @@ export const DelegateBottomNav: React.FC = () => {
               (activeDelegateTab === 'schedule' && selectedSessionId !== null && sessionBackTab === 'home') ||
               [
                 'speakers',
-                'polls',
                 'map',
                 'sponsors',
                 'ai_recommendations',

@@ -131,24 +131,6 @@ export interface Question {
   createdAt: string;
 }
 
-export interface PollOption {
-  id: string;
-  text: string;
-  votes: number;
-}
-
-export interface Poll {
-  id: string;
-  sessionId: string;
-  question: string;
-  options: PollOption[];
-  status: 'open' | 'closed';
-  totalVotes: number;
-  voterIds: string[]; // for 1 vote per person verification
-  hasVoted?: boolean;
-  votedOptionId?: string | null;
-}
-
 export interface SessionSpeakerInfo {
   name: string;
   role?: string; // 'Moderator' | 'Chair' | 'Co-Chair' | 'Panelist' | 'Keynote Speaker' | string;

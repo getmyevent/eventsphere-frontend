@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 
 export const OrganizerReports: React.FC = () => {
-  const { event, exhibitors, poll, showToast } = useStore();
+  const { event, exhibitors, showToast } = useStore();
   const [isGenerating, setIsGenerating] = useState(false);
   const [reportGenerated, setReportGenerated] = useState(true);
 
@@ -51,8 +51,7 @@ export const OrganizerReports: React.FC = () => {
         `Total Registered,${event.totalRegistered}`,
         `Total Exhibitors,${event.totalExhibitors}`,
         `Total Speakers,${event.totalSpeakers}`,
-        `Poll Responses,${poll.totalVotes}`,
-        '',
+                '',
         'Top 5 Exhibitors by Leads,Booth,Category,Leads Generated',
         ...topExhibitorsByLeads.map(
           (ex, idx) => `"#${idx + 1} ${ex.company}","${ex.booth}","${ex.category}",${ex.leads || 0}`
@@ -213,20 +212,6 @@ export const OrganizerReports: React.FC = () => {
         </div>
 
         {/* Engagement Highlights */}
-        <div>
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-2.5">
-            3. Audience Engagement Highlights
-          </h3>
-          <div className="p-3.5 bg-[#F8FAFC] rounded-lg border border-[#E2E8F0] max-w-xs text-center sm:text-left sm:flex sm:items-center sm:justify-between">
-            <div>
-              <span className="text-[11px] uppercase font-semibold text-[#64748B] block">Poll Responses</span>
-              <p className="text-[20px] font-semibold font-mono text-[#172033] mt-0.5">{poll.totalVotes}</p>
-            </div>
-            <span className="text-[11px] text-[#3563F6] font-medium bg-blue-50 border border-blue-200/60 px-2.5 py-1 rounded-md mt-2 sm:mt-0 inline-block">
-              Interactive voting
-            </span>
-          </div>
-        </div>
 
         {/* Report Footer */}
         <div className="pt-4 border-t border-[#E2E8F0] flex flex-wrap items-center justify-between gap-2 text-xs text-[#64748B]">

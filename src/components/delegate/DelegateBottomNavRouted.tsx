@@ -32,7 +32,6 @@ export const DelegateBottomNavRouted: React.FC = () => {
       pathname === '/delegate/speakers' ||
       pathname === '/delegate/organizers' ||
       pathname === '/delegate/partners' ||
-      pathname === '/delegate/polls' ||
       pathname === '/delegate/map' ||
       pathname === '/delegate/sponsors' ||
       pathname === '/delegate/people' ||

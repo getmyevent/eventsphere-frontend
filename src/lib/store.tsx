@@ -9,8 +9,7 @@ import {
   Product,
   Session,
   Question,
-  Poll,
-  ExhibitorStats,
+    ExhibitorStats,
   DemoRole,
   QuestionStatus,
   LeadStatus,
@@ -26,8 +25,7 @@ import {
   INITIAL_LEADS,
   INITIAL_SESSIONS,
   INITIAL_QUESTIONS,
-  INITIAL_POLL,
-  INITIAL_EXHIBITORS,
+    INITIAL_EXHIBITORS,
   INITIAL_INTERESTED_VISITORS
 } from './mockData';
 import { api } from './api';
@@ -82,8 +80,8 @@ interface StoreContextType {
   // Navigation & Role
   role: DemoRole;
   setRole: (role: DemoRole) => void;
-  activeDelegateTab: 'home' | 'people' | 'scan' | 'focus' | 'schedule' | 'profile' | 'companies' | 'company_detail' | 'edit_profile' | 'ai_recommendations' | 'speakers' | 'polls' | 'map' | 'sponsors' | 'support';
-  setActiveDelegateTab: (tab: 'home' | 'people' | 'scan' | 'focus' | 'schedule' | 'profile' | 'companies' | 'company_detail' | 'edit_profile' | 'ai_recommendations' | 'speakers' | 'polls' | 'map' | 'sponsors' | 'support') => void;
+  activeDelegateTab: 'home' | 'people' | 'scan' | 'focus' | 'schedule' | 'profile' | 'companies' | 'company_detail' | 'edit_profile' | 'ai_recommendations' | 'speakers' | 'map' | 'sponsors' | 'support';
+  setActiveDelegateTab: (tab: 'home' | 'people' | 'scan' | 'focus' | 'schedule' | 'profile' | 'companies' | 'company_detail' | 'edit_profile' | 'ai_recommendations' | 'speakers' | 'map' | 'sponsors' | 'support') => void;
   viewSavedPeopleOnly: boolean;
   setViewSavedPeopleOnly: (v: boolean) => void;
   viewSavedCompaniesOnly: boolean;
@@ -96,8 +94,8 @@ interface StoreContextType {
   toggleSaveCompany: (id: string) => void;
   activeExhibitorTab: 'home' | 'leads' | 'scan' | 'products' | 'more';
   setActiveExhibitorTab: (tab: 'home' | 'leads' | 'scan' | 'products' | 'more') => void;
-  activeOrganizerTab: 'overview' | 'attendees' | 'exhibitors' | 'sessions' | 'polls' | 'reports' | 'settings';
-  setActiveOrganizerTab: (tab: 'overview' | 'attendees' | 'exhibitors' | 'sessions' | 'polls' | 'reports' | 'settings') => void;
+  activeOrganizerTab: 'overview' | 'attendees' | 'exhibitors' | 'sessions' | 'reports' | 'settings';
+  setActiveOrganizerTab: (tab: 'overview' | 'attendees' | 'exhibitors' | 'sessions' | 'reports' | 'settings') => void;
 
   // View frame mode for Delegate/Exhibitor (centered 430px frame vs full)
   viewMode: 'frame' | 'responsive';
@@ -145,12 +143,6 @@ interface StoreContextType {
   products: Product[];
   sessions: Session[];
   questions: Question[];
-  poll: Poll;
-  setPoll: React.Dispatch<React.SetStateAction<Poll>>;
-  customPolls: Poll[];
-  setCustomPolls: React.Dispatch<React.SetStateAction<Poll[]>>;
-  createPoll: (data: { sessionId: string; question: string; options: string[] }) => Promise<Poll>;
-  activatePoll: (pollId: string) => Promise<void>;
   exhibitors: ExhibitorStats[];
   interestedVisitors: InterestedVisitor[];
 
@@ -169,9 +161,6 @@ interface StoreContextType {
   submitQuestion: (sessionId: string, text: string, isAnonymous: boolean) => void | Promise<void>;
   upvoteQuestion: (questionId: string) => Promise<{ success: boolean; message?: string }> | { success: boolean; message?: string };
   updateQuestionStatus: (questionId: string, status: QuestionStatus) => void;
-  votePoll: (optionId: string) => Promise<{ success: boolean; message: string }> | { success: boolean; message: string };
-  togglePollStatus: () => void;
-  resetPollVote: () => void | Promise<void>;
   toggleCheckIn: (personId: string) => void;
   addWalkInAttendee: (data: { name: string; email: string; mobile: string; company: string; designation: string; ticketType: string }) => void;
   importAttendeesMock: (count: number) => void;
@@ -190,52 +179,16 @@ interface StoreContextType {
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
 const STORAGE_KEY = 'eventsphere_mpss26_store_v13';
-const STORAGE_ACTIVE_POLL_KEY = 'eventsphere_active_poll_v2';
-const STORAGE_CUSTOM_POLLS_KEY = 'eventsphere_custom_polls_v2';
-
-const getStoredActivePoll = (): Poll => {
-  if (typeof window !== 'undefined') {
-    try {
-      const saved = localStorage.getItem(STORAGE_ACTIVE_POLL_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed && parsed.id && Array.isArray(parsed.options) && parsed.options.length > 0) {
-          return parsed;
-        }
-      }
-    } catch {
-      // ignore
-    }
-  }
-  return INITIAL_POLL;
-};
-
-const getStoredCustomPolls = (): Poll[] => {
-  if (typeof window !== 'undefined') {
-    try {
-      const saved = localStorage.getItem(STORAGE_CUSTOM_POLLS_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) {
-          return parsed;
-        }
-      }
-    } catch {
-      // ignore
-    }
-  }
-  return [];
-};
 
 export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Navigation & Role
   const [role, setRoleState] = useState<DemoRole>('delegate');
-  const [activeDelegateTab, setActiveDelegateTab] = useState<'home' | 'people' | 'scan' | 'focus' | 'schedule' | 'profile' | 'companies' | 'company_detail' | 'edit_profile' | 'ai_recommendations' | 'speakers' | 'polls' | 'map' | 'sponsors' | 'support'>('home');
+  const [activeDelegateTab, setActiveDelegateTab] = useState<'home' | 'people' | 'scan' | 'focus' | 'schedule' | 'profile' | 'companies' | 'company_detail' | 'edit_profile' | 'ai_recommendations' | 'speakers' | 'map' | 'sponsors' | 'support'>('home');
   const [viewSavedPeopleOnly, setViewSavedPeopleOnly] = useState<boolean>(false);
   const [viewSavedCompaniesOnly, setViewSavedCompaniesOnly] = useState<boolean>(false);
   const [scheduleSubTab, setScheduleSubTab] = useState<'all' | 'saved'>('all');
   const [activeExhibitorTab, setActiveExhibitorTab] = useState<'home' | 'leads' | 'scan' | 'products' | 'more'>('home');
-  const [activeOrganizerTab, setActiveOrganizerTab] = useState<'overview' | 'attendees' | 'exhibitors' | 'sessions' | 'polls' | 'reports' | 'settings'>('overview');
+  const [activeOrganizerTab, setActiveOrganizerTab] = useState<'overview' | 'attendees' | 'exhibitors' | 'sessions' | 'reports' | 'settings'>('overview');
   const [viewMode, setViewMode] = useState<'frame' | 'responsive'>('frame');
 
   // Connectivity
@@ -320,8 +273,6 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
   const [sessions, setSessions] = useState<Session[]>(INITIAL_SESSIONS);
   const [questions, setQuestions] = useState<Question[]>(INITIAL_QUESTIONS);
-  const [poll, setPoll] = useState<Poll>(getStoredActivePoll);
-  const [customPolls, setCustomPolls] = useState<Poll[]>(getStoredCustomPolls);
   const [exhibitors, setExhibitors] = useState<ExhibitorStats[]>(INITIAL_EXHIBITORS);
   const [interestedVisitors, setInterestedVisitors] = useState<InterestedVisitor[]>(INITIAL_INTERESTED_VISITORS);
 
@@ -343,12 +294,6 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setActiveDelegateTab('home');
     setRoleState('delegate');
     setSessions((prev) => prev.map((s) => ({ ...s, isBookmarked: false })));
-    setPoll((prev) => ({
-      ...prev,
-      voterIds: [],
-      hasVoted: false,
-      votedOptionId: null,
-    }));
     setQuestions((prev) =>
       prev.map((q) => ({
         ...q,
@@ -937,170 +882,20 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   }, [role, hasAccessConfirmed]);
 
-  // Persist poll and customPolls changes to localStorage
-  useEffect(() => {
-    if (typeof window !== 'undefined' && poll && poll.id) {
-      try {
-        localStorage.setItem(STORAGE_ACTIVE_POLL_KEY, JSON.stringify(poll));
-      } catch {
-        // ignore
-      }
-    }
-  }, [poll]);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined' && customPolls) {
-      try {
-        localStorage.setItem(STORAGE_CUSTOM_POLLS_KEY, JSON.stringify(customPolls));
-      } catch {
-        // ignore
-      }
-    }
-  }, [customPolls]);
-
-  // Sync live active poll from MySQL backend
-  useEffect(() => {
-    if (hasAccessConfirmed) {
-      api.sessions.getActivePoll()
-        .then((p) => {
-          if (p && p.id && p.options) {
-            setPoll((prev) => {
-              const isDifferent = prev.id !== p.id;
-              const formatted: Poll = {
-                id: p.id,
-                sessionId: p.sessionId || prev.sessionId,
-                question: p.question || prev.question,
-                status: (p.status as any) || prev.status,
-                totalVotes: typeof p.totalVotes === 'number' ? p.totalVotes : prev.totalVotes,
-                voterIds: isDifferent ? (p.hasVoted && currentUser?.id ? [currentUser.id] : []) : (p.hasVoted && currentUser?.id && !prev.voterIds.includes(currentUser.id) ? [...prev.voterIds, currentUser.id] : prev.voterIds),
-                hasVoted: Boolean(p.hasVoted),
-                votedOptionId: p.votedOptionId || (isDifferent ? null : prev.votedOptionId),
-                options: p.options.map((opt: any) => ({
-                  id: opt.id,
-                  text: opt.text,
-                  votes: opt.votes ?? opt.voteCount ?? 0,
-                })),
-              };
-              try {
-                localStorage.setItem(STORAGE_ACTIVE_POLL_KEY, JSON.stringify(formatted));
-              } catch {}
-              return formatted;
-            });
-          }
-        })
-        .catch((err) => {
-          console.warn('Backend active poll fetch skipped, preserving cached poll:', err);
-        });
-    }
-  }, [hasAccessConfirmed, currentUser?.id]);
-
-  // Real-Time Live Poll Streaming via Server-Sent Events (SSE)
-  // Connects to global active stream so votes AND newly posted polls update in 0ms across all devices
-  useEffect(() => {
-    if (!hasAccessConfirmed) return;
-
-    let eventSource: EventSource | null = null;
-
-    try {
-      const streamUrl = api.sessions.getActivePollStreamUrl();
-      eventSource = new EventSource(streamUrl);
-
-      const handleUpdate = (e: MessageEvent) => {
-        try {
-          const livePoll = JSON.parse(e.data);
-          if (livePoll && livePoll.options) {
-            setPoll((prev) => {
-              const isDifferentPoll = prev.id !== livePoll.id && Boolean(livePoll.id);
-              const updated: Poll = {
-                id: livePoll.id || prev.id,
-                sessionId: livePoll.sessionId || prev.sessionId,
-                question: livePoll.question || prev.question,
-                status: (livePoll.status as any) || prev.status,
-                totalVotes: typeof livePoll.totalVotes === 'number' ? livePoll.totalVotes : prev.totalVotes,
-                voterIds: isDifferentPoll ? [] : prev.voterIds,
-                hasVoted: isDifferentPoll ? false : prev.hasVoted,
-                votedOptionId: isDifferentPoll ? null : prev.votedOptionId,
-                options: livePoll.options.map((opt: any) => ({
-                  id: opt.id,
-                  text: opt.text,
-                  votes: opt.votes ?? opt.voteCount ?? 0,
-                })),
-              };
-              try {
-                localStorage.setItem(STORAGE_ACTIVE_POLL_KEY, JSON.stringify(updated));
-              } catch {}
-              return updated;
-            });
-
-            // Also guarantee that the poll exists in customPolls list across refreshes
-            setCustomPolls((prev) => {
-              const exists = prev.some((p) => p.id === livePoll.id);
-              if (exists) {
-                const updated = prev.map((p) => (p.id === livePoll.id ? {
-                  ...p,
-                  question: livePoll.question || p.question,
-                  status: (livePoll.status as any) || p.status,
-                  totalVotes: typeof livePoll.totalVotes === 'number' ? livePoll.totalVotes : p.totalVotes,
-                  options: livePoll.options.map((opt: any) => ({
-                    id: opt.id,
-                    text: opt.text,
-                    votes: opt.votes ?? opt.voteCount ?? 0,
-                  })),
-                } : p));
-                try { localStorage.setItem(STORAGE_CUSTOM_POLLS_KEY, JSON.stringify(updated)); } catch {}
-                return updated;
-              }
-              const newEntry: Poll = {
-                id: livePoll.id,
-                sessionId: livePoll.sessionId || 'mpss26-d1-01',
-                question: livePoll.question || '',
-                status: (livePoll.status as any) || 'open',
-                totalVotes: typeof livePoll.totalVotes === 'number' ? livePoll.totalVotes : 0,
-                voterIds: [],
-                options: (livePoll.options || []).map((opt: any) => ({
-                  id: opt.id,
-                  text: opt.text,
-                  votes: opt.votes ?? opt.voteCount ?? 0,
-                })),
-              };
-              const updated = [newEntry, ...prev];
-              try { localStorage.setItem(STORAGE_CUSTOM_POLLS_KEY, JSON.stringify(updated)); } catch {}
-              return updated;
-            });
-          }
-        } catch (err) {
-          console.warn('Error parsing live poll SSE message:', err);
-        }
-      };
-
-      eventSource.addEventListener('poll-init', handleUpdate);
-      eventSource.addEventListener('poll-update', handleUpdate);
-
-      eventSource.onerror = () => {
-        // EventSource will automatically retry in background
-      };
-    } catch (err) {
-      console.warn('EventSource initialization failed:', err);
-    }
-
-    return () => {
-      if (eventSource) {
-        eventSource.close();
-      }
-    };
-  }, [hasAccessConfirmed]);
-
-  // Phase 4: Lightweight polling for live data (sessions status, poll results, questions of active session)
-  // Polls every 20–30s with random jitter, only while document is visible, stops on 401
+  
+  
+  
+  // Phase 4: Lightweight background refresh for live data (sessions status, questions of active session)
+  // Refreshes every 20–30s with random jitter, only while document is visible, stops on 401
   useEffect(() => {
     if (!hasAccessConfirmed) return;
 
     let timeoutId: NodeJS.Timeout;
     let isCancelled = false;
 
-    const pollLiveData = async () => {
+    const refreshLiveData = async () => {
       if (typeof document !== 'undefined' && document.hidden) {
-        timeoutId = setTimeout(pollLiveData, 10000);
+        timeoutId = setTimeout(refreshLiveData, 10000);
         return;
       }
 
@@ -1124,24 +919,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           });
         }
 
-        // 2. Sync live poll results
-        const livePoll = await api.sessions.getPollById('poll-mpss26-01');
-        if (!isCancelled && livePoll && livePoll.id && livePoll.options) {
-          setPoll((prev) => ({
-            ...prev,
-            status: (livePoll.status as any) || prev.status,
-            totalVotes: typeof livePoll.totalVotes === 'number' ? livePoll.totalVotes : prev.totalVotes,
-            hasVoted: Boolean(livePoll.hasVoted),
-            votedOptionId: livePoll.votedOptionId || null,
-            voterIds: livePoll.hasVoted && currentUser?.id ? [currentUser.id] : [],
-            options: livePoll.options.map((opt: any) => ({
-              id: opt.id,
-              text: opt.text,
-              votes: opt.votes,
-            })),
-          }));
-        }
-
+        
         // 3. Sync live questions for active session
         const targetSessionId = selectedSessionId || 'mpss26-d1-02';
         const liveQuestions = await api.sessions.getQuestions(targetSessionId);
@@ -1171,12 +949,12 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
       if (!isCancelled) {
         const jitterInterval = 20000 + Math.floor(Math.random() * 10000);
-        timeoutId = setTimeout(pollLiveData, jitterInterval);
+        timeoutId = setTimeout(refreshLiveData, jitterInterval);
       }
     };
 
     const initialDelay = 20000 + Math.floor(Math.random() * 10000);
-    timeoutId = setTimeout(pollLiveData, initialDelay);
+    timeoutId = setTimeout(refreshLiveData, initialDelay);
 
     return () => {
       isCancelled = true;
@@ -1256,14 +1034,15 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   // Update current user profile with MySQL backend synchronization
   const updateCurrentUser = useCallback(async (data: Partial<Person>) => {
-    // 1. Optimistically update local React state
+    // 1. Optimistically update local React state immediately (< 1ms)
     setCurrentUser((prev) => {
       const updatedUser = { ...prev, ...data };
       setAttendees((att) => att.map((a) => (a.id === prev.id ? updatedUser : a)));
       return updatedUser;
     });
+    showToast('Profile saved successfully ✓', 'success');
 
-    // 2. Persist to MySQL database via Spring Boot API
+    // 2. Persist to MySQL database via Spring Boot API in background
     try {
       const res = await api.attendees.updateMyProfile(data);
       if (res && res.name) {
@@ -1287,10 +1066,8 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           return fresh;
         });
       }
-      showToast('Profile saved successfully', 'success');
     } catch (err: any) {
-      console.warn('Backend updateMyProfile failed:', err);
-      showToast('Profile updated locally (offline mode)', 'info');
+      console.warn('Backend updateMyProfile background sync skipped/failed:', err);
     }
   }, [showToast]);
 
@@ -1776,204 +1553,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     showToast(`Question marked as ${status} ✓`, 'info');
   }, [showToast]);
 
-  // Vote in Poll
-  const votePoll = useCallback(async (optionId: string) => {
-    if (poll.voterIds.includes(currentUser.id)) {
-      return { success: false, message: 'You have already voted.' };
-    }
-
-    setPoll((prev) => ({
-      ...prev,
-      totalVotes: prev.totalVotes + 1,
-      voterIds: [...prev.voterIds, currentUser.id],
-      hasVoted: true,
-      votedOptionId: optionId,
-      options: prev.options.map((opt) =>
-        opt.id === optionId ? { ...opt, votes: opt.votes + 1 } : opt
-      ),
-    }));
-
-    try {
-      const res = await api.sessions.votePoll(poll.id, optionId);
-      if (res && res.options) {
-        setPoll((prev) => ({
-          ...prev,
-          totalVotes: res.totalVotes,
-          hasVoted: true,
-          votedOptionId: optionId,
-          options: res.options.map((opt: any) => ({
-            id: opt.id,
-            text: opt.text,
-            votes: opt.votes,
-          })),
-        }));
-      }
-      showToast('Poll vote recorded ✓', 'success');
-      return { success: true, message: 'Vote submitted ✓' };
-    } catch (err: any) {
-      console.warn('Backend votePoll error:', err);
-      if (err?.message?.includes('already voted')) {
-        showToast('You have already voted in this poll', 'info');
-        return { success: false, message: 'You have already voted.' };
-      }
-      showToast('Vote recorded locally', 'info');
-      return { success: true, message: 'Vote recorded' };
-    }
-  }, [poll, currentUser.id, showToast]);
-
-  // Toggle Poll Status (Open / Closed)
-  const togglePollStatus = useCallback(async () => {
-    const nextStatus = poll.status === 'open' ? 'closed' : 'open';
-    setPoll((prev) => ({ ...prev, status: nextStatus }));
-    showToast(`Poll is now ${nextStatus.toUpperCase()}`, 'info');
-
-    try {
-      await api.organizer.updatePollStatus(poll.id, nextStatus);
-    } catch (err) {
-      console.warn('Backend updatePollStatus error:', err);
-    }
-  }, [poll.id, poll.status, showToast]);
-
-  // Reset Poll to Initial State (for delegates / testing)
-  const resetPollVote = useCallback(async () => {
-    setPoll((prev) => ({
-      ...prev,
-      voterIds: [],
-      hasVoted: false,
-      votedOptionId: null,
-    }));
-    if (typeof window !== 'undefined') {
-      try {
-        localStorage.removeItem(`eventsphere_poll_voted_${poll.id}`);
-        localStorage.removeItem(`eventsphere_poll_voted_${INITIAL_POLL.id}`);
-        if (currentUser?.id) {
-          localStorage.removeItem(`eventsphere_poll_voted_${poll.id}_${currentUser.id}`);
-          localStorage.removeItem(`eventsphere_poll_voted_${INITIAL_POLL.id}_${currentUser.id}`);
-        }
-      } catch {
-        // ignore
-      }
-    }
-    try {
-      const res = await api.sessions.resetPollVote(poll.id);
-      if (res && res.options) {
-        setPoll((prev) => ({
-          ...prev,
-          totalVotes: res.totalVotes,
-          voterIds: [],
-          hasVoted: false,
-          votedOptionId: null,
-          options: res.options.map((opt: any) => ({
-            id: opt.id,
-            text: opt.text,
-            votes: opt.votes,
-          })),
-        }));
-      }
-    } catch (err: any) {
-      console.warn('Backend resetPollVote error:', err);
-    }
-    showToast('Poll reset to initial state ✓', 'info');
-  }, [poll.id, currentUser?.id, showToast]);
-
-  // Create New Poll (Organizer)
-  const createPoll = useCallback(async (data: { sessionId: string; question: string; options: string[] }): Promise<Poll> => {
-    const localId = 'poll_' + Math.random().toString(36).substring(2, 10);
-    const fallbackPoll: Poll = {
-      id: localId,
-      sessionId: data.sessionId,
-      question: data.question,
-      status: 'open',
-      totalVotes: 0,
-      voterIds: [],
-      options: data.options.map((text, idx) => ({
-        id: `opt_${localId}_${idx + 1}`,
-        text,
-        votes: 0,
-      })),
-    };
-
-    let finalPoll = fallbackPoll;
-
-    try {
-      const created = await api.organizer.createPoll(data);
-      if (created && created.id) {
-        finalPoll = {
-          id: created.id,
-          sessionId: created.sessionId || data.sessionId,
-          question: created.question || data.question,
-          status: (created.status as any) || 'open',
-          totalVotes: created.totalVotes || 0,
-          voterIds: [],
-          options: (created.options || []).map((opt: any) => ({
-            id: opt.id,
-            text: opt.text,
-            votes: opt.votes ?? opt.voteCount ?? 0,
-          })),
-        };
-      }
-    } catch (err) {
-      console.warn('Backend createPoll call failed, saving locally:', err);
-    }
-
-    setPoll(finalPoll);
-    setCustomPolls((prev) => {
-      const filtered = prev.filter((p) => p.id !== finalPoll.id);
-      const next = [finalPoll, ...filtered];
-      try {
-        localStorage.setItem(STORAGE_CUSTOM_POLLS_KEY, JSON.stringify(next));
-      } catch {}
-      return next;
-    });
-    try {
-      localStorage.setItem(STORAGE_ACTIVE_POLL_KEY, JSON.stringify(finalPoll));
-    } catch {}
-
-    return finalPoll;
-  }, []);
-
-  // Activate Poll (Organizer)
-  const activatePoll = useCallback(async (pollId: string): Promise<void> => {
-    // 1. Find from customPolls, current poll, or INITIAL_POLL
-    let target = customPolls.find((p) => p.id === pollId);
-    if (!target && poll.id === pollId) target = poll;
-    if (!target && INITIAL_POLL.id === pollId) target = INITIAL_POLL;
-
-    if (target) {
-      const activated: Poll = { ...target, status: 'open' };
-      setPoll(activated);
-      try {
-        localStorage.setItem(STORAGE_ACTIVE_POLL_KEY, JSON.stringify(activated));
-      } catch {}
-    }
-
-    // 2. Call backend to activate on server
-    try {
-      const res = await api.organizer.activatePoll(pollId);
-      if (res && res.id) {
-        const formatted: Poll = {
-          id: res.id,
-          sessionId: res.sessionId || target?.sessionId || 'mpss26-d1-01',
-          question: res.question || target?.question || '',
-          status: (res.status as any) || 'open',
-          totalVotes: typeof res.totalVotes === 'number' ? res.totalVotes : target?.totalVotes || 0,
-          voterIds: [],
-          options: (res.options || []).map((opt: any) => ({
-            id: opt.id,
-            text: opt.text,
-            votes: opt.votes ?? opt.voteCount ?? 0,
-          })),
-        };
-        setPoll(formatted);
-        try {
-          localStorage.setItem(STORAGE_ACTIVE_POLL_KEY, JSON.stringify(formatted));
-        } catch {}
-      }
-    } catch (err) {
-      console.warn('Backend activatePoll call failed, activated locally:', err);
-    }
-  }, [customPolls, poll]);
-
+  
   // Toggle check-in (Organizer)
   const toggleCheckIn = useCallback(async (personId: string) => {
     let nextCheckedInState = false;
@@ -2244,7 +1824,6 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setProducts(INITIAL_PRODUCTS);
     setSessions(INITIAL_SESSIONS);
     setQuestions(INITIAL_QUESTIONS);
-    setPoll(INITIAL_POLL);
     setExhibitors(INITIAL_EXHIBITORS);
     setInterestedVisitors(INITIAL_INTERESTED_VISITORS);
     setRoleState('delegate');
@@ -2311,12 +1890,6 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     products,
     sessions,
     questions,
-    poll,
-    setPoll,
-    customPolls,
-    setCustomPolls,
-    createPoll,
-    activatePoll,
     exhibitors,
     interestedVisitors,
     connectWith,
@@ -2333,9 +1906,6 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     submitQuestion,
     upvoteQuestion,
     updateQuestionStatus,
-    votePoll,
-    togglePollStatus,
-    resetPollVote,
     toggleCheckIn,
     addWalkInAttendee,
     importAttendeesMock,
@@ -2387,12 +1957,6 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     products,
     sessions,
     questions,
-    poll,
-    setPoll,
-    customPolls,
-    setCustomPolls,
-    createPoll,
-    activatePoll,
     exhibitors,
     interestedVisitors,
     connectWith,
@@ -2409,9 +1973,6 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     submitQuestion,
     upvoteQuestion,
     updateQuestionStatus,
-    votePoll,
-    togglePollStatus,
-    resetPollVote,
     toggleCheckIn,
     addWalkInAttendee,
     importAttendeesMock,

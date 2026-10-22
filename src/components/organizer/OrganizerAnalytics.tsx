@@ -5,7 +5,7 @@ import { BarChart2, BarChart3, Briefcase, Building2, Calendar, CheckCircle2, Lin
 import { useStore } from '../../lib/store';
 
 export const OrganizerAnalytics: React.FC = () => {
-  const { event, exhibitors, poll, questions } = useStore();
+  const { event, exhibitors, questions } = useStore();
 
   const checkInRate = ((event.totalCheckedIn / event.totalRegistered) * 100).toFixed(1);
 
@@ -230,14 +230,14 @@ export const OrganizerAnalytics: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-sm font-semibold text-[#172033]">Audience Engagement Breakdown</h2>
-              <p className="text-xs text-[#64748B] mt-0.5">Q&A, Polls, and Product Enquiries</p>
+              <p className="text-xs text-[#64748B] mt-0.5">Q&A and Product Enquiries</p>
             </div>
             <span className="text-xs text-[#16A34A] font-medium bg-emerald-50 border border-emerald-200/60 px-2 py-0.5 rounded-md">
               High Interaction
             </span>
           </div>
 
-          <div className="grid grid-cols-3 gap-3 text-center pt-1">
+          <div className="grid grid-cols-2 gap-3 text-center pt-1">
             <div className="p-3.5 bg-[#F8FAFC] rounded-lg border border-[#E2E8F0]">
               <span className="text-[11px] text-[#64748B] block">Q&A Questions</span>
               <strong className="text-sm font-semibold font-mono text-[#172033] block mt-0.5">
@@ -248,13 +248,6 @@ export const OrganizerAnalytics: React.FC = () => {
               </span>
             </div>
 
-            <div className="p-3.5 bg-[#F8FAFC] rounded-lg border border-[#E2E8F0]">
-              <span className="text-[11px] text-[#64748B] block">Poll Responses</span>
-              <strong className="text-sm font-semibold font-mono text-[#172033] block mt-0.5">
-                {poll.totalVotes}
-              </strong>
-              <span className="text-[11px] text-[#64748B] block mt-0.5">1 vote/person</span>
-            </div>
 
             <div className="p-3.5 bg-[#F8FAFC] rounded-lg border border-[#E2E8F0]">
               <span className="text-[11px] text-[#64748B] block">Product Interest</span>

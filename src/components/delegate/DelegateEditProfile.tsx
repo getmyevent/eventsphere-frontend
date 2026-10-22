@@ -140,8 +140,11 @@ export const DelegateEditProfile: React.FC = () => {
     try {
       // Exclude base64 avatar from backend API payload (avatar is managed locally via localStorage)
       const { avatar, ...profileFields } = formData;
-      await updateCurrentUser(profileFields);
+      // Optimistically update store and trigger background sync
+      const savePromise = updateCurrentUser(profileFields);
+      // Immediately navigate back for instant UX
       router.push('/delegate/profile');
+      await savePromise;
     } catch {
       // error toast handled by store
     } finally {
