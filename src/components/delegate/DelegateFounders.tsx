@@ -1,13 +1,42 @@
 'use client';
 
-import React from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useStore } from '../../lib/store';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 export const DelegateFounders: React.FC = () => {
   const router = useRouter();
   const { setSelectedPersonId } = useStore();
+
+  const guidanceScrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+
+  const checkGuidanceScroll = useCallback(() => {
+    if (guidanceScrollRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = guidanceScrollRef.current;
+      setCanScrollLeft(scrollLeft > 10);
+      setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 10);
+    }
+  }, []);
+
+  useEffect(() => {
+    checkGuidanceScroll();
+    window.addEventListener('resize', checkGuidanceScroll);
+    return () => window.removeEventListener('resize', checkGuidanceScroll);
+  }, [checkGuidanceScroll]);
+
+  const handleScrollGuidance = (direction: 'left' | 'right') => {
+    if (guidanceScrollRef.current) {
+      const scrollAmount = guidanceScrollRef.current.clientWidth * 0.75;
+      guidanceScrollRef.current.scrollBy({
+        left: direction === 'right' ? scrollAmount : -scrollAmount,
+        behavior: 'smooth',
+      });
+      setTimeout(checkGuidanceScroll, 350);
+    }
+  };
 
   const founders = [
     {
@@ -223,10 +252,6 @@ export const DelegateFounders: React.FC = () => {
               <h4 className="text-[13.5px] font-bold text-[#111827] tracking-tight">
                 Mentors
               </h4>
-              <span className="text-[10.5px] font-semibold text-[#B51F32] flex items-center gap-1 select-none">
-                <span>Swipe</span>
-                <span className="text-[12px]">→</span>
-              </span>
             </div>
 
             {/* Mentors Cards - 2 cards fit in frame, scroll to see others */}
@@ -289,63 +314,90 @@ export const DelegateFounders: React.FC = () => {
               <h4 className="text-[13.5px] font-bold text-[#111827] tracking-tight">
                 Guidance &amp; Support
               </h4>
-              <span className="text-[10.5px] font-semibold text-[#B51F32] flex items-center gap-1 select-none">
-                <span>Swipe</span>
-                <span className="text-[12px]">→</span>
-              </span>
             </div>
 
-            {/* Guidance & Support Cards - 2 cards fit in frame, scroll to see others */}
-            <div className="flex gap-3 overflow-x-auto pb-2.5 pt-0.5 snap-x snap-mandatory [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-              {guidanceTeam.map((member) => (
-                <div
-                  key={member.id}
-                  onClick={() => setSelectedPersonId(member.id)}
-                  className="w-[calc((100%-12px)/2)] min-w-[calc((100%-12px)/2)] shrink-0 bg-white rounded-[20px] p-2.5 border border-[#E5E7EB] hover:border-gray-400 transition-all shadow-xs cursor-pointer flex flex-col group select-none snap-start"
+            {/* Guidance & Support Carousel with Scroll Arrow */}
+            <div className="relative">
+              {/* Guidance & Support Cards - 2 cards fit in frame, scroll to see others */}
+              <div
+                ref={guidanceScrollRef}
+                onScroll={checkGuidanceScroll}
+                className="flex gap-3 overflow-x-auto pb-2.5 pt-0.5 snap-x snap-mandatory [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden scroll-smooth"
+              >
+                {guidanceTeam.map((member) => (
+                  <div
+                    key={member.id}
+                    onClick={() => setSelectedPersonId(member.id)}
+                    className="w-[calc((100%-12px)/2)] min-w-[calc((100%-12px)/2)] shrink-0 bg-white rounded-[20px] p-2.5 border border-[#E5E7EB] hover:border-gray-400 transition-all shadow-xs cursor-pointer flex flex-col group select-none snap-start"
+                  >
+                    {/* Photo Container - identical to cofounders */}
+                    <div className="relative w-full aspect-[4/3] rounded-[14px] overflow-hidden bg-slate-100 shrink-0 border border-slate-200/70">
+                      <img
+                        src={member.avatar}
+                        alt={member.name}
+                        className="w-full h-full object-cover object-top transition-transform duration-300 group-hover:scale-105"
+                        onError={(e) => {
+                          e.currentTarget.onerror = null;
+                          e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(member.name)}&background=181818&color=ffffff&bold=true`;
+                        }}
+                      />
+
+                      {/* LinkedIn Badge if available */}
+                      {member.linkedin && (
+                        <a
+                          href={member.linkedin.startsWith('http') ? member.linkedin : `https://${member.linkedin}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="absolute top-1.5 right-1.5 w-[22px] h-[22px] rounded-[5px] bg-white shadow-xs border border-white/80 flex items-center justify-center transition-transform active:scale-90 hover:scale-105 z-10"
+                          title={`View ${member.name} on LinkedIn`}
+                        >
+                          <div className="w-[14px] h-[14px] rounded-[2.5px] bg-[#0A66C2] flex items-center justify-center text-white text-[9px] font-bold leading-none font-sans">
+                            in
+                          </div>
+                        </a>
+                      )}
+                    </div>
+
+                    {/* Member Info - center aligned like cofounders */}
+                    <div className="mt-2 text-center px-0.5 flex-1 flex flex-col justify-start">
+                      <h5 className="text-[12.5px] font-bold text-[#111827] leading-tight group-hover:text-[#B51F32] transition-colors min-h-[30px] flex items-center justify-center">
+                        {member.name}
+                      </h5>
+                      <p className="text-[11.5px] text-[#6B7280] font-medium mt-0.5 leading-tight">
+                        {member.role}
+                      </p>
+                      <p className="text-[10.5px] text-[#9CA3AF] font-normal mt-0.5 leading-tight">
+                        {member.company}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Scroll Right Arrow Button - Right middle of Rochak's card */}
+              {canScrollRight && (
+                <button
+                  type="button"
+                  onClick={() => handleScrollGuidance('right')}
+                  className="absolute -right-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-white shadow-md border border-gray-200/90 flex items-center justify-center text-[#B51F32] hover:bg-gray-50 active:scale-90 transition-all cursor-pointer"
+                  aria-label="Scroll next members"
                 >
-                  {/* Photo Container - identical to cofounders */}
-                  <div className="relative w-full aspect-[4/3] rounded-[14px] overflow-hidden bg-slate-100 shrink-0 border border-slate-200/70">
-                    <img
-                      src={member.avatar}
-                      alt={member.name}
-                      className="w-full h-full object-cover object-top transition-transform duration-300 group-hover:scale-105"
-                      onError={(e) => {
-                        e.currentTarget.onerror = null;
-                        e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(member.name)}&background=181818&color=ffffff&bold=true`;
-                      }}
-                    />
+                  <ChevronRight className="w-4 h-4 stroke-[2.5]" />
+                </button>
+              )}
 
-                    {/* LinkedIn Badge if available */}
-                    {member.linkedin && (
-                      <a
-                        href={member.linkedin.startsWith('http') ? member.linkedin : `https://${member.linkedin}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => e.stopPropagation()}
-                        className="absolute top-1.5 right-1.5 w-[22px] h-[22px] rounded-[5px] bg-white shadow-xs border border-white/80 flex items-center justify-center transition-transform active:scale-90 hover:scale-105 z-10"
-                        title={`View ${member.name} on LinkedIn`}
-                      >
-                        <div className="w-[14px] h-[14px] rounded-[2.5px] bg-[#0A66C2] flex items-center justify-center text-white text-[9px] font-bold leading-none font-sans">
-                          in
-                        </div>
-                      </a>
-                    )}
-                  </div>
-
-                  {/* Member Info - center aligned like cofounders */}
-                  <div className="mt-2 text-center px-0.5 flex-1 flex flex-col justify-start">
-                    <h5 className="text-[12.5px] font-bold text-[#111827] leading-tight group-hover:text-[#B51F32] transition-colors min-h-[30px] flex items-center justify-center">
-                      {member.name}
-                    </h5>
-                    <p className="text-[11.5px] text-[#6B7280] font-medium mt-0.5 leading-tight">
-                      {member.role}
-                    </p>
-                    <p className="text-[10.5px] text-[#9CA3AF] font-normal mt-0.5 leading-tight">
-                      {member.company}
-                    </p>
-                  </div>
-                </div>
-              ))}
+              {/* Scroll Left Arrow Button */}
+              {canScrollLeft && (
+                <button
+                  type="button"
+                  onClick={() => handleScrollGuidance('left')}
+                  className="absolute -left-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-white shadow-md border border-gray-200/90 flex items-center justify-center text-[#B51F32] hover:bg-gray-50 active:scale-90 transition-all cursor-pointer"
+                  aria-label="Scroll previous members"
+                >
+                  <ChevronLeft className="w-4 h-4 stroke-[2.5]" />
+                </button>
+              )}
             </div>
           </div>
         </div>
