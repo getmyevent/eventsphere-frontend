@@ -303,11 +303,13 @@ class ApiClient {
           result = (await response.text()) as unknown as T;
         }
 
-        // Cache GET responses for 5 seconds (5000ms)
+        // Cache GET responses: 15s for catalogs/directories, 5s for dynamic data
         if (isGet) {
+          const isCatalog = endpoint.includes('/sessions') || endpoint.includes('/exhibitors');
+          const cacheDuration = isCatalog ? 15000 : 5000;
           this.cache.set(cacheKey, {
             data: result,
-            expiry: Date.now() + 5000,
+            expiry: Date.now() + cacheDuration,
           });
         }
 

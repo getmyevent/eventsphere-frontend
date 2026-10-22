@@ -30,6 +30,7 @@ export const DelegatePeople: React.FC = () => {
 
   
   const [searchQuery, setSearchQuery] = useState('');
+  const [renderLimit, setRenderLimit] = useState(20);
 
   // Strictly the 10 curated speakers for People You Should Meet
   const baseList = useMemo(() => {
@@ -168,6 +169,7 @@ export const DelegatePeople: React.FC = () => {
               Clear
             </button>
           )}
+
         </div>
       </div>
 
@@ -193,7 +195,7 @@ export const DelegatePeople: React.FC = () => {
               </p>
             </div>
           ) : (
-            displayedList.map((person) => (
+            displayedList.slice(0, renderLimit).map((person) => (
               <div
                 key={person.id}
                 onClick={() => setSelectedPersonId(person.id)}
@@ -248,6 +250,17 @@ export const DelegatePeople: React.FC = () => {
                 </div>
               </div>
             ))
+          )}
+          {displayedList.length > renderLimit && (
+            <div className="pt-2 pb-4 text-center">
+              <button
+                type="button"
+                onClick={() => setRenderLimit((prev) => prev + 25)}
+                className="text-[12px] font-semibold px-4 py-2 bg-white border border-[#E5E7EB] rounded-full hover:bg-gray-50 text-[#181818] shadow-xs transition-colors cursor-pointer"
+              >
+                Show More Attendees ({displayedList.length - renderLimit} remaining)
+              </button>
+            </div>
           )}
         </div>
       </div>

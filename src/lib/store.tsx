@@ -181,6 +181,17 @@ const StoreContext = createContext<StoreContextType | undefined>(undefined);
 const STORAGE_KEY = 'eventsphere_mpss26_store_v13';
 
 export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // Preemptively warm up Cloud Run backend on initial page load
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || '';
+        if (backendUrl) {
+          fetch(`${backendUrl}/actuator/health`, { method: 'GET', mode: 'cors' }).catch(() => {});
+        }
+      } catch {}
+    }
+  }, []);
   // Navigation & Role
   const [role, setRoleState] = useState<DemoRole>('delegate');
   const [activeDelegateTab, setActiveDelegateTab] = useState<'home' | 'people' | 'scan' | 'focus' | 'schedule' | 'profile' | 'companies' | 'company_detail' | 'edit_profile' | 'ai_recommendations' | 'speakers' | 'map' | 'sponsors' | 'support'>('home');
@@ -900,31 +911,54 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       }
 
       try {
-        // 1. Sync live sessions (status changes, attendance count, question count)
+        // 1. Sync live sessions with dirty-checking to eliminate unnecessary full-app re-renders
         const liveSessions = await api.sessions.getAll();
         if (!isCancelled && Array.isArray(liveSessions) && liveSessions.length > 0) {
           setSessions((prev) => {
             const bMap = new Map(liveSessions.map((s: any) => [s.id, s]));
-            return prev.map((s) => {
+            let hasChanged = false;
+            const updated = prev.map((s) => {
               const b = bMap.get(s.id);
               if (!b) return s;
-              return {
-                ...s,
-                status: (b.status as any) || s.status,
-                attendanceCount: typeof b.attendanceCount === 'number' ? b.attendanceCount : s.attendanceCount,
-                questionsCount: typeof b.questionsCount === 'number' ? b.questionsCount : s.questionsCount,
-                isBookmarked: Boolean(b.isBookmarked),
-              };
+              const newStatus = (b.status as any) || s.status;
+              const newAttendance = typeof b.attendanceCount === 'number' ? b.attendanceCount : s.attendanceCount;
+              const newQuestionsCount = typeof b.questionsCount === 'number' ? b.questionsCount : s.questionsCount;
+              const newBookmarked = Boolean(b.isBookmarked);
+              if (
+                s.status !== newStatus ||
+                s.attendanceCount !== newAttendance ||
+                s.questionsCount !== newQuestionsCount ||
+                Boolean(s.isBookmarked) !== newBookmarked
+              ) {
+                hasChanged = true;
+                return {
+                  ...s,
+                  status: newStatus,
+                  attendanceCount: newAttendance,
+                  questionsCount: newQuestionsCount,
+                  isBookmarked: newBookmarked,
+                };
+              }
+              return s;
             });
+            return hasChanged ? updated : prev;
           });
         }
 
         
-        // 3. Sync live questions for active session
+        // 2. Sync live questions with equality check to prevent needless re-renders
         const targetSessionId = selectedSessionId || 'mpss26-d1-02';
         const liveQuestions = await api.sessions.getQuestions(targetSessionId);
         if (!isCancelled && Array.isArray(liveQuestions)) {
           setQuestions((prev) => {
+            const currentForSession = prev.filter((q) => q.sessionId === targetSessionId);
+            if (currentForSession.length === liveQuestions.length) {
+              const isIdentical = liveQuestions.every((lq: any, idx: number) => {
+                const cq = currentForSession[idx];
+                return cq && cq.id === lq.id && cq.upvotes === (lq.upvotes || 0) && cq.status === (lq.status || 'Submitted');
+              });
+              if (isIdentical) return prev;
+            }
             const others = prev.filter((q) => q.sessionId !== targetSessionId);
             const mapped: Question[] = liveQuestions.map((q: any) => ({
               id: q.id,

@@ -20,6 +20,11 @@ export const DelegateCompanies: React.FC = () => {
   } = useStore();
 
   const [searchQuery, setSearchQuery] = useState('');
+  const [renderLimit, setRenderLimit] = useState(25);
+
+    React.useEffect(() => {
+    setRenderLimit(25);
+  }, [searchQuery, viewSavedCompaniesOnly]);
 
   const filteredExhibitors = useMemo(() => {
     const list = exhibitors.filter((company) => {
@@ -111,7 +116,7 @@ export const DelegateCompanies: React.FC = () => {
             </p>
           </div>
         ) : (
-          filteredExhibitors.map((company) => (
+          filteredExhibitors.slice(0, renderLimit).map((company) => (
             <div
               key={company.id}
               onClick={() => {
@@ -164,6 +169,17 @@ export const DelegateCompanies: React.FC = () => {
               </div>
             </div>
           ))
+        )}
+        {filteredExhibitors.length > renderLimit && (
+          <div className="pt-2 pb-4 text-center">
+            <button
+              type="button"
+              onClick={() => setRenderLimit((prev) => prev + 25)}
+              className="text-[12px] font-semibold px-4 py-2 bg-white border border-[#E2E8F0] rounded-full hover:bg-gray-50 text-[#181818] shadow-xs transition-colors cursor-pointer"
+            >
+              Show More Exhibitors ({filteredExhibitors.length - renderLimit} remaining)
+            </button>
+          </div>
         )}
       </div>
     </div>
