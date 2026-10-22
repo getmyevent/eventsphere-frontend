@@ -1287,7 +1287,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           return fresh;
         });
       }
-      showToast('Profile saved & synced to MySQL ✓', 'success');
+      showToast('Profile saved successfully', 'success');
     } catch (err: any) {
       console.warn('Backend updateMyProfile failed:', err);
       showToast('Profile updated locally (offline mode)', 'info');
@@ -1331,7 +1331,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           return a;
         }));
       }
-      showToast('Attendee record updated & saved to MySQL ✓', 'success');
+      showToast('Attendee record updated successfully', 'success');
     } catch (err: any) {
       console.warn('Backend updateAttendee failed:', err);
       showToast(err.message || 'Failed to update attendee', 'error');

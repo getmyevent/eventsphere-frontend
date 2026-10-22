@@ -180,6 +180,7 @@ export const INITIAL_ATTENDEES: Person[] = [
   twitter: '',
   avatar: 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792451701/vaibhav.png',
   bio: 'Professor at IET-DAVV Indore. Key academic mentor and featured speaker at the Madhya Pradesh Semiconductor Summit 2026.',
+  privacy: { ...PRIVATE_CONTACT_DEFAULT, shareEmail: true, sharePhone: true, shareLinkedIn: true },
   interests: [],
   skills: [],
   },
