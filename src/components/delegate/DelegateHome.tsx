@@ -557,18 +557,18 @@ export const DelegateHome: React.FC = () => {
         </div>
       </div>
 
-      {/* People You Should Meet Section */}
+      {/* Speakers Section */}
       {recommendedPeople.length > 0 && (
         <div className="space-y-2 pt-1">
           <div className="flex items-center justify-between px-0.5">
             <h3
-              onClick={() => router.push('/delegate/people')}
+              onClick={() => router.push('/delegate/speakers')}
               className="text-[17px] font-bold text-[#111827] tracking-tight cursor-pointer hover:text-[#B51F32] transition-colors"
             >
-              People You Should Meet
+              Speakers
             </h3>
             <button
-              onClick={() => router.push('/delegate/people')}
+              onClick={() => router.push('/delegate/speakers')}
               className="text-[13px] font-semibold text-[#111827] flex items-center gap-0.5 hover:underline"
             >
               <span>View all</span>
