@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { ChevronLeft, MapPin, Star } from 'lucide-react';
 import { useStore } from '@/lib/store';
 import { api } from '@/lib/api';
+import { getOfficialBoothNumber, formatBoothBadge } from '@/lib/officialBooths';
 
 export const DelegateCompanyDetail: React.FC = () => {
   const router = useRouter();
@@ -94,7 +95,7 @@ export const DelegateCompanyDetail: React.FC = () => {
               </div>
             )}
             <div className="bg-[#181818] text-white text-[11px] font-bold px-2.5 py-1 rounded-md">
-              {company.booth ? (company.booth.toLowerCase().includes('pavilion') || company.booth.toLowerCase().includes('booth') ? company.booth : `Booth ${company.booth}`) : 'Booth TBA'}
+              {formatBoothBadge(getOfficialBoothNumber(company?.company, company?.booth))}
             </div>
           </div>
           
@@ -105,7 +106,7 @@ export const DelegateCompanyDetail: React.FC = () => {
           </div>
 
           <p className="text-[12px] text-[#181818] leading-relaxed mb-2">
-            {company.company} is showcasing their latest innovations in the {company.category} space. Visit {company.booth ? (company.booth.toLowerCase().includes('pavilion') || company.booth.toLowerCase().includes('booth') ? company.booth : `Booth ${company.booth}`) : 'their booth'} at MPSS26 to explore their products and engage with their experts.
+            {company.company} is showcasing their latest innovations in the {company.category} space. Visit {formatBoothBadge(getOfficialBoothNumber(company?.company, company?.booth))} at MPSS26 to explore their products and engage with their experts.
           </p>
 
           <button 

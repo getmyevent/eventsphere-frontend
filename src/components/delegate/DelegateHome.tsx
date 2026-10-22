@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useStore } from '../../lib/store';
 import { INITIAL_ATTENDEES, RECOMMENDED_PEOPLE_IDS } from '../../lib/mockData';
 import { getExhibitorSlug } from '../../lib/exhibitorSlug';
+import { getOfficialBoothNumber, formatBoothBadge } from '../../lib/officialBooths';
 import { Person } from '../../types';
 import {
   Calendar,
@@ -682,11 +683,15 @@ export const DelegateHome: React.FC = () => {
                         company.company.charAt(0)
                       )}
                     </div>
-                    {company.booth && (
-                      <span className="text-[8.5px] font-semibold text-[#166534] bg-[#F0FDF4] border border-[#BBF7D0] px-1.5 py-0.5 rounded-md flex-shrink-0 whitespace-nowrap tracking-tight">
-                        {company.booth.toLowerCase().includes('pavilion') || company.booth.toLowerCase().includes('booth') ? company.booth : `Booth ${company.booth}`}
-                      </span>
-                    )}
+                    {(() => {
+                      const boothNum = getOfficialBoothNumber(company.company, company.booth);
+                      if (!boothNum || boothNum === 'TBA') return null;
+                      return (
+                        <span className="text-[8.5px] font-semibold text-[#166534] bg-[#F0FDF4] border border-[#BBF7D0] px-1.5 py-0.5 rounded-md flex-shrink-0 whitespace-nowrap tracking-tight">
+                          {formatBoothBadge(boothNum)}
+                        </span>
+                      );
+                    })()}
                   </div>
                   <div className="min-w-0 w-full">
                     <h4 className="text-[13px] font-bold text-[#181818] leading-tight truncate">

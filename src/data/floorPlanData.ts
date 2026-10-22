@@ -98,7 +98,7 @@ export const FLOOR_PLAN_BOOTHS: FloorBooth[] = [
   {
     id: 'booth-41',
     number: 41,
-    name: 'Technisum Web Solutions',
+    name: 'Technisium Web Solutions',
     category: 'IoT, Cloud & Robotics',
     categoryColor: '#8B5CF6',
     zone: 'Left Wall',
@@ -108,7 +108,7 @@ export const FLOOR_PLAN_BOOTHS: FloorBooth[] = [
     h: 48,
     size: '3m x 3m',
     description: 'Cloud architectures, enterprise web solutions and digital integration platforms.',
-    exhibitorSlug: 'technisum-web-solutions',
+    exhibitorSlug: 'technisium-web-solutions',
   },
   {
     id: 'booth-40',
@@ -128,7 +128,8 @@ export const FLOOR_PLAN_BOOTHS: FloorBooth[] = [
   {
     id: 'booth-39',
     number: 39,
-    name: 'SAGE University',
+    name: 'SAGUNE University',
+    subtitle: 'SAGE University',
     category: 'Academia & Research',
     categoryColor: '#10B981',
     zone: 'Left Wall',
@@ -138,7 +139,7 @@ export const FLOOR_PLAN_BOOTHS: FloorBooth[] = [
     h: 48,
     size: '3m x 3m',
     description: 'Advanced engineering laboratories, electronics curriculums and student startup incubator.',
-    exhibitorSlug: 'sage-university',
+    exhibitorSlug: 'sagune-university',
   },
   {
     id: 'booth-38',
@@ -188,7 +189,7 @@ export const FLOOR_PLAN_BOOTHS: FloorBooth[] = [
   {
     id: 'booth-35',
     number: 35,
-    name: 'Laxmishri PCB',
+    name: 'Lakshmishri PCB',
     category: 'Semiconductor & Design',
     categoryColor: '#0284C7',
     zone: 'Left Wall',
@@ -198,7 +199,7 @@ export const FLOOR_PLAN_BOOTHS: FloorBooth[] = [
     h: 48,
     size: '3m x 3m',
     description: 'High-density interconnect (HDI) and multilayer PCB manufacturing & rapid prototyping.',
-    exhibitorSlug: 'laxmishri-pcb',
+    exhibitorSlug: 'lakshmishri-pcb',
   },
   {
     id: 'booth-34',
@@ -233,7 +234,8 @@ export const FLOOR_PLAN_BOOTHS: FloorBooth[] = [
   {
     id: 'booth-32',
     number: 32,
-    name: 'SGSITS Indore',
+    name: 'SGSTS Indore',
+    subtitle: 'SGSITS Indore',
     category: 'Academia & Research',
     categoryColor: '#10B981',
     zone: 'Left Wall',
@@ -243,7 +245,7 @@ export const FLOOR_PLAN_BOOTHS: FloorBooth[] = [
     h: 48,
     size: '3m x 3m',
     description: 'Shri Govindram Seksaria Institute of Technology and Science, premier MP engineering college.',
-    exhibitorSlug: 'sgsits-indore',
+    exhibitorSlug: 'sgsts-indore',
   },
   {
     id: 'booth-31',
@@ -278,7 +280,7 @@ export const FLOOR_PLAN_BOOTHS: FloorBooth[] = [
   {
     id: 'booth-29',
     number: 29,
-    name: 'IISER Bhopal / Anuraran',
+    name: 'IISER Bhopal / Anuranan',
     category: 'Academia & Research',
     categoryColor: '#10B981',
     zone: 'Left Wall',
@@ -984,7 +986,8 @@ export const FLOOR_PLAN_BOOTHS: FloorBooth[] = [
   {
     id: 'booth-62',
     number: 62,
-    name: 'CraftifAI',
+    name: 'CraftAI',
+    subtitle: 'CraftifAI',
     category: 'IoT, Cloud & Robotics',
     categoryColor: '#8B5CF6',
     zone: 'Center Island Spine',
@@ -994,7 +997,7 @@ export const FLOOR_PLAN_BOOTHS: FloorBooth[] = [
     h: 42,
     size: '3m x 3m',
     description: 'AI model acceleration, computer vision and edge silicon algorithms.',
-    exhibitorSlug: 'craftifai',
+    exhibitorSlug: 'craftai',
   },
   {
     id: 'booth-63',

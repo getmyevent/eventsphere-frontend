@@ -1,8 +1,8 @@
-import { ExhibitorStats } from '../types';
+import { getOfficialBoothNumber } from './officialBooths';
 
 /**
  * Extracts the first numeric value from a booth string.
- * Examples: "1-2" -> 1, "Booth 9" -> 9, "56-57" -> 56, "58 & 70" -> 58
+ * Examples: "1-2" -> 1, "1, 2" -> 1, "Booth 9" -> 9, "56-57" -> 56, "58, 70" -> 58
  */
 export const getBoothNumber = (boothStr?: string): number | null => {
   if (!boothStr) return null;
@@ -15,7 +15,7 @@ export const getBoothNumber = (boothStr?: string): number | null => {
  */
 export const isMpsedcExhibitor = (ex: { company?: string; booth?: string }): boolean => {
   const comp = (ex.company || '').trim().toLowerCase();
-  const booth = (ex.booth || '').trim().toLowerCase();
+  const booth = (getOfficialBoothNumber(ex.company, ex.booth) || '').toLowerCase();
   return comp.includes('mpsedc') || booth.includes('mpsedc');
 };
 
@@ -24,7 +24,7 @@ export const isMpsedcExhibitor = (ex: { company?: string; booth?: string }): boo
  */
 export const isPavilionOnlyExhibitor = (ex: { company?: string; booth?: string }): boolean => {
   if (isMpsedcExhibitor(ex)) return false;
-  const booth = (ex.booth || '').trim().toLowerCase();
+  const booth = (getOfficialBoothNumber(ex.company, ex.booth) || '').toLowerCase();
   const num = getBoothNumber(booth);
   return booth.includes('pavilion') || num === null;
 };
@@ -32,7 +32,7 @@ export const isPavilionOnlyExhibitor = (ex: { company?: string; booth?: string }
 /**
  * Sorts exhibitors:
  * 1. MPSEDC first
- * 2. Ascending sequence by booth number (Booth 1, 2, 3...)
+ * 2. Ascending sequence by official booth number (Booth 1, 2, 3...)
  * 3. Exhibitors with only pavilion (except MPSEDC) in the last positions
  */
 export const sortExhibitors = <T extends { company: string; booth?: string }>(exhibitors: T[]): T[] => {
@@ -54,8 +54,10 @@ export const sortExhibitors = <T extends { company: string; booth?: string }>(ex
     }
 
     // 3. Both have booth numbers: sort in numeric sequence (Booth 1, Booth 2, ...)
-    const aNum = getBoothNumber(a.booth) ?? 999999;
-    const bNum = getBoothNumber(b.booth) ?? 999999;
+    const aOfficial = getOfficialBoothNumber(a.company, a.booth);
+    const bOfficial = getOfficialBoothNumber(b.company, b.booth);
+    const aNum = getBoothNumber(aOfficial) ?? 999999;
+    const bNum = getBoothNumber(bOfficial) ?? 999999;
     if (aNum !== bNum) {
       return aNum - bNum;
     }

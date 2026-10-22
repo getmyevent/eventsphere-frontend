@@ -7,6 +7,7 @@ import { useStore } from '../../lib/store';
 import { getExhibitorSlug } from '../../lib/exhibitorSlug';
 import { sortExhibitors } from '../../lib/exhibitorSort';
 import { getOptimizedThumbnailUrl } from '../../lib/cloudinary';
+import { getOfficialBoothNumber, formatBoothBadge } from '../../lib/officialBooths';
 
 export const DelegateCompanies: React.FC = () => {
   const router = useRouter();
@@ -30,9 +31,11 @@ export const DelegateCompanies: React.FC = () => {
     const list = exhibitors.filter((company) => {
       if (viewSavedCompaniesOnly && !savedCompanyIds.includes(company.id)) return false;
 
+      const officialBooth = getOfficialBoothNumber(company.company, company.booth);
       const matchesSearch =
         searchQuery === '' ||
         company.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (officialBooth && officialBooth.toLowerCase().includes(searchQuery.toLowerCase())) ||
         (company.booth && company.booth.toLowerCase().includes(searchQuery.toLowerCase())) ||
         (company.category && company.category.toLowerCase().includes(searchQuery.toLowerCase()));
 
@@ -156,12 +159,16 @@ export const DelegateCompanies: React.FC = () => {
                 </div>
 
                 <div className="flex flex-col items-end gap-1 flex-shrink-0">
-                  {company.booth && (
-                    <span className="text-[8.5px] font-semibold bg-[#F0FDF4] border border-[#BBF7D0] px-1.5 py-0.5 rounded-md text-[#166534] flex items-center gap-0.5 tracking-tight whitespace-nowrap">
-                      <MapPin className="w-2.5 h-2.5 flex-shrink-0" />
-                      {company.booth.toLowerCase().includes('pavilion') || company.booth.toLowerCase().includes('booth') ? company.booth : `Booth ${company.booth}`}
-                    </span>
-                  )}
+                  {(() => {
+                    const boothNum = getOfficialBoothNumber(company.company, company.booth);
+                    if (!boothNum || boothNum === 'TBA') return null;
+                    return (
+                      <span className="text-[8.5px] font-semibold bg-[#F0FDF4] border border-[#BBF7D0] px-1.5 py-0.5 rounded-md text-[#166534] flex items-center gap-0.5 tracking-tight whitespace-nowrap">
+                        <MapPin className="w-2.5 h-2.5 flex-shrink-0" />
+                        {formatBoothBadge(boothNum)}
+                      </span>
+                    );
+                  })()}
                   <span className="text-[10px] font-semibold text-[#B51F32] flex items-center gap-0.5">
                     Visit &rarr;
                   </span>

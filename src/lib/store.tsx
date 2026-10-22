@@ -30,6 +30,7 @@ import {
 } from './mockData';
 import { api } from './api';
 import { getStoredProfileImage } from './profileImageStorage';
+import { getOfficialBoothNumber } from './officialBooths';
 
 
 export const isPlaceholderDesignation = (d?: string): boolean => {
@@ -479,10 +480,11 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
               const updated = prev.map((e) => {
                 const b = bMap.get(e.id);
                 if (b) {
+                  const companyName = b.company || e.company;
                   return {
                     ...e,
-                    company: b.company || e.company,
-                    booth: b.booth || e.booth,
+                    company: companyName,
+                    booth: getOfficialBoothNumber(companyName, b.booth || e.booth),
                     category: b.category || e.category,
                     leads: typeof b.leadCount === 'number' ? b.leadCount : e.leads,
                   };
@@ -495,7 +497,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 .map((b) => ({
                   id: b.id,
                   company: b.company,
-                  booth: b.booth || 'TBA',
+                  booth: getOfficialBoothNumber(b.company, b.booth),
                   category: b.category || 'Technology',
                   logo: b.logoUrl || '',
                   leads: b.leadCount || 0,
@@ -564,10 +566,11 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
               const updated = prev.map((e) => {
                 const b = bMap.get(e.id);
                 if (b) {
+                  const companyName = b.company || e.company;
                   return {
                     ...e,
-                    company: b.company || e.company,
-                    booth: b.booth || e.booth,
+                    company: companyName,
+                    booth: getOfficialBoothNumber(companyName, b.booth || e.booth),
                     category: b.category || e.category,
                     logo: b.logoUrl || e.logo,
                   };
@@ -580,7 +583,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 .map((b: any) => ({
                   id: b.id,
                   company: b.company,
-                  booth: b.booth || 'TBA',
+                  booth: getOfficialBoothNumber(b.company, b.booth),
                   category: b.category || 'Technology',
                   logo: b.logoUrl || '',
                   leads: 0,
