@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   ArrowRight,
@@ -276,25 +276,27 @@ export const DelegateSchedule: React.FC = () => {
       }
     : null;
 
-  // Enhanced session list mapped with official INITIAL_SESSIONS definitions
-  const enhancedSessions = sessions.map((s: Session) => {
-    const init =
-      INITIAL_SESSIONS.find((is: Session) => is.id === s.id) ||
-      INITIAL_SESSIONS.find((is: Session) => is.title.toLowerCase().trim() === s.title?.toLowerCase().trim());
-    if (init) {
-      return {
-        ...s,
-        timeRange: init.timeRange || s.timeRange,
-        room: init.room || s.room,
-        track: init.track || s.track,
-        speakerName: init.speakerName || s.speakerName,
-        panelists: (s.panelists && s.panelists.length > 0) ? s.panelists : init.panelists,
-        takeaways: (init.takeaways && init.takeaways.length > 0) ? init.takeaways : s.takeaways,
-        description: init.description || s.description,
-      };
-    }
-    return s;
-  });
+  // Enhanced session list mapped with official INITIAL_SESSIONS definitions (memoized for 60fps scrolling)
+  const enhancedSessions = useMemo(() => {
+    return sessions.map((s: Session) => {
+      const init =
+        INITIAL_SESSIONS.find((is: Session) => is.id === s.id) ||
+        INITIAL_SESSIONS.find((is: Session) => is.title.toLowerCase().trim() === s.title?.toLowerCase().trim());
+      if (init) {
+        return {
+          ...s,
+          timeRange: init.timeRange || s.timeRange,
+          room: init.room || s.room,
+          track: init.track || s.track,
+          speakerName: init.speakerName || s.speakerName,
+          panelists: (s.panelists && s.panelists.length > 0) ? s.panelists : init.panelists,
+          takeaways: (init.takeaways && init.takeaways.length > 0) ? init.takeaways : s.takeaways,
+          description: init.description || s.description,
+        };
+      }
+      return s;
+    });
+  }, [sessions]);
 
   // Day filter counts
   const daySessions = enhancedSessions.filter((s) => s.day === activeDay);

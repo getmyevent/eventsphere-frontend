@@ -1,6 +1,13 @@
 import type { Metadata, Viewport } from 'next';
+import { Inter } from 'next/font/google';
 import './globals.css';
 import { StoreProvider } from '../lib/store';
+
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',
+});
 
 export const metadata: Metadata = {
   title: 'GetMyEvent — Digital Experience Layer | MP Semiconductor Summit 2026 (MPSS26)',
@@ -27,15 +34,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="h-[100dvh]">
+    <html lang="en" className={`h-[100dvh] ${inter.variable}`}>
       <head>
         <link rel="icon" href="/icon-192.png" type="image/png" />
         <link rel="apple-touch-icon" href="/icon-192.png" />
+        <link rel="preconnect" href="https://res.cloudinary.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://images.unsplash.com" />
+        <link rel="dns-prefetch" href="https://ui-avatars.com" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <script src="https://accounts.google.com/gsi/client" async defer></script>
       </head>
-      <body className="h-[100dvh] antialiased selection:bg-[#3563F6]/20 selection:text-inherit">
+      <body className={`h-[100dvh] antialiased selection:bg-[#3563F6]/20 selection:text-inherit ${inter.className}`}>
         <StoreProvider>
           {children}
         </StoreProvider>
