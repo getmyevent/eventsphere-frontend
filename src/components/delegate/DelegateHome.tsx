@@ -646,12 +646,20 @@ export const DelegateHome: React.FC = () => {
 
         <div className="grid grid-cols-2 gap-2.5">
           {(() => {
-            const exploreCompanies = ['MPSEDC', 'Truechip solutions private limited', 'CDAC', 'Analog Devices']
-              .map((name) => exhibitors.find((e) => e.company === name))
+            const featuredNames = ['MPSEDC', 'Truechip Solutions', 'DigiComm Semi', 'Analog Devices'];
+            const seen = new Set<string>();
+            const uniqueExhibitors = exhibitors.filter((e) => {
+              const key = (e.company || '').toLowerCase().trim();
+              if (!key || seen.has(key)) return false;
+              seen.add(key);
+              return true;
+            });
+
+            const matched = featuredNames
+              .map((name) => uniqueExhibitors.find((e) => e.company.toLowerCase().trim() === name.toLowerCase().trim()))
               .filter(Boolean);
 
-            const displayCompanies =
-              exploreCompanies.length === 4 ? exploreCompanies : exhibitors.slice(0, 4);
+            const displayCompanies = matched.length === 4 ? matched : uniqueExhibitors.slice(0, 4);
 
             return displayCompanies.map((company) => {
               if (!company) return null;

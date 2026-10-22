@@ -477,36 +477,19 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           if (exhList && Array.isArray(exhList) && exhList.length > 0) {
             setExhibitors((prev) => {
               const bMap = new Map(exhList.map((e) => [e.id, e]));
-              const updated = prev.map((e) => {
-                const b = bMap.get(e.id);
+              const bNameMap = new Map(exhList.map((e) => [(e.company || '').toLowerCase().trim(), e]));
+              return prev.map((e) => {
+                const b = bMap.get(e.id) || bNameMap.get(e.company.toLowerCase().trim());
                 if (b) {
-                  const companyName = b.company || e.company;
                   return {
                     ...e,
-                    company: companyName,
-                    booth: getOfficialBoothNumber(companyName, b.booth || e.booth),
+                    leads: typeof b.leadCount === 'number' ? b.leadCount : (typeof b.leads === 'number' ? b.leads : e.leads),
                     category: b.category || e.category,
-                    leads: typeof b.leadCount === 'number' ? b.leadCount : e.leads,
+                    logo: b.logoUrl || e.logo,
                   };
                 }
                 return e;
               });
-              const existingIds = new Set(prev.map((e) => e.id));
-              const brandNew: ExhibitorStats[] = exhList
-                .filter((b) => !existingIds.has(b.id))
-                .map((b) => ({
-                  id: b.id,
-                  company: b.company,
-                  booth: getOfficialBoothNumber(b.company, b.booth),
-                  category: b.category || 'Technology',
-                  logo: b.logoUrl || '',
-                  leads: b.leadCount || 0,
-                  enquiries: 0,
-                  visits: 0,
-                  teamSize: 0,
-                  status: 'Active' as const,
-                }));
-              return [...updated, ...brandNew];
             });
           }
         })
@@ -563,36 +546,19 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           if (backendExhibitors && Array.isArray(backendExhibitors) && backendExhibitors.length > 0) {
             setExhibitors((prev) => {
               const bMap = new Map(backendExhibitors.map((b: any) => [b.id, b]));
-              const updated = prev.map((e) => {
-                const b = bMap.get(e.id);
+              const bNameMap = new Map(backendExhibitors.map((b: any) => [(b.company || '').toLowerCase().trim(), b]));
+              return prev.map((e) => {
+                const b = bMap.get(e.id) || bNameMap.get(e.company.toLowerCase().trim());
                 if (b) {
-                  const companyName = b.company || e.company;
                   return {
                     ...e,
-                    company: companyName,
-                    booth: getOfficialBoothNumber(companyName, b.booth || e.booth),
+                    leads: typeof b.leadCount === 'number' ? b.leadCount : (typeof b.leads === 'number' ? b.leads : e.leads),
                     category: b.category || e.category,
                     logo: b.logoUrl || e.logo,
                   };
                 }
                 return e;
               });
-              const existingIds = new Set(prev.map((e) => e.id));
-              const brandNew: ExhibitorStats[] = backendExhibitors
-                .filter((b: any) => !existingIds.has(b.id))
-                .map((b: any) => ({
-                  id: b.id,
-                  company: b.company,
-                  booth: getOfficialBoothNumber(b.company, b.booth),
-                  category: b.category || 'Technology',
-                  logo: b.logoUrl || '',
-                  leads: 0,
-                  enquiries: 0,
-                  visits: 0,
-                  teamSize: 0,
-                  status: 'Active' as const,
-                }));
-              return [...updated, ...brandNew];
             });
           }
         })

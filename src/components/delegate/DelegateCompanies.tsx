@@ -28,15 +28,24 @@ export const DelegateCompanies: React.FC = () => {
   }, [searchQuery, viewSavedCompaniesOnly]);
 
   const filteredExhibitors = useMemo(() => {
-    const list = exhibitors.filter((company) => {
+    const seen = new Set<string>();
+    const uniqueList = exhibitors.filter((company) => {
+      const key = (company.company || '').toLowerCase().trim();
+      if (!key || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+
+    const list = uniqueList.filter((company) => {
       if (viewSavedCompaniesOnly && !savedCompanyIds.includes(company.id)) return false;
 
       const officialBooth = getOfficialBoothNumber(company.company, company.booth);
+      if (officialBooth === 'TBA') return false;
+
       const matchesSearch =
         searchQuery === '' ||
         company.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
         (officialBooth && officialBooth.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        (company.booth && company.booth.toLowerCase().includes(searchQuery.toLowerCase())) ||
         (company.category && company.category.toLowerCase().includes(searchQuery.toLowerCase()));
 
       return matchesSearch;

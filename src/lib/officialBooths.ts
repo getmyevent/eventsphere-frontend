@@ -176,7 +176,7 @@ const SORTED_BOOTH_ENTRIES = Object.entries(OFFICIAL_EXHIBITOR_BOOTHS).sort(
  */
 export function getOfficialBoothNumber(companyName?: string, rawBooth?: string): string {
   if (!companyName) {
-    if (rawBooth && !rawBooth.includes('Hall 1') && rawBooth !== 'TBA') return rawBooth;
+    if (rawBooth && !rawBooth.toLowerCase().includes('hall') && !rawBooth.includes('·') && rawBooth !== 'TBA') return rawBooth;
     return 'TBA';
   }
 
@@ -202,8 +202,8 @@ export function getOfficialBoothNumber(companyName?: string, rawBooth?: string):
     }
   }
 
-  // 3. Fallback to rawBooth if it's clean (doesn't contain dummy 'Hall 1')
-  if (rawBooth && !rawBooth.includes('Hall 1') && rawBooth !== 'TBA') {
+  // 3. Fallback to rawBooth if it's clean (doesn't contain dummy 'hall' or '·')
+  if (rawBooth && !rawBooth.toLowerCase().includes('hall') && !rawBooth.includes('·') && rawBooth !== 'TBA') {
     return rawBooth;
   }
 

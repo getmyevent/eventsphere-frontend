@@ -36,7 +36,16 @@ export const isPavilionOnlyExhibitor = (ex: { company?: string; booth?: string }
  * 3. Exhibitors with only pavilion (except MPSEDC) in the last positions
  */
 export const sortExhibitors = <T extends { company: string; booth?: string }>(exhibitors: T[]): T[] => {
-  return [...exhibitors].sort((a, b) => {
+  // Deduplicate exhibitors by company name so each exhibitor appears only once
+  const seen = new Set<string>();
+  const uniqueExhibitors = exhibitors.filter((e) => {
+    const key = (e.company || '').toLowerCase().trim();
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+
+  return uniqueExhibitors.sort((a, b) => {
     // 1. MPSEDC is always first
     const aIsMp = isMpsedcExhibitor(a);
     const bIsMp = isMpsedcExhibitor(b);
