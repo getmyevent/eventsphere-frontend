@@ -413,6 +413,20 @@ export const DelegateMap: React.FC = () => {
                   fill="url(#floorTilePattern)"
                 />
 
+                {/* Architectural Scale Label (Matching official floor plan) */}
+                <text
+                  x="20"
+                  y="42"
+                  fill="#6B7280"
+                  fontSize="8"
+                  fontFamily="sans-serif"
+                  fontWeight="700"
+                  fontStyle="italic"
+                  className="select-none"
+                >
+                  Booths 3m x 3m
+                </text>
+
                 {/* ================= GATES & MARKERS ================= */}
                 {/* EXIT GATE (Top Right) */}
                 <g className="select-none">

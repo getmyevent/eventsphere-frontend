@@ -2737,85 +2737,11 @@ export const INITIAL_SESSIONS: Session[] = [
     "questionsCount": 0
   },
   {
-    "id": "mpss26-d1-02",
-    "title": "Inauguration & Dignitaries Address",
-    "track": "Plenary",
-    "day": 1,
-    "timeRange": "11:00 – 13:00",
-    "room": "Grand Hall · Ground Floor",
-    "speakerName": "Honorable Dignitaries & Ministers",
-    "speakerDesignation": "State Leadership",
-    "speakerCompany": "Government of Madhya Pradesh & MeitY",
-    "speakerId": "speaker-dr-mohan-yadav",
-    "speakerIds": [
-      "speaker-dr-mohan-yadav",
-      "speaker-ashok-barnwal",
-      "speaker-prof-rajeev-dixit"
-    ],
-    "panelists": [
-      {
-        "name": "Dr. Mohan Yadav",
-        "role": "Chief Guest",
-        "designation": "Honorable Chief Minister",
-        "company": "Government of Madhya Pradesh",
-        "speakerId": "speaker-dr-mohan-yadav"
-      },
-      {
-        "name": "Ashok Barnwal",
-        "role": "Dignitary",
-        "designation": "Additional Chief Secretary",
-        "company": "Technical Education, Govt. of MP",
-        "speakerId": "speaker-ashok-barnwal"
-      },
-      {
-        "name": "Prof. Rajeev Dixit",
-        "role": "Dignitary",
-        "designation": "Leadership & Advisor",
-        "company": "Government of Madhya Pradesh",
-        "speakerId": "speaker-prof-rajeev-dixit"
-      }
-    ],
-    "description": "Official inauguration ceremony of MP Semiconductor Summit 2026 with ceremonial lamp lighting, inaugural addresses by state and national leadership, policy unveilings, and key industrial MoU signings.",
-    "takeaways": [
-      "Release of MP Semiconductor Policy 2026",
-      "Key industrial MoU announcements",
-      "Vision 2030 for state electronics & fab manufacturing"
-    ],
-    "status": "upcoming",
-    "attendanceCount": 940,
-    "isBookmarked": false,
-    "questionsCount": 3
-  },
-  {
-    "id": "mpss26-d1-03",
-    "title": "Lunch",
-    "track": "Dining",
-    "day": 1,
-    "timeRange": "13:00 – 14:00",
-    "room": "Nakshatra Lawn · Ground Floor",
-    "speakerName": "Organizing Committee",
-    "speakerDesignation": "Hospitality Team",
-    "speakerCompany": "MP Semiconductor Summit 2026",
-    "speakerId": "",
-    "speakerIds": [],
-    "panelists": [],
-    "description": "Networking luncheon for all summit delegates, speakers, exhibitors, and government officials.",
-    "takeaways": [
-      "Executive dining & networking",
-      "B2B connection opportunities",
-      "Informal discussion of morning sessions"
-    ],
-    "status": "upcoming",
-    "attendanceCount": 850,
-    "isBookmarked": false,
-    "questionsCount": 0
-  },
-  {
     "id": "mpss26-d1-04",
     "title": "Keynote 1: Global Semiconductor Industry & Technology Trends",
     "track": "Keynote",
     "day": 1,
-    "timeRange": "14:00 – 14:30",
+    "timeRange": "11:00 – 11:30",
     "room": "Grand Hall · Ground Floor",
     "speakerName": "Satya Gupta",
     "speakerDesignation": "President",
@@ -2849,11 +2775,11 @@ export const INITIAL_SESSIONS: Session[] = [
     "title": "Keynote 2: Journey of India Semiconductor Mission (ISM 1.0 & ISM 2.0)",
     "track": "Keynote",
     "day": 1,
-    "timeRange": "14:30 – 15:00",
+    "timeRange": "11:30 – 12:00",
     "room": "Grand Hall · Ground Floor",
     "speakerName": "Nishit Gupta",
     "speakerDesignation": "Director (Design)",
-    "speakerCompany": "ISM & Scientist 'E'- MeitY Government of India",
+    "speakerCompany": "ISM, MeitY",
     "speakerId": "speaker-nishit-gupta",
     "speakerIds": [
       "speaker-nishit-gupta"
@@ -2863,7 +2789,7 @@ export const INITIAL_SESSIONS: Session[] = [
         "name": "Nishit Gupta",
         "role": "Keynote Speaker",
         "designation": "Director (Design)",
-        "company": "ISM & Scientist 'E'- MeitY Government of India",
+        "company": "ISM, MeitY",
         "speakerId": "speaker-nishit-gupta"
       }
     ],
@@ -2883,7 +2809,7 @@ export const INITIAL_SESSIONS: Session[] = [
     "title": "Panel 1: Making Madhya Pradesh Advance Packaging and Testing Hub",
     "track": "Panel Discussion",
     "day": 1,
-    "timeRange": "15:00 – 15:50",
+    "timeRange": "12:00 – 13:00",
     "room": "Grand Hall · Ground Floor",
     "speakerName": "Ashok Barnwal, IAS (Chair), Charan Gurumoorthy (Moderator) & 4 others",
     "speakerDesignation": "Advanced Packaging & Testing Panel",
@@ -2957,7 +2883,7 @@ export const INITIAL_SESSIONS: Session[] = [
     "title": "Round Table on AI Infrastructure",
     "track": "Round Table",
     "day": 1,
-    "timeRange": "15:00 – 15:50",
+    "timeRange": "12:00 – 13:00",
     "room": "Jamawar Hall · Ground Floor",
     "speakerName": "Sanjay Dubey, IAS (Chair), Mohit Bansal (Co-Chair) & 21 participants",
     "speakerDesignation": "AI Infrastructure Leadership Round Table",
@@ -3137,35 +3063,85 @@ export const INITIAL_SESSIONS: Session[] = [
     "questionsCount": 3
   },
   {
-    "id": "mpss26-d1-08",
-    "title": "Tea",
-    "track": "Tea Break",
+    "id": "mpss26-d1-03",
+    "title": "Lunch",
+    "track": "Dining",
     "day": 1,
-    "timeRange": "15:50 – 16:20",
-    "room": "Jamawar Hall Pre-Function Area · Ground Floor",
+    "timeRange": "13:00 – 14:00",
+    "room": "Nakshatra Lawn · Ground Floor",
     "speakerName": "Organizing Committee",
     "speakerDesignation": "Hospitality Team",
     "speakerCompany": "MP Semiconductor Summit 2026",
     "speakerId": "",
     "speakerIds": [],
     "panelists": [],
-    "description": "Afternoon tea break and informal delegate networking.",
+    "description": "Networking luncheon for all summit delegates, speakers, exhibitors, and government officials.",
     "takeaways": [
-      "Refreshments and informal discussion",
-      "Delegate peer networking",
-      "Exhibition floor exploration"
+      "Executive dining & networking",
+      "B2B connection opportunities",
+      "Informal discussion of morning sessions"
     ],
     "status": "upcoming",
-    "attendanceCount": 710,
+    "attendanceCount": 850,
     "isBookmarked": false,
     "questionsCount": 0
+  },
+  {
+    "id": "mpss26-d1-02",
+    "title": "Inauguration & Dignitaries Address",
+    "track": "Plenary",
+    "day": 1,
+    "timeRange": "14:00 – 16:00",
+    "room": "Grand Hall · Ground Floor",
+    "speakerName": "Honorable Dignitaries & Ministers",
+    "speakerDesignation": "State Leadership",
+    "speakerCompany": "Government of Madhya Pradesh & MeitY",
+    "speakerId": "speaker-dr-mohan-yadav",
+    "speakerIds": [
+      "speaker-dr-mohan-yadav",
+      "speaker-ashok-barnwal",
+      "speaker-prof-rajeev-dixit"
+    ],
+    "panelists": [
+      {
+        "name": "Dr. Mohan Yadav",
+        "role": "Chief Guest",
+        "designation": "Honorable Chief Minister",
+        "company": "Government of Madhya Pradesh",
+        "speakerId": "speaker-dr-mohan-yadav"
+      },
+      {
+        "name": "Ashok Barnwal",
+        "role": "Dignitary",
+        "designation": "Chief Secretary",
+        "company": "Govt. of MP",
+        "speakerId": "speaker-ashok-barnwal"
+      },
+      {
+        "name": "Prof. Rajeev Dixit",
+        "role": "Dignitary",
+        "designation": "Leadership & Advisor",
+        "company": "Government of Madhya Pradesh",
+        "speakerId": "speaker-prof-rajeev-dixit"
+      }
+    ],
+    "description": "Official inauguration ceremony of MP Semiconductor Summit 2026 with ceremonial lamp lighting, inaugural addresses by state and national leadership, policy unveilings, and key industrial MoU signings.",
+    "takeaways": [
+      "Release of MP Semiconductor Policy 2026",
+      "Key industrial MoU announcements",
+      "Vision 2030 for state electronics & fab manufacturing"
+    ],
+    "status": "upcoming",
+    "attendanceCount": 940,
+    "isBookmarked": false,
+    "questionsCount": 3
   },
   {
     "id": "mpss26-d1-09",
     "title": "Panel 2: Building a Robust Fabless Eco-System in Madhya Pradesh",
     "track": "Panel Discussion",
     "day": 1,
-    "timeRange": "16:20 – 17:10",
+    "timeRange": "16:00 – 16:50",
     "room": "Grand Hall · Ground Floor",
     "speakerName": "Neeraj Mandloi, IAS (Chair), Satya Gupta (Moderator) & 5 others",
     "speakerDesignation": "Fabless Leadership Panel",
@@ -3245,7 +3221,7 @@ export const INITIAL_SESSIONS: Session[] = [
     "title": "Round Tables with Directors/Vice-Chancellors",
     "track": "Round Table",
     "day": 1,
-    "timeRange": "16:20 – 17:10",
+    "timeRange": "16:00 – 16:50",
     "room": "Jamawar Hall · Ground Floor",
     "speakerName": "Rajiv Dixit (Chair), Rakesh Singhai (Co-Chair) & 24 Academic Leaders",
     "speakerDesignation": "Higher Education Leadership",
@@ -3303,7 +3279,7 @@ export const INITIAL_SESSIONS: Session[] = [
         "name": "Sashi Chandra Sharma",
         "role": "Panelist",
         "designation": "Director",
-        "company": "Acropolis Indore"
+        "company": "Acropolish Indore"
       },
       {
         "name": "Dilip Kumar Patnaik",
@@ -3326,7 +3302,7 @@ export const INITIAL_SESSIONS: Session[] = [
       {
         "name": "Dhru Ghai",
         "role": "Panelist",
-        "designation": "Pro Vice-Chancellor",
+        "designation": "Pro-Chancellor",
         "company": "Oriental University, Indore"
       },
       {
@@ -3439,7 +3415,7 @@ export const INITIAL_SESSIONS: Session[] = [
     "title": "Panel 3: Semiconductor Manufacturing & Supply Chain",
     "track": "Panel Discussion",
     "day": 1,
-    "timeRange": "17:10 – 18:00",
+    "timeRange": "16:50 – 17:40",
     "room": "Grand Hall · Ground Floor",
     "speakerName": "Manu Shrivastava, IAS (Chair), Kamaljeet Singh (Moderator) & 4 others",
     "speakerDesignation": "Manufacturing & Supply Chain Panel",
@@ -3509,7 +3485,7 @@ export const INITIAL_SESSIONS: Session[] = [
     "title": "Round Table with Semiconductor Fabless Product/IP Companies",
     "track": "Round Table",
     "day": 1,
-    "timeRange": "17:10 – 18:00",
+    "timeRange": "16:50 – 17:40",
     "room": "Jamawar Hall · Ground Floor",
     "speakerName": "Anshuman Raj, IAS (Chair), Krishna Thakur (Co-Chair) & 21 IP Leaders",
     "speakerDesignation": "Fabless Product & IP Round Table",
@@ -3697,7 +3673,7 @@ export const INITIAL_SESSIONS: Session[] = [
     "title": "Madhya Pradesh Semiconductor Policy - 2026 : Discussion with Key Stakeholders",
     "track": "Policy Consultation",
     "day": 1,
-    "timeRange": "18:00 – 19:00",
+    "timeRange": "17:40 – 18:40",
     "room": "Grand Hall · Ground Floor",
     "speakerName": "State Leadership & Key Stakeholders",
     "speakerDesignation": "Government of Madhya Pradesh",
@@ -3732,7 +3708,7 @@ export const INITIAL_SESSIONS: Session[] = [
     "isBookmarked": false,
     "questionsCount": 0
   },
-  {
+    {
     "id": "mpss26-d2-01",
     "title": "Keynote 1: Chips for Strategic Sovereignty",
     "track": "Keynote",
@@ -3809,14 +3785,14 @@ export const INITIAL_SESSIONS: Session[] = [
     "room": "Imperial Hall · 1st Floor",
     "speakerName": "Anshuman Raj, IAS (Chair), Chitra Hariharan (Moderator) & 5 others",
     "speakerDesignation": "AI & Silicon Leadership Panel",
-    "speakerCompany": "MPSEDC, Renesas, Intel, Maieutic, Synopsys, Analog Devices, Cadence",
+    "speakerCompany": "MPSEDC, Renesas, Intel, Maieutic, Synopsys, VLSI EXPERT, Cadence",
     "speakerId": "speaker-chitra-hariharan",
     "speakerIds": [
       "speaker-chitra-hariharan",
       "speaker-arpan-sircar",
       "speaker-ashish-lachhwani",
       "speaker-swapnil-garge",
-      "speaker-mohit-jain",
+      "speaker-puneet-mittal",
       "speaker-channakeshav-ananth"
     ],
     "panelists": [
@@ -3855,11 +3831,11 @@ export const INITIAL_SESSIONS: Session[] = [
         "speakerId": "speaker-swapnil-garge"
       },
       {
-        "name": "Mohit Jain",
+        "name": "Puneet Mittal",
         "role": "Panelist",
-        "designation": "Engineering Director",
-        "company": "Analog Devices",
-        "speakerId": "speaker-mohit-jain"
+        "designation": "Founder and CEO",
+        "company": "VLSI EXPERT",
+        "speakerId": "speaker-puneet-mittal"
       },
       {
         "name": "Channakeshav Ananth",
