@@ -414,17 +414,75 @@ class ApiClient {
           const delegateUser: ApiUser = {
             id: 'att-hari-gupta',
             name: 'Hari Gupta',
-            mobile: '+91 7089157046',
+            mobile: cleanDigits === '7089157046' ? '+91 7089157046' : '+91 98765 43210',
             email: 'harigupta@getmyevent.in',
             role: 'ROLE_DELEGATE',
-            company: '',
-            designation: '',
+            company: 'GetMyEvent',
+            designation: 'Co-Founder',
             avatar: 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792450462/hari.png',
-            ticketType: '',
+            ticketType: 'Full Access Delegate Pass',
             checkedIn: true,
           };
           const fallbackRes: AuthResponse = {
             token: 'mpss26-delegate-token-harigupta',
+            tokenType: 'Bearer',
+            expiresIn: 86400,
+            user: delegateUser,
+          };
+          this.setToken(fallbackRes.token);
+          if (typeof window !== 'undefined') {
+            try {
+              localStorage.setItem(USER_KEY, JSON.stringify(delegateUser));
+            } catch {
+              // ignore
+            }
+          }
+          return fallbackRes;
+        }
+        if (cleanDigits === '9845021078' || mobile === '9845021078') {
+          const delegateUser: ApiUser = {
+            id: 'att-delegate-9845021078',
+            name: 'Summit Delegate',
+            mobile: '+91 98450 21078',
+            email: 'delegate.98450@getmyevent.in',
+            role: 'ROLE_DELEGATE',
+            company: 'MPSS 2026',
+            designation: 'Delegate',
+            avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+            ticketType: 'Delegate Pass',
+            checkedIn: true,
+          };
+          const fallbackRes: AuthResponse = {
+            token: 'mpss26-delegate-token-9845021078',
+            tokenType: 'Bearer',
+            expiresIn: 86400,
+            user: delegateUser,
+          };
+          this.setToken(fallbackRes.token);
+          if (typeof window !== 'undefined') {
+            try {
+              localStorage.setItem(USER_KEY, JSON.stringify(delegateUser));
+            } catch {
+              // ignore
+            }
+          }
+          return fallbackRes;
+        }
+        if (cleanDigits === '9981643512' || mobile === '9981643512') {
+          const delegateUser: ApiUser = {
+            id: 'att-delegate-9981643512',
+            name: 'VIP Delegate',
+            mobile: '+91 99816 43512',
+            email: 'delegate.99816@getmyevent.in',
+            role: 'ROLE_DELEGATE',
+            company: 'MPSS 2026',
+            designation: 'VIP Delegate',
+            avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
+            ticketType: 'VIP Delegate Pass',
+            checkedIn: true,
+          };
+          const fallbackRes: AuthResponse = {
+            token: 'mpss26-delegate-token-9981643512',
             tokenType: 'Bearer',
             expiresIn: 86400,
             user: delegateUser,
@@ -449,7 +507,7 @@ class ApiClient {
             company: 'GetMyEvent',
             designation: 'Co-Founder',
             avatar: '/images/founders/pushpit-upadhyay.jpg',
-            ticketType: '',
+            ticketType: 'Delegate',
             checkedIn: true,
           };
           const fallbackRes: AuthResponse = {
