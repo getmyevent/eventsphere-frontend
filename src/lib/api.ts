@@ -410,15 +410,44 @@ class ApiClient {
         }
         return res;
       } catch (err) {
-        if (cleanDigits === '7089157046' || mobile === '7089157046' || cleanDigits === '9876543210' || mobile === '9876543210') {
+        if (cleanDigits === '7089157046' || mobile === '7089157046') {
           const delegateUser: ApiUser = {
-            id: 'att-hari-gupta',
+            id: 'att-hari-gupta-7046',
             name: 'Hari Gupta',
-            mobile: cleanDigits === '7089157046' ? '+91 7089157046' : '+91 98765 43210',
+            mobile: '+91 70891 57046',
             email: 'harigupta@getmyevent.in',
             role: 'ROLE_DELEGATE',
             company: 'GetMyEvent',
             designation: 'Co-Founder',
+            avatar: 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792450462/hari.png',
+            ticketType: 'Full Access Delegate Pass',
+            checkedIn: true,
+          };
+          const fallbackRes: AuthResponse = {
+            token: 'mpss26-delegate-token-harigupta-7046',
+            tokenType: 'Bearer',
+            expiresIn: 86400,
+            user: delegateUser,
+          };
+          this.setToken(fallbackRes.token);
+          if (typeof window !== 'undefined') {
+            try {
+              localStorage.setItem(USER_KEY, JSON.stringify(delegateUser));
+            } catch {
+              // ignore
+            }
+          }
+          return fallbackRes;
+        }
+        if (cleanDigits === '9876543210' || mobile === '9876543210') {
+          const delegateUser: ApiUser = {
+            id: 'att-hari-gupta',
+            name: 'Hari Gupta',
+            mobile: '+91 98765 43210',
+            email: 'hari@eventsphere.com',
+            role: 'ROLE_DELEGATE',
+            company: 'EventSphere',
+            designation: 'CEO & Founder',
             avatar: 'https://res.cloudinary.com/vc0wtqtw/image/upload/v1792450462/hari.png',
             ticketType: 'Full Access Delegate Pass',
             checkedIn: true,
@@ -441,19 +470,19 @@ class ApiClient {
         }
         if (cleanDigits === '9845021078' || mobile === '9845021078') {
           const delegateUser: ApiUser = {
-            id: 'att-delegate-9845021078',
-            name: 'Summit Delegate',
+            id: 'att-sanjeev-keskar',
+            name: 'Sanjeev Keskar',
             mobile: '+91 98450 21078',
-            email: 'delegate.98450@getmyevent.in',
+            email: 'sanjeev.keskar@arvindconsultancy.com',
             role: 'ROLE_DELEGATE',
-            company: 'MPSS 2026',
-            designation: 'Delegate',
-            avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
-            ticketType: 'Delegate Pass',
+            company: 'Arvind Consultancy',
+            designation: 'CEO',
+            avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
+            ticketType: 'Full Access Delegate Pass',
             checkedIn: true,
           };
           const fallbackRes: AuthResponse = {
-            token: 'mpss26-delegate-token-9845021078',
+            token: 'mpss26-delegate-token-sanjeev-keskar',
             tokenType: 'Bearer',
             expiresIn: 86400,
             user: delegateUser,
@@ -470,19 +499,19 @@ class ApiClient {
         }
         if (cleanDigits === '9981643512' || mobile === '9981643512') {
           const delegateUser: ApiUser = {
-            id: 'att-delegate-9981643512',
-            name: 'VIP Delegate',
+            id: 'att-pratosh-bansal',
+            name: 'Dr. Pratosh Bansal',
             mobile: '+91 99816 43512',
-            email: 'delegate.99816@getmyevent.in',
+            email: 'pbansal@ietdavv.edu.in',
             role: 'ROLE_DELEGATE',
-            company: 'MPSS 2026',
-            designation: 'VIP Delegate',
-            avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
-            ticketType: 'VIP Delegate Pass',
+            company: 'IET DAVV',
+            designation: 'Director',
+            avatar: '/images/mentors/pratosh-bansal.jpg',
+            ticketType: 'Director',
             checkedIn: true,
           };
           const fallbackRes: AuthResponse = {
-            token: 'mpss26-delegate-token-9981643512',
+            token: 'mpss26-delegate-token-pratosh-bansal',
             tokenType: 'Bearer',
             expiresIn: 86400,
             user: delegateUser,
