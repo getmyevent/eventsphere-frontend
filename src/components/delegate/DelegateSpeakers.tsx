@@ -10,6 +10,7 @@ import {
 
 import { useStore } from '../../lib/store';
 import { Person } from '../../types';
+import { INITIAL_SPEAKERS } from '../../lib/mockData';
 import { getCloudinaryProfileUrl } from '../../lib/profileImages';
 import { getOptimizedAvatarUrl, optimizeCloudinaryUrl } from '../../lib/cloudinary';
 
@@ -48,8 +49,12 @@ export const DelegateSpeakers: React.FC = () => {
   };
 
   const speakers = useMemo(() => {
-    return attendees
+    const list = attendees
       .filter((p) => p.role === 'speaker' && p.id !== currentUser.id)
+      .sort((a, b) => (a.priority ?? 999) - (b.priority ?? 999));
+    if (list.length > 0) return list;
+    return INITIAL_SPEAKERS
+      .filter((p) => p.id !== currentUser.id)
       .sort((a, b) => (a.priority ?? 999) - (b.priority ?? 999));
   }, [attendees, currentUser.id]);
 
