@@ -359,6 +359,9 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           if (u.mobile === 'Not listed') {
             u.mobile = '';
           }
+          if (u.avatar && (u.avatar.includes('unsplash.com') || u.avatar.includes('pravatar.cc') || u.avatar.includes('photo-1507003211169') || u.avatar.includes('pratosh-bansal.jpg'))) {
+            u.avatar = '';
+          }
           if (u.email) {
             const storedImg = getStoredProfileImage(u.email);
             if (storedImg) {

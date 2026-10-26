@@ -138,9 +138,37 @@ export const DelegateHome: React.FC = () => {
     }
   }, []);
 
+  // Check if summit has concluded (MPSS 2026 dates: Oct 23-24, 2026)
+  const isEventOver = useMemo(() => {
+    try {
+      const options = { timeZone: 'Asia/Kolkata', year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: false } as const;
+      const parts = new Intl.DateTimeFormat('en-US', options).formatToParts(new Date());
+      const currentYear = parseInt(parts.find((p) => p.type === 'year')?.value || '2026', 10);
+      const currentMonth = parseInt(parts.find((p) => p.type === 'month')?.value || '10', 10);
+      const currentDay = parseInt(parts.find((p) => p.type === 'day')?.value || '23', 10);
+      const hour = parseInt(parts.find((p) => p.type === 'hour')?.value || '0', 10);
+
+      // Event concluded after Oct 24, 2026 18:00 IST
+      if (currentYear > 2026) return true;
+      if (currentYear === 2026 && currentMonth > 10) return true;
+      if (currentYear === 2026 && currentMonth === 10) {
+        if (currentDay > 24) return true;
+        if (currentDay === 24 && hour >= 18) return true;
+      }
+      return false;
+    } catch {
+      return true;
+    }
+  }, []);
+
   // Resolve Live now vs Up next sessions dynamically from agenda
   const { activeSessions, isLiveNow } = useMemo(() => {
     if (!sessions || sessions.length === 0) {
+      return { activeSessions: [], isLiveNow: false };
+    }
+
+    // If event is over, there are no live or upcoming sessions
+    if (isEventOver) {
       return { activeSessions: [], isLiveNow: false };
     }
 
@@ -202,7 +230,7 @@ export const DelegateHome: React.FC = () => {
       sessions[0];
 
     return { activeSessions: fallback ? [fallback] : [], isLiveNow: false };
-  }, [sessions, eventDay]);
+  }, [sessions, eventDay, isEventOver]);
 
   const safeIndex = activeSessionIndex >= activeSessions.length ? 0 : activeSessionIndex;
   const currentSession = activeSessions[safeIndex] || activeSessions[0];
@@ -331,7 +359,7 @@ export const DelegateHome: React.FC = () => {
             className="relative group focus:outline-none flex-shrink-0"
             aria-label="View Profile"
           >
-            {currentUser.avatar ? (
+            {currentUser.avatar && !currentUser.avatar.includes('unsplash.com') && !currentUser.avatar.includes('pravatar.cc') ? (
               <img
                 src={currentUser.avatar}
                 alt={currentUser.name || 'Delegate'}
@@ -339,7 +367,7 @@ export const DelegateHome: React.FC = () => {
               />
             ) : (
               <div className="w-12 h-12 rounded-full bg-[#181818] text-white flex items-center justify-center font-bold text-base border-2 border-white shadow-sm">
-                {currentUser.name ? currentUser.name.split(' ').filter(Boolean).map((n) => n[0]).join('').slice(0, 2) : '?'}
+                {currentUser.name ? currentUser.name.split(' ').filter(Boolean).map((n) => n[0]).join('').slice(0, 2).toUpperCase() : '?'}
               </div>
             )}
             <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-[#22C55E] border-2 border-white rounded-full shadow-xs" />
@@ -364,12 +392,22 @@ export const DelegateHome: React.FC = () => {
               <span className="text-[10px] font-bold tracking-wider text-slate-300 bg-white/10 px-2 py-0.5 rounded-md border border-white/10">
                 {event.id}
               </span>
-              <div className="flex items-center gap-1.5 text-[9.5px] font-bold text-[#38BDF8] bg-[#0284C7]/20 border border-[#38BDF8]/40 px-2.5 py-0.5 rounded-full shadow-sm">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#38BDF8] animate-pulse" />
-                <span className="tracking-wider">
-                  UPCOMING
-                </span>
-              </div>
+              {isEventOver ? (
+                <div className="flex items-center gap-1.5 text-[9.5px] font-bold text-emerald-400 bg-emerald-950/40 border border-emerald-500/40 px-2.5 py-0.5 rounded-full shadow-sm">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                  <span className="tracking-wider">CONCLUDED</span>
+                </div>
+              ) : isLiveNow ? (
+                <div className="flex items-center gap-1.5 text-[9.5px] font-bold text-red-400 bg-red-950/40 border border-red-500/40 px-2.5 py-0.5 rounded-full shadow-sm">
+                  <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping" />
+                  <span className="tracking-wider">LIVE NOW</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-1.5 text-[9.5px] font-bold text-[#38BDF8] bg-[#0284C7]/20 border border-[#38BDF8]/40 px-2.5 py-0.5 rounded-full shadow-sm">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#38BDF8] animate-pulse" />
+                  <span className="tracking-wider">UPCOMING</span>
+                </div>
+              )}
             </div>
 
             <h2 className="text-[16px] font-bold text-white tracking-tight leading-snug">
@@ -607,8 +645,65 @@ export const DelegateHome: React.FC = () => {
         </div>
       </div>
 
-      {/* Live now / Up next Section */}
-      {currentSession && (
+      {/* Live now / Up next / Concluded Section */}
+      {isEventOver ? (
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between px-0.5">
+            <div className="flex items-center gap-2">
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-600"></span>
+              </span>
+              <h3 className="text-[16px] font-bold text-[#111827] tracking-tight flex items-center gap-1.5">
+                Summit Concluded
+                <span className="text-[9.5px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full uppercase tracking-wider">
+                  COMPLETED
+                </span>
+              </h3>
+            </div>
+            <button
+              onClick={() => {
+                router.push('/delegate/agenda/allsessions');
+              }}
+              className="text-[12px] font-semibold text-[#DC2626] flex items-center gap-0.5 hover:underline"
+            >
+              <span>View full agenda</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+
+          <div
+            onClick={() => {
+              router.push('/delegate/agenda/allsessions');
+            }}
+            className="bg-white rounded-[16px] p-3.5 border border-[#E5E7EB] shadow-xs cursor-pointer hover:border-gray-300 transition-all relative select-none"
+          >
+            <div className="flex items-center justify-between mb-1.5">
+              <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/80 px-2 py-0.5 rounded-md">
+                23–24 Oct 2026 · All Sessions Completed
+              </span>
+              <span className="text-[11px] text-[#6B6B6B] font-medium">Grand Hall & Hall A/B</span>
+            </div>
+
+            <h4 className="text-[15px] font-bold text-[#111827] leading-snug">
+              Inauguration to Valedictory Sessions Successfully Concluded
+            </h4>
+            <p className="text-[11.5px] text-[#6B7280] mt-1 leading-relaxed">
+              Thank you for participating in MPSS 2026. All keynote tracks, panel discussions, and partner exhibitions have concluded. You can explore all session details, key takeaways, and speaker profiles anytime.
+            </p>
+
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                router.push('/delegate/agenda/allsessions');
+              }}
+              className="w-full mt-2.5 py-2 bg-[#FAF7F2] hover:bg-[#F2ECE3] text-[#111827] rounded-xl text-[12px] font-bold flex items-center justify-center gap-1 border border-[#EBE7DF] transition-colors"
+            >
+              <span>Explore session archives</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+      ) : currentSession && (
         <div className="space-y-1.5">
           <div className="flex items-center justify-between px-0.5">
             <div className="flex items-center gap-2">
@@ -789,18 +884,18 @@ export const DelegateHome: React.FC = () => {
         </div>
       </div>
 
-      {/* Speakers Section */}
+      {/* People you should meet Section */}
       {recommendedPeople.length > 0 && (
         <div className="space-y-2 pt-1">
           <div className="flex items-center justify-between px-0.5">
             <h3
-              onClick={() => router.push('/delegate/speakers')}
+              onClick={() => router.push('/delegate/people')}
               className="text-[17px] font-bold text-[#111827] tracking-tight cursor-pointer hover:text-[#B51F32] transition-colors"
             >
-              Speakers
+              People you should meet
             </h3>
             <button
-              onClick={() => router.push('/delegate/speakers')}
+              onClick={() => router.push('/delegate/people')}
               className="text-[13px] font-semibold text-[#111827] flex items-center gap-0.5 hover:underline"
             >
               <span>View all</span>
@@ -821,7 +916,7 @@ export const DelegateHome: React.FC = () => {
                   >
                     <div>
                       <div className="flex items-center gap-2.5">
-                        {person.avatar ? (
+                        {person.avatar && !person.avatar.includes('unsplash.com') && !person.avatar.includes('pravatar.cc') ? (
                            <img
                             src={getOptimizedAvatarUrl(person.avatar, 70)}
                             alt={person.name}
