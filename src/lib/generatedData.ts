@@ -71,11 +71,10 @@ export function generateAttendees(count: number): Person[] {
 }
 
 export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
-
   {
     "id": "exh-1",
     "company": "DigiComm Semi",
-    "logo": "",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696119/18-digicomm-semi.jpg",
     "booth": "1, 2",
     "category": "Semiconductor Design",
     "visits": 620,
@@ -87,7 +86,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-2",
     "company": "New Age Instruments",
-    "logo": "",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696170/29-new-age-instruments-and-material-s-pvt-ltd.jpg",
     "booth": "3, 4, 5",
     "category": "Instrumentation & Test",
     "visits": 540,
@@ -99,7 +98,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-3",
     "company": "RRCAT",
-    "logo": "",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696166/28-rrcat.jpg",
     "booth": "6, 7",
     "category": "R&D & Computing",
     "visits": 710,
@@ -111,7 +110,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-4",
     "company": "Bio Line India",
-    "logo": "",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696156/26-bio-line-india.jpg",
     "booth": "8",
     "category": "Instrumentation & Test",
     "visits": 420,
@@ -123,7 +122,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-5",
     "company": "AndGate Informatics",
-    "logo": "",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696063/06-andgate-informatics.jpg",
     "booth": "9",
     "category": "Embedded Systems",
     "visits": 430,
@@ -135,7 +134,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-6",
     "company": "VLSI Experts",
-    "logo": "",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696101/14-vlsi-experts.jpg",
     "booth": "10",
     "category": "Skill Development",
     "visits": 680,
@@ -147,7 +146,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-7",
     "company": "RackBank",
-    "logo": "",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696082/10-rackbank-datacenters-pvt-ltd.jpg",
     "booth": "11, 12",
     "category": "AI Data Centers",
     "visits": 810,
@@ -159,7 +158,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-8",
     "company": "Impute Inc. Japan",
-    "logo": "",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696110/16-siliciom-semiconductors.jpg",
     "booth": "13, 14",
     "category": "AI & Edge Systems",
     "visits": 690,
@@ -171,7 +170,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-9",
     "company": "Analog Devices",
-    "logo": "",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696265/46-analog-devices.jpg",
     "booth": "15, 16",
     "category": "Semiconductor Design",
     "visits": 950,
@@ -183,7 +182,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-10",
     "company": "Nanodroits Technology",
-    "logo": "",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696072/08-nanodroits-technology.jpg",
     "booth": "17",
     "category": "Nanotechnology",
     "visits": 460,
@@ -195,7 +194,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-11",
     "company": "MANIT Bhopal",
-    "logo": "",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696128/20-manit-bhopal.jpg",
     "booth": "18",
     "category": "Academia & Research",
     "visits": 590,
@@ -207,7 +206,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-12",
     "company": "HLBS Technologies",
-    "logo": "",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696087/11-hlbs.jpg",
     "booth": "19",
     "category": "Electronics Manufacturing",
     "visits": 480,
@@ -219,7 +218,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-13",
     "company": "Jetwave",
-    "logo": "",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696147/24-jetwave.jpg",
     "booth": "20",
     "category": "RF & Wireless Systems",
     "visits": 410,
@@ -231,7 +230,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-14",
     "company": "ABV-IIITM Gwalior",
-    "logo": "",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696142/23-abv-iiitm-gwalior.jpg",
     "booth": "21",
     "category": "Academia & Research",
     "visits": 530,
@@ -243,7 +242,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-15",
     "company": "AgriHub IIT Indore",
-    "logo": "",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696236/39-iiti-drishti-cps-foundation.jpg",
     "booth": "22",
     "category": "IoT & Sensors",
     "visits": 470,
@@ -255,7 +254,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-16",
     "company": "Daksh Instruments",
-    "logo": "",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696250/43-daksh-instruments-pvt-ltd.jpg",
     "booth": "23",
     "category": "Instrumentation & Test",
     "visits": 390,
@@ -267,7 +266,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-17",
     "company": "DAVV Incubation Center",
-    "logo": "",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696255/44-iet-davv-indore.jpg",
     "booth": "24",
     "category": "Incubation & Startups",
     "visits": 510,
@@ -279,7 +278,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-18",
     "company": "IET-DAVV Indore",
-    "logo": "",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696255/44-iet-davv-indore.jpg",
     "booth": "25",
     "category": "Academia & Research",
     "visits": 620,
@@ -291,7 +290,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-19",
     "company": "Setu Manufacturing",
-    "logo": "",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696184/32-setu-manufacturing-solutions.jpg",
     "booth": "26",
     "category": "Electronics Manufacturing",
     "visits": 490,
@@ -303,7 +302,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-20",
     "company": "Nirji Semicon",
-    "logo": "",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696274/nirji-semicon.jpg",
     "booth": "27",
     "category": "Semiconductor Design",
     "visits": 540,
@@ -315,7 +314,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-21",
     "company": "Stemrobo",
-    "logo": "",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696053/04-stemrobo.jpg",
     "booth": "28",
     "category": "EdTech & Robotics",
     "visits": 620,
@@ -327,7 +326,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-22",
     "company": "IISER Bhopal / Anuranan",
-    "logo": "",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696270/iiser-bhopal.png",
     "booth": "29",
     "category": "Academia & Research",
     "visits": 560,
@@ -339,7 +338,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-23",
     "company": "Techno Support Core Inn",
-    "logo": "",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696092/12-spintronics-ai.jpg",
     "booth": "30",
     "category": "Prototyping & Lab Support",
     "visits": 420,
@@ -351,7 +350,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-24",
     "company": "VIT Bhopal",
-    "logo": "",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696124/19-vit-bhopal.jpg",
     "booth": "31",
     "category": "Academia & Research",
     "visits": 640,
@@ -363,7 +362,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-25",
     "company": "SGSTS Indore",
-    "logo": "",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696138/22-sgsits-indore.jpg",
     "booth": "32",
     "category": "Academia & Research",
     "visits": 670,
@@ -375,7 +374,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-26",
     "company": "Samvit Logix",
-    "logo": "",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696180/31-sagar-group-of-institutions-sistec-bhopal.jpg",
     "booth": "33",
     "category": "ASIC & Verification",
     "visits": 450,
@@ -387,7 +386,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-27",
     "company": "Medicaps",
-    "logo": "",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696133/21-medicaps.jpg",
     "booth": "34",
     "category": "Academia & Research",
     "visits": 580,
@@ -399,7 +398,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-28",
     "company": "Lakshmishri PCB",
-    "logo": "",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696197/35-laxmishri-printed-circuit-boad.jpg",
     "booth": "35",
     "category": "PCB Design & Fabrication",
     "visits": 530,
@@ -411,7 +410,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-29",
     "company": "Mehtab Intl Agro Trade",
-    "logo": "",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696246/42-leadsoc-technologies.jpg",
     "booth": "36",
     "category": "AgriTech & Automation",
     "visits": 380,
@@ -423,7 +422,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-30",
     "company": "Prestige PIEMR / Soaring",
-    "logo": "",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696279/prestige-piemr.svg",
     "booth": "37",
     "category": "Academia & Research",
     "visits": 610,
@@ -435,7 +434,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-31",
     "company": "Acropolis Institute",
-    "logo": "",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696174/30-acropolis-institute-of-tecnology-and-resea.jpg",
     "booth": "38",
     "category": "Academia & Research",
     "visits": 630,
@@ -447,7 +446,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-32",
     "company": "SAGUNE University",
-    "logo": "",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696210/36-sage-university-indore.jpg",
     "booth": "39",
     "category": "Academia & Research",
     "visits": 590,
@@ -459,7 +458,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-33",
     "company": "IES University",
-    "logo": "",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696260/45-iet-university-bhopal.jpg",
     "booth": "40",
     "category": "Academia & Research",
     "visits": 510,
@@ -471,7 +470,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-34",
     "company": "Technisium Web Solutions",
-    "logo": "",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696284/technisum.png",
     "booth": "41",
     "category": "Cloud & Web Integration",
     "visits": 440,
@@ -483,7 +482,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-35",
     "company": "Oriental University",
-    "logo": "",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696260/45-iet-university-bhopal.jpg",
     "booth": "42",
     "category": "Academia & Research",
     "visits": 520,
@@ -495,7 +494,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-36",
     "company": "HTL Co India",
-    "logo": "",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696188/33-htl-co-india-pvt-ltd.jpg",
     "booth": "43, 44",
     "category": "Instrumentation & Fab Support",
     "visits": 570,
@@ -507,7 +506,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-37",
     "company": "Scientech",
-    "logo": "",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696250/43-daksh-instruments-pvt-ltd.jpg",
     "booth": "45, 46",
     "category": "Instrumentation & Test",
     "visits": 720,
@@ -519,7 +518,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-38",
     "company": "SVVV Indore",
-    "logo": "",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696096/13-svvv-indore.jpg",
     "booth": "47",
     "category": "Academia & Research",
     "visits": 580,
@@ -531,7 +530,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-39",
     "company": "Futurewiz",
-    "logo": "",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696106/15-vlsi-for-all-private-ltd.jpg",
     "booth": "48",
     "category": "Skill Development & EDA",
     "visits": 560,
@@ -543,7 +542,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-40",
     "company": "Truechip Solutions",
-    "logo": "",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696048/03-truesilicon.jpg",
     "booth": "49",
     "category": "Verification IP & EDA",
     "visits": 760,
@@ -567,7 +566,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-42",
     "company": "MPCST",
-    "logo": "",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696040/01-mpsedc.jpg",
     "booth": "52, 53",
     "category": "Government & Nodal",
     "visits": 650,
@@ -579,7 +578,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-43",
     "company": "Technical Education",
-    "logo": "",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696040/01-mpsedc.jpg",
     "booth": "54",
     "category": "Government & Nodal",
     "visits": 610,
@@ -591,7 +590,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-44",
     "company": "Higher Education",
-    "logo": "",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696040/01-mpsedc.jpg",
     "booth": "55",
     "category": "Government & Nodal",
     "visits": 590,
@@ -603,7 +602,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-45",
     "company": "Teradyne",
-    "logo": "",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696229/38-teradyne.jpg",
     "booth": "56",
     "category": "Automated Test Equipment",
     "visits": 840,
@@ -615,7 +614,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-46",
     "company": "Pisarv Innovations",
-    "logo": "",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696288/triveni.png",
     "booth": "57",
     "category": "IoT, Cloud & Robotics",
     "visits": 580,
@@ -639,7 +638,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-48",
     "company": "Indiesemic",
-    "logo": "",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696192/34-indiesemic-private-limited.jpg",
     "booth": "59",
     "category": "Semiconductor Design",
     "visits": 560,
@@ -651,7 +650,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-49",
     "company": "Shubham IOT Homes",
-    "logo": "",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696293/tulshree.png",
     "booth": "60, 61",
     "category": "IoT & Smart Devices",
     "visits": 520,
@@ -663,7 +662,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-50",
     "company": "CraftAI",
-    "logo": "",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696161/27-craftifai.jpg",
     "booth": "62",
     "category": "AI & Silicon Acceleration",
     "visits": 610,
@@ -675,7 +674,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-51",
     "company": "CSIR CEERI Pilani",
-    "logo": "",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696214/37-csir-ceeri-pilani.jpg",
     "booth": "63",
     "category": "Academia & Research",
     "visits": 690,
@@ -687,7 +686,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-52",
     "company": "MCTE Mhow",
-    "logo": "",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696077/09-mcte.jpg",
     "booth": "64, 65",
     "category": "Defense & Strategic Comms",
     "visits": 730,
@@ -699,7 +698,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-53",
     "company": "Paras Semi",
-    "logo": "",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696115/17-paras-semi.jpg",
     "booth": "66, 67",
     "category": "OSAT & Packaging",
     "visits": 780,
@@ -711,7 +710,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-54",
     "company": "NSDCS Lab, IIT Indore",
-    "logo": "",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696241/41-nsdcs-lab-iit-indore.jpg",
     "booth": "68, 69",
     "category": "Academia & Research",
     "visits": 650,
@@ -735,7 +734,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-56",
     "company": "SCL Mohali",
-    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792507139/SCL-logo.png",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696068/07-scl-mohali.jpg",
     "booth": "SCL Mohali Pavilion",
     "category": "Wafer Fabrication",
     "visits": 920,
@@ -747,7 +746,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-57",
     "company": "MPSEDC",
-    "logo": "",
+    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696040/01-mpsedc.jpg",
     "booth": "MPSEDC Pavilion",
     "category": "State Nodal Agency",
     "visits": 980,
@@ -756,7 +755,6 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
     "teamSize": 16,
     "status": "Active"
   }
-
 ];
 
 export const GENERATED_PRODUCTS: Product[] = [
@@ -767,7 +765,7 @@ export const GENERATED_PRODUCTS: Product[] = [
     "company": "MPSEDC",
     "category": "State Policy & Grants",
     "booth": "MPSEDC Pavilion",
-    "image": "/images/exhibitors/mpsedc.png",
+    "image": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696040/01-mpsedc.jpg",
     "views": 890,
     "enquiries": 68,
     "interestedVisitorsCount": 142,
@@ -798,7 +796,7 @@ export const GENERATED_PRODUCTS: Product[] = [
     "company": "MPSEDC",
     "category": "Infrastructure",
     "booth": "MPSEDC Pavilion",
-    "image": "/images/exhibitors/mpsedc.png",
+    "image": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696040/01-mpsedc.jpg",
     "views": 710,
     "enquiries": 45,
     "interestedVisitorsCount": 98,
@@ -829,7 +827,7 @@ export const GENERATED_PRODUCTS: Product[] = [
     "company": "Truechip Solutions",
     "category": "Verification IP & EDA",
     "booth": "49",
-    "image": "/images/exhibitors/truechip.png",
+    "image": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696048/03-truesilicon.jpg",
     "views": 840,
     "enquiries": 65,
     "interestedVisitorsCount": 138,
@@ -860,7 +858,7 @@ export const GENERATED_PRODUCTS: Product[] = [
     "company": "Truechip Solutions",
     "category": "Verification IP & EDA",
     "booth": "49",
-    "image": "/images/exhibitors/truechip.png",
+    "image": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696048/03-truesilicon.jpg",
     "views": 790,
     "enquiries": 58,
     "interestedVisitorsCount": 124,
@@ -891,7 +889,7 @@ export const GENERATED_PRODUCTS: Product[] = [
     "company": "Truechip Solutions",
     "category": "Verification IP & EDA",
     "booth": "49",
-    "image": "/images/exhibitors/truechip.png",
+    "image": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696048/03-truesilicon.jpg",
     "views": 720,
     "enquiries": 49,
     "interestedVisitorsCount": 112,
@@ -922,7 +920,7 @@ export const GENERATED_PRODUCTS: Product[] = [
     "company": "Truechip Solutions",
     "category": "Verification IP & EDA",
     "booth": "49",
-    "image": "/images/exhibitors/truechip.png",
+    "image": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696048/03-truesilicon.jpg",
     "views": 680,
     "enquiries": 44,
     "interestedVisitorsCount": 98,
@@ -953,7 +951,7 @@ export const GENERATED_PRODUCTS: Product[] = [
     "company": "Truechip Solutions",
     "category": "Verification IP & EDA",
     "booth": "49",
-    "image": "/images/exhibitors/truechip.png",
+    "image": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696048/03-truesilicon.jpg",
     "views": 650,
     "enquiries": 42,
     "interestedVisitorsCount": 92,
@@ -984,7 +982,7 @@ export const GENERATED_PRODUCTS: Product[] = [
     "company": "Truechip Solutions",
     "category": "Verification IP & EDA",
     "booth": "49",
-    "image": "/images/exhibitors/truechip.png",
+    "image": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696048/03-truesilicon.jpg",
     "views": 610,
     "enquiries": 38,
     "interestedVisitorsCount": 85,
@@ -1015,7 +1013,7 @@ export const GENERATED_PRODUCTS: Product[] = [
     "company": "Truechip Solutions",
     "category": "Verification IP & EDA",
     "booth": "49",
-    "image": "/images/exhibitors/truechip.png",
+    "image": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696048/03-truesilicon.jpg",
     "views": 590,
     "enquiries": 36,
     "interestedVisitorsCount": 78,
@@ -1046,7 +1044,7 @@ export const GENERATED_PRODUCTS: Product[] = [
     "company": "RRCAT",
     "category": "R&D & Computing",
     "booth": "6, 7",
-    "image": "/images/exhibitors/rrcat.png",
+    "image": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696166/28-rrcat.jpg",
     "views": 820,
     "enquiries": 74,
     "interestedVisitorsCount": 165,
@@ -1077,7 +1075,7 @@ export const GENERATED_PRODUCTS: Product[] = [
     "company": "SCL Mohali",
     "category": "Semiconductor Fabrication",
     "booth": "SCL Mohali Pavilion",
-    "image": "/images/exhibitors/scl.png",
+    "image": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696068/07-scl-mohali.jpg",
     "views": 930,
     "enquiries": 88,
     "interestedVisitorsCount": 190,
@@ -1108,7 +1106,7 @@ export const GENERATED_PRODUCTS: Product[] = [
     "company": "Analog Devices",
     "category": "Analog & Mixed-Signal ICs",
     "booth": "15-16",
-    "image": "/images/exhibitors/analogdevices.png",
+    "image": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696265/46-analog-devices.jpg",
     "views": 940,
     "enquiries": 92,
     "interestedVisitorsCount": 180,
@@ -1139,7 +1137,7 @@ export const GENERATED_PRODUCTS: Product[] = [
     "company": "Analog Devices",
     "category": "Analog & Mixed-Signal ICs",
     "booth": "15-16",
-    "image": "/images/exhibitors/analogdevices.png",
+    "image": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696265/46-analog-devices.jpg",
     "views": 810,
     "enquiries": 65,
     "interestedVisitorsCount": 130,
@@ -1170,7 +1168,7 @@ export const GENERATED_PRODUCTS: Product[] = [
     "company": "Teradyne",
     "category": "ATE & Testing Solutions",
     "booth": "24",
-    "image": "/images/exhibitors/teradyne.png",
+    "image": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696229/38-teradyne.jpg",
     "views": 790,
     "enquiries": 60,
     "interestedVisitorsCount": 140,
@@ -1201,7 +1199,7 @@ export const GENERATED_PRODUCTS: Product[] = [
     "company": "Indiesemic Private Limited",
     "category": "Fabless Semiconductor",
     "booth": "59",
-    "image": "/images/exhibitors/indiesemic.png",
+    "image": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696192/34-indiesemic-private-limited.jpg",
     "views": 660,
     "enquiries": 48,
     "interestedVisitorsCount": 115,
@@ -1232,7 +1230,7 @@ export const GENERATED_PRODUCTS: Product[] = [
     "company": "RackBank",
     "category": "Data Centers & Cloud",
     "booth": "11, 12",
-    "image": "/images/exhibitors/rackbank.png",
+    "image": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696082/10-rackbank-datacenters-pvt-ltd.jpg",
     "views": 740,
     "enquiries": 58,
     "interestedVisitorsCount": 125,
@@ -1263,7 +1261,7 @@ export const GENERATED_PRODUCTS: Product[] = [
     "company": "Futurewiz",
     "category": "Skill Development & EDA",
     "booth": "48",
-    "image": "/images/exhibitors/futurewiz.png",
+    "image": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696106/15-vlsi-for-all-private-ltd.jpg",
     "views": 630,
     "enquiries": 50,
     "interestedVisitorsCount": 112,

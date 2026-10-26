@@ -102,8 +102,55 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
 
     setStatus('verifying');
 
+    // 1. FAST-PATH: Instant verification for authorized delegates & registered attendees (< 200ms)
+    const matchedAttendee = INITIAL_ATTENDEES.find((a) => {
+      const aDigits = (a.mobile || '').replace(/\D/g, '');
+      return aDigits === num || (aDigits.length >= 10 && num.length >= 10 && (aDigits.endsWith(num) || num.endsWith(aDigits)));
+    });
+
+    if (matchedAttendee) {
+      resetUserState();
+      const detectedRole = (matchedAttendee.role as any) === 'organizer_staff'
+        ? 'organizer'
+        : (matchedAttendee.role as any) === 'exhibitor_staff'
+          ? 'exhibitor'
+          : 'delegate';
+
+      setRole(detectedRole);
+      const userProfile = {
+        ...matchedAttendee,
+        checkedIn: true,
+      };
+      setCurrentUser(userProfile);
+
+      // Persist auth session
+      const token = `mpss26-delegate-token-${matchedAttendee.id}`;
+      api.setSession(token, {
+        id: matchedAttendee.id,
+        name: matchedAttendee.name,
+        mobile: matchedAttendee.mobile || num,
+        email: matchedAttendee.email || '',
+        role: detectedRole === 'organizer' ? 'ROLE_ORGANIZER' : detectedRole === 'exhibitor' ? 'ROLE_EXHIBITOR' : 'ROLE_DELEGATE',
+        company: matchedAttendee.company,
+        designation: matchedAttendee.designation,
+        avatar: matchedAttendee.avatar,
+        ticketType: matchedAttendee.ticketType,
+        checkedIn: true,
+      });
+
+      setStatus('confirmed');
+      setTimeout(() => {
+        setHasAccessConfirmed(true);
+        onSuccess();
+      }, 200);
+
+      // Background notification to backend (non-blocking)
+      api.auth.login(trimmedEventId, num).catch(() => {});
+      return;
+    }
+
+    // 2. REMOTE FALLBACK: Query backend if not matched locally
     try {
-      // 1. Authenticate against backend
       const res = await api.auth.login(trimmedEventId, num);
       if (res && res.token && res.user) {
         resetUserState();
@@ -207,38 +254,12 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
         setTimeout(() => {
           setHasAccessConfirmed(true);
           onSuccess();
-        }, 350);
+        }, 200);
         return;
       }
     } catch (err: any) {
-      // Offline / Local Fallback for registered attendees
-      const matchedAttendee = INITIAL_ATTENDEES.find((a) => {
-        const aDigits = (a.mobile || '').replace(/\D/g, '');
-        return aDigits === num || (aDigits.length >= 10 && num.length >= 10 && (aDigits.endsWith(num) || num.endsWith(aDigits)));
-      });
-
-      if (matchedAttendee) {
-        resetUserState();
-        const fallbackRole = (matchedAttendee.role as any) === 'organizer_staff'
-          ? 'organizer'
-          : (matchedAttendee.role as any) === 'exhibitor_staff'
-            ? 'exhibitor'
-            : 'delegate';
-        setRole(fallbackRole);
-        setCurrentUser({
-          ...matchedAttendee,
-          checkedIn: true,
-        });
-        setStatus('confirmed');
-        setTimeout(() => {
-          setHasAccessConfirmed(true);
-          onSuccess();
-        }, 350);
-        return;
-      }
-
       setStatus('error');
-      setErrorMessage(err?.message || 'Login failed. Please verify your registered mobile number.');
+      setErrorMessage(err?.message || 'Login failed. Mobile number not registered for MPSS 2026.');
     }
   };
 

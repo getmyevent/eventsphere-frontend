@@ -249,10 +249,20 @@ class ApiClient {
           headers['Authorization'] = `Bearer ${token}`;
         }
 
-        const response = await fetch(url, {
-          ...options,
-          headers,
-        });
+        const controller = new AbortController();
+        const timeoutMs = 4000;
+        const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+        let response: Response;
+        try {
+          response = await fetch(url, {
+            ...options,
+            headers,
+            signal: options.signal || controller.signal,
+          });
+        } finally {
+          clearTimeout(timeoutId);
+        }
 
         if (response.status === 401) {
           // Never blow away a session or clear localStorage on background read requests (e.g. attendees, sessions, connections)
@@ -344,10 +354,20 @@ class ApiClient {
       headers['Authorization'] = `Bearer ${token}`;
     }
 
-    const response = await fetch(url, {
-      ...options,
-      headers,
-    });
+    const controller = new AbortController();
+    const timeoutMs = 4000;
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+    let response: Response;
+    try {
+      response = await fetch(url, {
+        ...options,
+        headers,
+        signal: options.signal || controller.signal,
+      });
+    } finally {
+      clearTimeout(timeoutId);
+    }
 
     if (response.status === 401) {
       // Never blow away a session or clear localStorage on background read requests (e.g. attendees, sessions, connections)
@@ -512,35 +532,6 @@ class ApiClient {
           };
           const fallbackRes: AuthResponse = {
             token: 'mpss26-delegate-token-pratosh-bansal',
-            tokenType: 'Bearer',
-            expiresIn: 86400,
-            user: delegateUser,
-          };
-          this.setToken(fallbackRes.token);
-          if (typeof window !== 'undefined') {
-            try {
-              localStorage.setItem(USER_KEY, JSON.stringify(delegateUser));
-            } catch {
-              // ignore
-            }
-          }
-          return fallbackRes;
-        }
-        if (cleanDigits === '8463865310' || mobile === '8463865310') {
-          const delegateUser: ApiUser = {
-            id: 'att-pushpit-upadhyay',
-            name: 'Pushpit Upadhyay',
-            mobile: '+91 8463865310',
-            email: 'pushpitupadhya@getmyevent.in',
-            role: 'ROLE_DELEGATE',
-            company: 'GetMyEvent',
-            designation: 'Co-Founder',
-            avatar: '/images/founders/pushpit-upadhyay.jpg',
-            ticketType: 'Delegate',
-            checkedIn: true,
-          };
-          const fallbackRes: AuthResponse = {
-            token: 'mpss26-delegate-token-pushpit',
             tokenType: 'Bearer',
             expiresIn: 86400,
             user: delegateUser,
