@@ -645,21 +645,13 @@ export const DelegateHome: React.FC = () => {
         </div>
       </div>
 
-      {/* Live now / Up next / Concluded Section */}
+      {/* Live now / Up next / Past Sessions Section */}
       {isEventOver ? (
         <div className="space-y-1.5">
           <div className="flex items-center justify-between px-0.5">
-            <div className="flex items-center gap-2">
-              <span className="relative flex h-2.5 w-2.5">
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-600"></span>
-              </span>
-              <h3 className="text-[16px] font-bold text-[#111827] tracking-tight flex items-center gap-1.5">
-                Summit Concluded
-                <span className="text-[9.5px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full uppercase tracking-wider">
-                  COMPLETED
-                </span>
-              </h3>
-            </div>
+            <h3 className="text-[16px] font-bold text-[#111827] tracking-tight">
+              Past Sessions
+            </h3>
             <button
               onClick={() => {
                 router.push('/delegate/agenda/allsessions');
@@ -675,32 +667,30 @@ export const DelegateHome: React.FC = () => {
             onClick={() => {
               router.push('/delegate/agenda/allsessions');
             }}
-            className="bg-white rounded-[16px] p-3.5 border border-[#E5E7EB] shadow-xs cursor-pointer hover:border-gray-300 transition-all relative select-none"
+            className="bg-white rounded-[16px] p-3 border border-[#E5E7EB] shadow-xs cursor-pointer hover:border-gray-300 transition-all select-none group active:scale-[0.99]"
           >
-            <div className="flex items-center justify-between mb-1.5">
-              <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/80 px-2 py-0.5 rounded-md">
-                23–24 Oct 2026 · All Sessions Completed
+            <div className="flex items-center justify-between text-[11px] mb-1.5">
+              <span className="text-[#6B7280] font-medium">23–24 Oct 2026 · Grand Hall & Hall A/B</span>
+              <span className="text-[9.5px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/80 px-2 py-0.5 rounded-full uppercase tracking-wider">
+                Completed
               </span>
-              <span className="text-[11px] text-[#6B6B6B] font-medium">Grand Hall & Hall A/B</span>
             </div>
 
-            <h4 className="text-[15px] font-bold text-[#111827] leading-snug">
-              Inauguration to Valedictory Sessions Successfully Concluded
-            </h4>
-            <p className="text-[11.5px] text-[#6B7280] mt-1 leading-relaxed">
-              Thank you for participating in MPSS 2026. All keynote tracks, panel discussions, and partner exhibitions have concluded. You can explore all session details, key takeaways, and speaker profiles anytime.
-            </p>
+            <div className="flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <h4 className="text-[13.5px] font-bold text-[#111827] tracking-tight group-hover:text-[#DC2626] transition-colors leading-snug">
+                  Inauguration to Valedictory Sessions
+                </h4>
+                <p className="text-[11px] text-[#6B7280] mt-0.5 truncate">
+                  Explore keynote tracks, panel discussions & archives
+                </p>
+              </div>
 
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                router.push('/delegate/agenda/allsessions');
-              }}
-              className="w-full mt-2.5 py-2 bg-[#FAF7F2] hover:bg-[#F2ECE3] text-[#111827] rounded-xl text-[12px] font-bold flex items-center justify-center gap-1 border border-[#EBE7DF] transition-colors"
-            >
-              <span>Explore session archives</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
+              <div className="flex items-center gap-1 text-[11.5px] font-bold text-[#111827] shrink-0 bg-[#FAF7F2] group-hover:bg-[#F2ECE3] px-2.5 py-1.5 rounded-xl border border-[#EBE7DF] transition-colors">
+                <span>Archives</span>
+                <ArrowRight className="w-3.5 h-3.5 text-[#DC2626]" />
+              </div>
+            </div>
           </div>
         </div>
       ) : currentSession && (
