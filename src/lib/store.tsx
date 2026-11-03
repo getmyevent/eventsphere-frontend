@@ -285,7 +285,6 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         } catch {
           // ignore
         }
-<<<<<<< HEAD
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) {
           const parsed = JSON.parse(saved);
@@ -295,30 +294,6 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
               setCurrentUser(CURRENT_USER);
             } else {
               setCurrentUser((prev) => ({ ...prev, ...parsed.currentUser }));
-=======
-      }
-
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed.currentUser && parsed.currentUser.id === authUser.id) {
-          const u = { ...EMPTY_USER, ...parsed.currentUser };
-          if (isPlaceholderDesignation(u.designation)) {
-            u.designation = '';
-          }
-          if (isPlaceholderCompany(u.company)) {
-            u.company = '';
-          }
-          if (u.mobile === 'Not listed') {
-            u.mobile = '';
-          }
-          if (u.avatar && (u.avatar.includes('unsplash.com') || u.avatar.includes('pravatar.cc') || u.avatar.includes('photo-1507003211169') || u.avatar.includes('pratosh-bansal.jpg'))) {
-            u.avatar = '';
-          }
-          if (u.email) {
-            const storedImg = getStoredProfileImage(u.email);
-            if (storedImg) {
-              u.avatar = storedImg;
->>>>>>> 2a04478ca1b0c492a9584bc66fe61f50f0cea145
             }
           }
         }

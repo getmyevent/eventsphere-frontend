@@ -381,13 +381,8 @@ export const DelegateHome: React.FC = () => {
                 className="w-12 h-12 rounded-full border-2 border-white object-cover shadow-sm"
               />
             ) : (
-<<<<<<< HEAD
               <div className="w-12 h-12 rounded-full bg-[#F6F4F0] border border-[#E5E7EB] text-[#6B7280] flex items-center justify-center shadow-xs">
                 <User className="w-6 h-6" />
-=======
-              <div className="w-12 h-12 rounded-full bg-[#181818] text-white flex items-center justify-center font-bold text-base border-2 border-white shadow-sm">
-                {currentUser.name ? currentUser.name.split(' ').filter(Boolean).map((n) => n[0]).join('').slice(0, 2).toUpperCase() : '?'}
->>>>>>> 2a04478ca1b0c492a9584bc66fe61f50f0cea145
               </div>
             )}
             <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-[#22C55E] border-2 border-white rounded-full shadow-xs" />
@@ -879,24 +874,15 @@ export const DelegateHome: React.FC = () => {
         </div>
       </div>
 
-<<<<<<< HEAD
       {/* People You Should Meet Section */}
       {displaySpeakers.length > 0 && (
-=======
-      {/* People you should meet Section */}
-      {recommendedPeople.length > 0 && (
->>>>>>> 2a04478ca1b0c492a9584bc66fe61f50f0cea145
         <div className="space-y-2 pt-1">
           <div className="flex items-center justify-between px-0.5">
             <h3
               onClick={() => router.push('/delegate/people')}
               className="text-[17px] font-bold text-[#111827] tracking-tight cursor-pointer hover:text-[#B51F32] transition-colors"
             >
-<<<<<<< HEAD
               People You Should Meet
-=======
-              People you should meet
->>>>>>> 2a04478ca1b0c492a9584bc66fe61f50f0cea145
             </h3>
             <button
               onClick={() => router.push('/delegate/people')}
