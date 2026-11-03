@@ -71,6 +71,7 @@ export function generateAttendees(count: number): Person[] {
 }
 
 export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
+
   {
     "id": "exh-1",
     "company": "DigiComm Semi",
@@ -158,7 +159,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-8",
     "company": "Impute Inc. Japan",
-    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696110/16-siliciom-semiconductors.jpg",
+    "logo": "",
     "booth": "13, 14",
     "category": "AI & Edge Systems",
     "visits": 690,
@@ -266,7 +267,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-17",
     "company": "DAVV Incubation Center",
-    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696255/44-iet-davv-indore.jpg",
+    "logo": "",
     "booth": "24",
     "category": "Incubation & Startups",
     "visits": 510,
@@ -338,7 +339,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-23",
     "company": "Techno Support Core Inn",
-    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696092/12-spintronics-ai.jpg",
+    "logo": "",
     "booth": "30",
     "category": "Prototyping & Lab Support",
     "visits": 420,
@@ -374,11 +375,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-26",
     "company": "Samvit Logix",
-<<<<<<< HEAD
     "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696246/42-leadsoc-technologies.jpg",
-=======
-    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696180/31-sagar-group-of-institutions-sistec-bhopal.jpg",
->>>>>>> 2a04478ca1b0c492a9584bc66fe61f50f0cea145
     "booth": "33",
     "category": "ASIC & Verification",
     "visits": 450,
@@ -414,7 +411,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-29",
     "company": "Mehtab Intl Agro Trade",
-    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696246/42-leadsoc-technologies.jpg",
+    "logo": "",
     "booth": "36",
     "category": "AgriTech & Automation",
     "visits": 380,
@@ -486,7 +483,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-35",
     "company": "Oriental University",
-    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696260/45-iet-university-bhopal.jpg",
+    "logo": "",
     "booth": "42",
     "category": "Academia & Research",
     "visits": 520,
@@ -510,7 +507,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-37",
     "company": "Scientech",
-    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696250/43-daksh-instruments-pvt-ltd.jpg",
+    "logo": "",
     "booth": "45, 46",
     "category": "Instrumentation & Test",
     "visits": 720,
@@ -534,7 +531,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-39",
     "company": "Futurewiz",
-    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696106/15-vlsi-for-all-private-ltd.jpg",
+    "logo": "",
     "booth": "48",
     "category": "Skill Development & EDA",
     "visits": 560,
@@ -570,7 +567,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-42",
     "company": "MPCST",
-    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696040/01-mpsedc.jpg",
+    "logo": "",
     "booth": "52, 53",
     "category": "Government & Nodal",
     "visits": 650,
@@ -582,11 +579,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-43",
     "company": "Technical Education",
-<<<<<<< HEAD
     "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696152/25-nielit.jpg",
-=======
-    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696040/01-mpsedc.jpg",
->>>>>>> 2a04478ca1b0c492a9584bc66fe61f50f0cea145
     "booth": "54",
     "category": "Government & Nodal",
     "visits": 610,
@@ -598,7 +591,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-44",
     "company": "Higher Education",
-    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696040/01-mpsedc.jpg",
+    "logo": "",
     "booth": "55",
     "category": "Government & Nodal",
     "visits": 590,
@@ -622,7 +615,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-46",
     "company": "Pisarv Innovations",
-    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696288/triveni.png",
+    "logo": "",
     "booth": "57",
     "category": "IoT, Cloud & Robotics",
     "visits": 580,
@@ -658,7 +651,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
   {
     "id": "exh-49",
     "company": "Shubham IOT Homes",
-    "logo": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696293/tulshree.png",
+    "logo": "",
     "booth": "60, 61",
     "category": "IoT & Smart Devices",
     "visits": 520,
@@ -763,6 +756,7 @@ export const GENERATED_EXHIBITORS: ExhibitorStats[] = [
     "teamSize": 16,
     "status": "Active"
   }
+
 ];
 
 export const GENERATED_PRODUCTS: Product[] = [
@@ -1269,11 +1263,7 @@ export const GENERATED_PRODUCTS: Product[] = [
     "company": "Futurewiz",
     "category": "Skill Development & EDA",
     "booth": "48",
-<<<<<<< HEAD
     "image": "",
-=======
-    "image": "https://res.cloudinary.com/vc0wtqtw/image/upload/v1792696106/15-vlsi-for-all-private-ltd.jpg",
->>>>>>> 2a04478ca1b0c492a9584bc66fe61f50f0cea145
     "views": 630,
     "enquiries": 50,
     "interestedVisitorsCount": 112,
