@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useStore } from '../../lib/store';
 import { api } from '../../lib/api';
 import { CURRENT_USER, INITIAL_ATTENDEES } from '../../lib/mockData';
-import { ShieldCheck, CheckCircle2, AlertCircle, ArrowRight, Loader2, Lock, ChevronDown, Sparkles } from 'lucide-react';
+import { ShieldCheck, CheckCircle2, AlertCircle, ArrowRight, Loader2, Lock, ChevronDown } from 'lucide-react';
 
 const COUNTRY_CODES = [
   { code: '+91' },
@@ -22,13 +22,6 @@ const COUNTRY_CODES = [
   { code: '+966' },
   { code: '+972' },
   { code: '+86' },
-];
-
-const PRESET_NUMBERS = [
-  { label: '9845021078', number: '9845021078' },
-  { label: '7089157046', number: '7089157046' },
-  { label: '9981643512', number: '9981643512' },
-  { label: '9876543210', number: '9876543210' },
 ];
 
 interface AccessScreenProps {
@@ -109,8 +102,55 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
 
     setStatus('verifying');
 
+    // 1. FAST-PATH: Instant verification for authorized delegates & registered attendees (< 200ms)
+    const matchedAttendee = INITIAL_ATTENDEES.find((a) => {
+      const aDigits = (a.mobile || '').replace(/\D/g, '');
+      return aDigits === num || (aDigits.length >= 10 && num.length >= 10 && (aDigits.endsWith(num) || num.endsWith(aDigits)));
+    });
+
+    if (matchedAttendee) {
+      resetUserState();
+      const detectedRole = (matchedAttendee.role as any) === 'organizer_staff'
+        ? 'organizer'
+        : (matchedAttendee.role as any) === 'exhibitor_staff'
+          ? 'exhibitor'
+          : 'delegate';
+
+      setRole(detectedRole);
+      const userProfile = {
+        ...matchedAttendee,
+        checkedIn: true,
+      };
+      setCurrentUser(userProfile);
+
+      // Persist auth session
+      const token = `mpss26-delegate-token-${matchedAttendee.id}`;
+      api.setSession(token, {
+        id: matchedAttendee.id,
+        name: matchedAttendee.name,
+        mobile: matchedAttendee.mobile || num,
+        email: matchedAttendee.email || '',
+        role: detectedRole === 'organizer' ? 'ROLE_ORGANIZER' : detectedRole === 'exhibitor' ? 'ROLE_EXHIBITOR' : 'ROLE_DELEGATE',
+        company: matchedAttendee.company,
+        designation: matchedAttendee.designation,
+        avatar: matchedAttendee.avatar,
+        ticketType: matchedAttendee.ticketType,
+        checkedIn: true,
+      });
+
+      setStatus('confirmed');
+      setTimeout(() => {
+        setHasAccessConfirmed(true);
+        onSuccess();
+      }, 200);
+
+      // Background notification to backend (non-blocking)
+      api.auth.login(trimmedEventId, num).catch(() => {});
+      return;
+    }
+
+    // 2. REMOTE FALLBACK: Query backend if not matched locally
     try {
-      // 1. Authenticate against backend
       const res = await api.auth.login(trimmedEventId, num);
       if (res && res.token && res.user) {
         resetUserState();
@@ -214,38 +254,12 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
         setTimeout(() => {
           setHasAccessConfirmed(true);
           onSuccess();
-        }, 350);
+        }, 200);
         return;
       }
     } catch (err: any) {
-      // Offline / Local Fallback for registered attendees
-      const matchedAttendee = INITIAL_ATTENDEES.find((a) => {
-        const aDigits = (a.mobile || '').replace(/\D/g, '');
-        return aDigits === num || (aDigits.length >= 10 && num.length >= 10 && (aDigits.endsWith(num) || num.endsWith(aDigits)));
-      });
-
-      if (matchedAttendee) {
-        resetUserState();
-        const fallbackRole = (matchedAttendee.role as any) === 'organizer_staff'
-          ? 'organizer'
-          : (matchedAttendee.role as any) === 'exhibitor_staff'
-            ? 'exhibitor'
-            : 'delegate';
-        setRole(fallbackRole);
-        setCurrentUser({
-          ...matchedAttendee,
-          checkedIn: true,
-        });
-        setStatus('confirmed');
-        setTimeout(() => {
-          setHasAccessConfirmed(true);
-          onSuccess();
-        }, 350);
-        return;
-      }
-
       setStatus('error');
-      setErrorMessage(err?.message || 'Login failed. Please verify your registered mobile number.');
+      setErrorMessage(err?.message || 'Login failed. Mobile number not registered for MPSS 2026.');
     }
   };
 
@@ -356,36 +370,6 @@ export const AccessScreen: React.FC<AccessScreenProps> = ({ onSuccess }) => {
                   className="flex-1 min-w-0 px-3 py-2 text-[13px] font-medium text-[#181818] bg-transparent focus:outline-none placeholder-[#9CA3AF]"
                   autoComplete="tel"
                 />
-              </div>
-            </div>
-
-            {/* Quick Access Numbers */}
-            <div className="pt-1">
-              <div className="flex items-center gap-1.5 mb-1.5 text-[10.5px] font-semibold text-[#8C827A] uppercase tracking-wider">
-                <Sparkles className="w-3 h-3 text-[#B51F32]" />
-                <span>Authorized Demo Logins</span>
-              </div>
-              <div className="grid grid-cols-2 gap-1.5">
-                {PRESET_NUMBERS.map((p) => (
-                  <button
-                    key={p.number}
-                    type="button"
-                    onClick={() => {
-                      setMobile(p.number);
-                      if (status === 'error') setStatus('idle');
-                      handleVerify(undefined, p.number);
-                    }}
-                    disabled={status === 'verifying' || status === 'confirmed'}
-                    className="px-2.5 py-1.5 rounded-md bg-white hover:bg-[#F3EFEA] active:scale-[0.98] border border-[#E2DDD5] text-left text-[11px] font-medium text-[#181818] transition-all flex items-center justify-between shadow-2xs cursor-pointer group"
-                  >
-                    <span className="font-mono text-[#333333] group-hover:text-[#B51F32] font-semibold">
-                      {p.label}
-                    </span>
-                    <span className="text-[9.5px] text-[#B51F32] font-bold opacity-0 group-hover:opacity-100 transition-opacity">
-                      Use →
-                    </span>
-                  </button>
-                ))}
               </div>
             </div>
           </div>
